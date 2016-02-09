@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-sm-12 text-right">
+        <div class="btn-group">
+            <a
+                ng-repeat="num in [5,10,25,50]"
+                class="btn btn-default btn-xs" 
+                ng-class="{ 'active' : request.arguments.limit == num }" 
+                ng-click="globalParams.redirect(request.url, {'offset':0,'limit':num,'type':request.arguments.filter.type,'class':request.arguments.filter.class})"
+               >{{ num }}</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <ul class="pagination">
+            <li
+                ng-repeat="item in resource.pagination"
+                class="{{ item.class }}"
+                ><a ng-click="alert(request.url); globalParams.redirect(request.url, {'offset': item.name * request.arguments.limit,'limit': request.arguments.limit,'type':request.arguments.filter.type,'class':request.arguments.filter.class})">{{ item.name +1 }}</a></li>
+        </ul>
+    </div>
+</div>

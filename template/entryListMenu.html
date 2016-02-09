@@ -1,0 +1,31 @@
+<div class="controls list-functions">
+    <div class="functions">
+        <div class="row functions">
+            <div class="col-xs-6">
+                <a ng-show="routeParams.id !== undefined" class="btn btn-default" href="/entry/list"><i class="fa fa-reply"></i> Tillbaka</a>                
+                <a ng-show="globalParams.get('user').sa && routeParams.id == undefined" class="btn btn-default" href="/registry/list"><i class="fa fa-reply"></i> Tillbaka</a>
+            </div>
+            <div class="col-xs-6 text-right">
+                <a
+                    ng-show="!user.registry"
+                    class="btn btn-default"
+                    href="/entry/-1/edit"><i class="fa fa-pencil"></i> Skapa
+                </a>
+            </div>
+        </div>
+        <div class="row" ng-show="types.items.length > 0" ng-if="routeParams.id == undefined">
+            <div class="col-xs-12">
+                <div class="btn-group">
+                    <a
+                        ng-repeat="item in types.items"
+                        ng-if="item.id != '1'"
+                        class="btn btn-xs btn-default"
+                        ng-class="{'active' : request.arguments.filter.type == item.id }"
+                        ng-click="globalParams.redirect('/entry/list', {'offset':0,'limit':50,'type':item.id,'class':item.class})"
+                        > {{ item.name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+<div ng-include="'/template/topbar.html'"></div>
+<div ng-include="'/template/registryListMenu.html'"></div>
+<div class="row mainList-ct">
+    <div class="col-sm-12">
+        <table class="mainList">
+            <tr ng-repeat="item in resource">
+                <td><a href="/registry/{{item.id}}/edit">{{item.name}}</a></td>
+                <td>
+                    <a href="/registry/{{item.id}}/delete" ng-disabled="1" onclick="confirm('Radera?') ? return true : return false;" class="btn btn-default btn-sm"><i class="fa fa-times fa-lg"></i></a>
+                    <a ng-click="goto(item.id)" class="btn btn-default btn-sm"><i class="fa fa-sign-in"></i></a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="alert alert-info" ng-show="resource == 0">
+    Inga poster.
+</div>
+<div ng-include="'/template/pagination.html'"></div>

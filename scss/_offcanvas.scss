@@ -1,0 +1,11 @@
+@media (max-width:767px)
+{
+  .row-offcanvas { margin-top:6rem; position:relative; @include transition(all .25s ease-out); }
+  .row-offcanvas-right { right: 0; }
+  .row-offcanvas-left { left: 0; }
+  .row-offcanvas-right .sidebar-offcanvas.col-xs-#{$offcanvas-width} { right:-$offcanvas-width * 8.3333%; }
+  .row-offcanvas-left .sidebar-offcanvas.col-xs-#{$offcanvas-width} { left:-$offcanvas-width * 8.3333%; }
+  .row-offcanvas-right.col-xs-#{$offcanvas-width}.active { right:$offcanvas-width * 8.3333%; }
+  .row-offcanvas-left.col-xs-#{$offcanvas-width}.active { left:$offcanvas-width * 8.3333%; }
+  .sidebar-offcanvas { position:absolute; top:0; width:$offcanvas-width * 8.3333%; }
+}

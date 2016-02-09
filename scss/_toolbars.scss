@@ -1,0 +1,28 @@
+.toolbar-top {
+    background:#efefef;
+    min-height:5rem;
+    box-shadow:0 0 2px rgba(0,0,0,0.2);
+    > .container-fluid {
+        padding:0 1.5rem;
+        > .row > div:first-child {
+            position:relative;
+            min-height:5rem;
+            > * {
+                position:absolute;
+                top:50%;
+                @include transform(translate3d(0,-50%,0));
+            }
+        }
+        > .row > div:last-child {
+            position:relative;
+            min-height:5rem;
+            > * {
+                position:absolute;
+                top:50%;
+                right:1.5rem;
+                width:100%;
+                @include transform(translate3d(0,-50%,0));
+            }
+        }        
+    }
+}

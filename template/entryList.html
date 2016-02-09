@@ -1,0 +1,25 @@
+<!-- pre style="position:absolute; left:10px; top:10px; width:400px; z-index:10;">{{ resource.length }}</pre -->
+<div ng-include="'/template/topbar.html'"></div>
+<div ng-include="'/template/entryListMenu.html'"></div>
+<div class="row mainList-ct">
+    <div class="col-sm-12">
+        <table ng-show="1" class="mainList">
+            <tr ng-repeat="(key, item) in resource">
+                <td>
+                    <i ng-show="item.class == 'ORGANIZATION'" class="fa fa-cubes"></i>
+                    <i ng-show="item.class == 'PERSON'" class="fa fa-user"></i>
+                    {{ item.name }}
+                </td>
+                <td>
+                    <a class="btn btn-default" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>
+                    <a class="btn btn-default" href="/entry/{{ item.id }}/edit"><i class="fa fa-pencil"></i></a>
+                    <a ng-show="item.class == 'ORGANIZATION'" class="btn btn-default" href="/entry/list/{{ item.id }}"><i class="fa fa-sign-in"></i></a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div ng-include="'/template/pagination.html'"></div>
+<div class="alert alert-info" ng-show="resource.length == 0">
+    Inga poster.
+</div>

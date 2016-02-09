@@ -1,0 +1,21 @@
+/* angular-ui desktop compatibility */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+/* remove chrome resize x */
+textarea { resize:vertical; }
+
+.modal-header h3 { margin:0; }
+.alert:last-child { margin-bottom:0; }
+
+/* general mixins */
+@mixin transition($value) {
+    -webkit-transition:$value;
+    -o-transition:$value;
+    transition:$value;
+}
+
+@mixin transform($value) {
+    -webkit-transform:$value;
+    -o-transform:$value;
+    transform:$value;
+}
