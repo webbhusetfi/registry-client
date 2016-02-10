@@ -380,7 +380,6 @@ var regApp = angular
                     $http
                         .post(globalParams.static.apiurl, deleteQuery)
                         .then(function(response) {
-                            $log.log(response);
                             $route.reload();
                         })
                         .catch(function(response) {
@@ -484,7 +483,7 @@ var regApp = angular
                 $location.path('/user/login');
             });
     })
-    .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams) {
+    .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
         
@@ -504,72 +503,9 @@ var regApp = angular
             });
             $scope.entry.membership = newObject;
         }
-        
-        // defaults
-        $http.post(globalParams.static.apiurl,
-        {
-            "entryTypes":{
-                "service":"type/search",
-                "arguments":{
-                    "filter": {
-                        "registry": Number(globalParams.get('user').registry)
-                    }
-                }
-            },
-            "statusTypes":{
-                "service":"status/search",
-                "arguments":{
-                    "filter": {
-                        "registry": Number(globalParams.get('user').registry)
-                    }
-                }
-            },
-            "connectionType":{
-                "service":"connectionType/search",
-                "arguments":{
-                    "filter": {
-                        "registry": Number(globalParams.get('user').registry)
-                    }
-                }
-            },
-            "organizations":{
-                "service":"entry/search",
-                "arguments":{
-                    "filter": {
-                        "registry": Number(globalParams.get('user').registry),
-                        "class":"ORGANIZATION",
-                        "type":[3,1]
-                    },
-                    "order": {
-                        "name":"asc"
-                    }
-                }
-            }
-        })
-        .then(function(response) {
-            $scope.entryTypes = {}
-            angular.forEach(response.data.entryTypes.data.items, function(value, key) {
-                $scope.entryTypes[value.id] = value;
-            });
-            
-            $scope.connectionTypes = {};
-            angular.forEach(response.data.connectionType.data.items, function(values, key) {
-                $scope.connectionTypes[values.childType] = values;
-            });
-            
-            $scope.statusTypes = response.data.statusTypes.data.items;
-            $scope.organizations = response.data.organizations.data.items;
-            
-            $scope.$watch('entry.type', function() {
-                $scope.entry.class = $scope.entryTypes[$scope.entry.type].class;
-            });
-        })
-        .catch(function(response) {
-            $location.path('/user/login');
-        });
 
         $scope.addMembership = function() {
-            $scope.entry.membership[Object.keys($scope.entry.membership).length] = {
+            $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
                     "organization": "-",
                     "status": "1",
                     "from": $scope.today,
@@ -580,101 +516,94 @@ var regApp = angular
         }
         
         $scope.addContactsheet = function() {
-            $scope.entry.contactsheet[Object.keys($scope.entry.contactsheet).length] = {"country":"Finland"}
-            $scope.meta.contactActive = Object.keys($scope.entry.contactsheet).length - 1;
+            $scope.entry.address[Object.keys($scope.entry.address).length] = {"country":"Finland"}
+            $scope.meta.addressActive = Object.keys($scope.entry.address).length - 1;
         }
         
         $scope.init = function() {
             if($routeParams.id == '-1')
             {
-                $scope.entry = {
-                    "type": "3",
-                    "class": "ORGANIZATION",
-                    "gender": "",
-                    "membership": {},
-                    "contactsheet": {}
-                };
+                dbHandler
+                    .getEntryTypes()
+                    .getStatusTypes()
+                    .getConnectionTypes()
+                    .getOrganizations()
+                    .runQuery()
+                    .then(function(response) {
+                        $scope.entryTypes = response.entryTypes;
+                        $scope.statusTypes = response.statusTypes;
+                        $scope.connectionType = response.connectionType;
+                        $scope.organizations = response.organizations;
+                        
+                        $scope.entry = {
+                            "type": "3",
+                            "class": "ORGANIZATION",
+                            "gender": "",
+                            "connection": {},
+                            "address": {}
+                        };
 
-                $scope.meta = {
-                    "contactActive": "0",
-                    "contactsheet": {},
-                    "birthYear": $scope.today
-                }
-
-                $scope.addMembership();
-                $scope.addContactsheet();
+                        $scope.meta = {
+                            "addressActive": "0",
+                            "address": {},
+                            "birthYear": $scope.today
+                        }
+                        
+                        $scope.$watch('entry.type', function() {
+                            $scope.entry.class = $scope.entryTypes[$scope.entry.type].class;
+                        });
+                        
+                        $scope.addMembership();
+                        $scope.addContactsheet();
+                    });
             }else{
-                $http.post(globalParams.static.apiurl,
-                {
-                    "entry": {
-                        "service":"entry/read",
-                        "arguments": {
-                            "id": $routeParams.id
-                        }
-                    },
-                    "membership": {
-                        "service":"connection/search",
-                        "arguments": {
-                            "filter": {
-                                "childEntry": $routeParams.id
+                dbHandler
+                    .getEntryTypes()
+                    .getStatusTypes()
+                    .getConnectionTypes()
+                    .getOrganizations()
+                    .getFullEntry($routeParams.id)
+                    .runQuery()
+                    .then(function(response) {
+                        $scope.entryTypes = response.entryTypes;
+                        $scope.statusTypes = response.statusTypes;
+                        $scope.connectionType = response.connectionType;
+                        $scope.organizations = response.organizations;
+                        $scope.entry = response.fullEntry;
+                        
+                        $scope.meta = {};
+                        $scope.setCalTime = function(format, date, target) {
+                            switch(format)
+                            {
+                                case 'YYYY':
+                                    // virtualize ?
+                                    $scope.entry.birthYear = date.getFullYear();
+                                break;
                             }
                         }
-                    },
-                    "address": {
-                        "service":"address/search",
-                        "arguments": {
-                            "filter": {
-                                "entry": $routeParams.id
-                            }
-                        }
-                    }
-                }).then(function(response) {
-                    $scope.entry = response.data.entry.data.item;
-                    $scope.meta = {};
-                    $scope.setCalTime = function(format, date, target) {
-                        switch(format)
+                        if($scope.entry.class == 'PERSON')
                         {
-                            case 'YYYY':
-                                // virtualize ?
-                                $scope.entry.birthYear = date.getFullYear();
-                            break;
+                            $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
                         }
-                    }
-                    if($scope.entry.class == 'PERSON')
-                    {
-                        $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
-                    }
-
-                    if(response.data.address.data.foundCount > 0)
-                    {
-                        $scope.contact = response.data.address.data.items;
-                        $scope.entry.contactsheet = {};
-                        $scope.meta.contactActive = 0;
-                        angular.forEach(response.data.address.data.items, function(value, key) {
-                            $scope.entry.contactsheet[key] = value;
+                        $scope.meta.addressActive = 0;
+                        
+                        angular.forEach($scope.entry.address, function(value, key) {
                             if(value.country == null)
                             {
-                                $scope.entry.contactsheet[key].country = 'Finland';
+                                $scope.entry.address[key].country = 'Finland';
                             }
                         });
-                    }
-                    
-                    if(response.data.membership.data.foundCount > 0)
-                    {
-                        $scope.entry.membership = {};
-                        angular.forEach(response.data.membership.data.items, function(value, key) {
-                            $scope.entry.membership[key] = {
+                        
+                        angular.forEach($scope.entry.connection, function(value, key) {
+                            $scope.entry.connection[key] = {
                                 "id" : value.id,
                                 "organization" : String(value.parentEntry.id),
-                                "status" : String(value.status),
+                                "status" : String(value.status.id),
                                 "from" : value.start ? new Date(value.start) : null,
                                 "to" : value.end ? new Date(value.end) : null
                             }
                         })
-                    }
-                }).catch(function(response) {
-                    $scope.response = response;
-                })
+                });
             }
             
             $scope.submit = function() {
@@ -709,7 +638,7 @@ var regApp = angular
                             var entryId = $scope.entry.id;
 
                         var membership = {};
-                        angular.forEach($scope.entry.membership, function(values, key) {
+                        angular.forEach($scope.entry.connection, function(values, key) {
                             if(values.organization !== '-') {
                                 membership['membership' + key] = {};
                                 membership['membership' + key].arguments = {
@@ -720,7 +649,7 @@ var regApp = angular
                                     "endNotes" : values.endNotes,
                                     "status" : Number(values.status),
                                     "parentEntry": values.organization,
-                                    "connectionType": $scope.connectionTypes[$scope.entry.type].id
+                                    "connectionType": $scope.connectionType[$scope.entry.type].id
                                 }
                             }
 
@@ -734,10 +663,10 @@ var regApp = angular
                             }
                         });
 
-                        var contactsheet = {}
-                        angular.forEach($scope.entry.contactsheet, function(values, key) {
-                            contactsheet['contactsheet' + key] = {};
-                            contactsheet['contactsheet' + key].arguments = {
+                        var address = {}
+                        angular.forEach($scope.entry.address, function(values, key) {
+                            address['contactsheet' + key] = {};
+                            address['contactsheet' + key].arguments = {
                                 "name": values.name,
                                 "street": values.street,
                                 "postalCode": values.postalCode,
@@ -751,15 +680,15 @@ var regApp = angular
 
                             if(values.id !== undefined)
                             {
-                                contactsheet['contactsheet' + key].service = 'address/update';
-                                contactsheet['contactsheet' + key].arguments.id = values.id;
+                                address['contactsheet' + key].service = 'address/update';
+                                address['contactsheet' + key].arguments.id = values.id;
                             }else{
-                                contactsheet['contactsheet' + key].service = 'address/create';
-                                contactsheet['contactsheet' + key].arguments.entry = entryId;
+                                address['contactsheet' + key].service = 'address/create';
+                                address['contactsheet' + key].arguments.entry = entryId;
                             }
                         });
 
-                        var subQuery = angular.merge(membership, contactsheet);
+                        var subQuery = angular.merge(membership, address);
                         
                         if($scope.meta.membershipDelete !== undefined)
                         {
@@ -784,11 +713,11 @@ var regApp = angular
                                 $window.history.back();
                             })
                             .catch(function(response) {
-                                $location.path('/user/logout')
+                                $log.error(response)
                             });
                     })
                     .catch(function(response) {
-                        $location.path('/user/logout')
+                        $log.error(response)
                     });
             };
         };
