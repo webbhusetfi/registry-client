@@ -351,10 +351,10 @@ var regApp = angular
     })
     .controller('registryView',  function ($scope, $routeParams, $http) {
     })
-    .controller('entryList', function($scope, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, defaultParams) {
+    .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, defaultParams, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
-    
+        
         $scope.deleteConfirm = function(item)
         {
             if(item.id !== undefined)
@@ -388,18 +388,154 @@ var regApp = angular
                 });
             }
         }
+        
+        $scope.params = {
+            "type":3,
+            "class":"ORGANIZATION",
+            "limit":50,
+            "offset":0
+        }
+        
+        if($routeParams.id !== undefined)
+        {
+            $scope.params.type = 2;
+            $scope.params.class = "PERSON";
+            $scope.params.parentEntry = $routeParams.id;
+            $scope.params.orgId = $routeParams.id;
+        }else{
+            $scope.params.orgId = 1;
+        }
+        
+        $scope.setSearch = function(query)
+        {
+            if(query.length > 0)
+            {
+                if($scope.params.class == 'ORGANIZATION')
+                {
+                    $scope.entrylistAppend = {
+                        "arguments":{
+                            "filter":{
+                                "name":query
+                            }
+                        }
+                    }
+                }else{
+                    $log.log('triggered');
+                    $scope.entrylistAppend = {
+                        "arguments":{
+                            "filter":{
+                                "lastName":$scope.lastName,
+                                "firstName":$scope.firstName
+                            }
+                        }
+                    }
+                }
+            }else{
+                if(($scope.params.class == 'PERSON' && $scope.lastName.length == 0 && $scope.firstName.length == 0) || $scope.params.class == 'ORGANIZATION')
+                    delete $scope.entrylistAppend;
+            }
+            
+            $scope.init();
+        }
+        
+        $scope.setType = function(type)
+        {
+            $scope.params.type = type.id;
+            $scope.params.class = type.class;
+            $scope.init();
+        }
+        
+        $scope.setLimit = function(limit)
+        {
+            $scope.params.limit = limit;
+            $scope.init();
+        }
+        
+        $scope.setOffset = function(offset)
+        {
+            $scope.params.offset = offset;
+            $scope.init();
+            $window.scroll(0,0);
+        }
+        
+        $scope.go = function(location)
+        {
+            $location.path(location);
+        }
+        
+        $scope.init = function()
+        {
+            dbHandler
+                .getEntry({
+                    "name":"organization",
+                    "id": $scope.params.orgId
+                })
+                .getEntryTypes()
+                .getEntries({
+                    "name":"entrylist",
+                    "filter": {
+                        "class":$scope.params.class,
+                        "type":$scope.params.type,
+                        "parentEntry":$scope.params.parentEntry
+                    },
+                    "limit":$scope.params.limit,
+                    "offset":$scope.params.offset,
+                    "order": {
+                        "lastName":"asc",
+                        "name":"asc"
+                    },
+                    "append":$scope.entrylistAppend
+                })
+                .runQuery()
+                .then(function(response) {
+                    $scope.entrylist = response.entrylist;
+                    $scope.organization = response.organization;
+                    $scope.entryTypes = response.entryTypes;
+                    $scope.foundCount = response.foundCount;
+                    
+                    if($scope.foundCount.entrylist > 0)
+                    {
+                        var active = $scope.params.offset/$scope.params.limit;
+                        var total = Math.ceil(Number($scope.foundCount.entrylist)/$scope.params.limit);
+
+                        if(total < 6)
+                        {
+                            var lower = 0;
+                            var upper = total;
+                        }else if(active > 4)
+                        {
+                            var lower = active - 4;
+                            var upper = active + 5 < total ? active + 5 : total;
+                        }else if(active > total - 5 && total > 10){
+                            var lower = total - 10;
+                            var upper = total;
+                        }else{
+                            var lower = 0;
+                            var upper = total;
+                        }
+
+                        var pagination = [];
+                        for(i = lower; i < upper; i++)
+                        {
+                            var page = {}
+                            page.name = i;
+                            if(i == active)
+                                page.class = 'active';
+                            pagination.push(page);
+                        }
+                    }
+                    $scope.pagination = pagination;
+                });
+        }
+        
+        $scope.init();
     
+        /*
         var entryListQuery = globalParams.getToQuery(defaultParams);
         
         $scope.request = entryListQuery;
         
         var request = {
-            "organization": {
-                "service":"entry/read",
-                "arguments": {
-                    "id":$routeParams.id
-                }
-            },
             "entrylist": entryListQuery,
             "entrytype":{
                 "service":"type/search",
@@ -410,7 +546,7 @@ var regApp = angular
                 }
             }
         };
-        
+
         if($routeParams.id)
         {
             var addRequest = {
@@ -444,44 +580,12 @@ var regApp = angular
                     if(value.class == 'PERSON')
                         $scope.resource[key].name = value.lastName + ', ' + value.firstName;
                 });
-                
-                if(response.data.entrylist.data.foundCount > 0)
-                {
-                    var active = $scope.request.arguments.offset/$scope.request.arguments.limit;
-                    var total = Math.ceil(Number(response.data.entrylist.data.foundCount)/request.entrylist.arguments.limit);
-                    
-                    if(total < 6)
-                    {
-                        var lower = 0;
-                        var upper = total;
-                    }else if(active > 4)
-                    {
-                        var lower = active - 4;
-                        var upper = active + 5 < total ? active + 5 : total;
-                    }else if(active > total - 5 && total > 10){
-                        var lower = total - 10;
-                        var upper = total;
-                    }else{
-                        var lower = 0;
-                        var upper = 9;
-                    }
-                    
-                    var pagination = [];
-                    for(i = lower; i < upper; i++)
-                    {
-                        var page = {}
-                        page.name = i;
-                        if(i == active)
-                            page.class = 'active';
-                        pagination.push(page);
-                    }
-                }
-                $scope.resource.pagination = pagination;
             })
             .catch(function(response) {
                 $log.error(response);
                 $location.path('/user/login');
             });
+        */
     })
     .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
         $scope.today = new Date();
@@ -527,7 +631,13 @@ var regApp = angular
                     .getEntryTypes()
                     .getStatusTypes()
                     .getConnectionTypes()
-                    .getOrganizations()
+                    .getEntries({
+                        "name":"organizations",
+                        "filter": {
+                            "class":"ORGANIZATION",
+                            "type":[3,1]
+                        }
+                    })
                     .runQuery()
                     .then(function(response) {
                         $scope.entryTypes = response.entryTypes;
@@ -561,7 +671,13 @@ var regApp = angular
                     .getEntryTypes()
                     .getStatusTypes()
                     .getConnectionTypes()
-                    .getOrganizations()
+                    .getEntries({
+                        "name":"organizations",
+                        "filter": {
+                            "class":"ORGANIZATION",
+                            "type":[3,1]
+                        }
+                    })
                     .getFullEntry($routeParams.id)
                     .runQuery()
                     .then(function(response) {

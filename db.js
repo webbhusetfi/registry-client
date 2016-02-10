@@ -50,18 +50,46 @@ var regApp = angular.module('RegistryClient')
             
             return this;
         },
-        getOrganizations: function() {
-            reports.push('organizations');
-            query.organizations = {
+        getEntries: function(args) {
+            if(args.name === undefined)
+                args.name = 'entries';
+            reports.push(args.name);
+            query[args.name] = {
                 "service":"entry/search",
                 "arguments":{
                     "filter": {
                         "registry": config().registry,
-                        "class":"ORGANIZATION",
-                        "type":[3,1]
                     },
                     "order": {
                         "name":"asc"
+                    }
+                }
+            }
+            
+            if(args.filter !== undefined)
+                query[args.name].arguments.filter = angular.merge(query[args.name].arguments.filter, args.filter)
+            if(args.order !== undefined)
+                query[args.name].arguments.order = angular.merge(query[args.name].arguments.order, args.order)
+            if(args.limit !== undefined)
+                query[args.name].arguments.limit = args.limit;
+            if(args.offset !== undefined)
+                query[args.name].arguments.offset = args.offset;
+            if(args.append !== undefined)
+                query[args.name] = angular.merge(query[args.name], args.append);
+            
+            return this;
+        },
+        // expects id
+        getEntry: function(args) {
+            if(args.id !== undefined)
+            {
+                if(args.name === undefined)
+                    args.name = 'entry';
+                reports.push(args.name);
+                query[args.name] = {
+                    "service":"entry/read",
+                    "arguments": {
+                        "id":args.id
                     }
                 }
             }
@@ -97,6 +125,8 @@ var regApp = angular.module('RegistryClient')
         },
         reset: function() {
             query = {};
+            
+            return this;
         },
         runQuery: function() {
             var promise = $http
@@ -140,6 +170,14 @@ var regApp = angular.module('RegistryClient')
                                         parsedResult.entry = false;
                                     }
                                 break;
+                                
+                                default:
+                                case 'entry':
+                                    if(result[value].status == 'success')
+                                    {
+                                        parsedResult[value] = result[value].data.item;
+                                    }
+                                break;
                             }
                         break;
 
@@ -162,7 +200,21 @@ var regApp = angular.module('RegistryClient')
                                 default:
                                     if(result[value].status == 'success' && result[value].data.foundCount > 0)
                                     {
-                                        parsedResult[value] = result[value].data.items;
+                                        parsedResult[value] = {}
+                                        angular.forEach(result[value].data.items, function(row, key2)
+                                        {
+                                            if(row.class == 'PERSON')
+                                                row.name = row.lastName + ', ' + row.firstName;
+                                            parsedResult[value][key2] = row;
+                                        });
+                                        if(parsedResult.foundCount === undefined)
+                                            parsedResult.foundCount = {};
+                                        parsedResult.foundCount[value] = result[value].data.foundCount;
+                                    }else{
+                                        if(parsedResult.foundCount === undefined)
+                                            parsedResult.foundCount = {};
+                                        
+                                        parsedResult.foundCount[value] = 0;
                                     }
                                 break;
                             }

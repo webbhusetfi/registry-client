@@ -13,15 +13,15 @@
                 </a>
             </div>
         </div>
-        <div class="row" ng-show="types.items.length > 0" ng-if="routeParams.id == undefined">
+        <div class="row" ng-if="routeParams.id == undefined">
             <div class="col-xs-12">
                 <div class="btn-group">
                     <a
-                        ng-repeat="item in types.items"
+                        ng-repeat="item in entryTypes"
                         ng-if="item.id != '1'"
                         class="btn btn-xs btn-default"
-                        ng-class="{'active' : request.arguments.filter.type == item.id }"
-                        ng-click="globalParams.redirect('/entry/list', {'offset':0,'limit':50,'type':item.id,'class':item.class})"
+                        ng-class="{'active' : params.type == item.id }"
+                        ng-click="setType({'id':item.id,'class':item.class})"
                         > {{ item.name }}
                     </a>
                 </div>

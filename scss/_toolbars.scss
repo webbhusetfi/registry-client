@@ -1,10 +1,17 @@
 .toolbar-top {
-    background:#efefef;
+    background:#ffffff;
     min-height:5rem;
     box-shadow:0 0 2px rgba(0,0,0,0.2);
+    margin-left:-2rem;
+    margin-right:-2rem;
+    padding-left:1rem;
+    padding-right:1rem;
     > .container-fluid {
         padding:0 1.5rem;
-        > .row > div:first-child {
+        > .row:first-child {
+            min-height:6rem;
+        }
+        > .row:last-child > div:first-child {
             position:relative;
             min-height:5rem;
             > * {
@@ -13,7 +20,7 @@
                 @include transform(translate3d(0,-50%,0));
             }
         }
-        > .row > div:last-child {
+        > .row:last-child > div:last-child {
             position:relative;
             min-height:5rem;
             > * {

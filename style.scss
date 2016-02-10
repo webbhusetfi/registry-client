@@ -9,6 +9,7 @@
 html { min-height:100%; }
 body {
     min-height:100%;
+    overflow-x:hidden;
     > .outer {
         margin:0 -1.5rem;
         min-height:100%;
@@ -20,15 +21,45 @@ body {
 }
 
 h1, h2, h3 { font-family:Raleway, Arial, Tahoma, Sans-serif; font-weight:300; }
+h1 { font-size:3rem; }
+h2 { font-size:2.4rem; }
+h3 { font-size:2rem; }
 
-.main > div { margin-top:1.5rem; margin-bottom:1.5rem; }
+.outer-topbar {
+    height:0.5rem;
+    line-height:0.5rem;
+    position:relative;
+    z-index:1;
+    > * {
+        height:0.5rem;
+        display:inline-block;
+        line-height:0.5rem;
+        vertical-align:top;
+    }
+    > :first-child {
+        width:5%;
+        background:#111;
+    }
+    > :last-child {
+        width:95%;
+        background:#40C1B5;
+    }
+}
+
+img.webbhuset { max-width:14rem; vertical-align:baseline; }
+
+.main > div { padding-left:0; padding-right:0; }
 .toolbar-top { margin-bottom:4rem; }
 .toolbar-top h2 { margin:0; }
 
-.mainList-ct { margin-bottom:2rem; }
-.mainList { border:0.1rem solid #ccc; width:100%; }
+.outer-section { background:#333333; }
+.mainList-ct { min-height:80rem; padding-left:2rem; padding-right:2rem; padding-bottom:2rem; margin-left:5%; background:#e1e1e1; box-shadow:0 0 2px rgba(0,0,0,0.05) inset }
+.mainList { border:0.1rem solid #ccc; width:100%; margin-bottom:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }
+.inner-form { border:0.1rem solid #ccc; padding:2rem; background:#fff; width:100%; margin-bottom:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }
 .mainList tr td { border:0.1rem solid #ccc; padding:1rem; }
 .mainList tr:nth-child(2n) td { background:#f5f5f5; }
+.mainList tr td:last-child { width:15rem; }
+.mainList thead td, .mainList tr:nth-child(2n-1) td { background:#fff; }
 
 .membership-list > div:last-child hr { display:none; }
 .form-text { margin-top:0.7rem; }
