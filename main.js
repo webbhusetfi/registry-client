@@ -420,7 +420,6 @@ var regApp = angular
                         }
                     }
                 }else{
-                    $log.log('triggered');
                     $scope.entrylistAppend = {
                         "arguments":{
                             "filter":{
@@ -430,13 +429,23 @@ var regApp = angular
                         }
                     }
                 }
-            }else{
-                if(($scope.params.class == 'PERSON' && $scope.lastName.length == 0 && $scope.firstName.length == 0) || $scope.params.class == 'ORGANIZATION')
-                    delete $scope.entrylistAppend;
             }
             
             $scope.init();
         }
+        
+        $scope.$watch('name + firstName + lastName', function(newVal) {
+            angular.forEach(['name', 'firstName', 'lastName'], function(value) {
+                if($scope[value] !== undefined)
+                {
+                    if($scope[value].length == 0)
+                    {
+                        delete $scope.entrylistAppend.arguments.filter[value];
+                        $scope.init();
+                    }
+                }
+            });
+        });
         
         $scope.setType = function(type)
         {
@@ -529,63 +538,6 @@ var regApp = angular
         }
         
         $scope.init();
-    
-        /*
-        var entryListQuery = globalParams.getToQuery(defaultParams);
-        
-        $scope.request = entryListQuery;
-        
-        var request = {
-            "entrylist": entryListQuery,
-            "entrytype":{
-                "service":"type/search",
-                "arguments":{
-                    "filter": {
-                        "registry": Number(globalParams.get('user').registry)
-                    }
-                }
-            }
-        };
-
-        if($routeParams.id)
-        {
-            var addRequest = {
-                "entrylist": {
-                    "url":"/entry/list/" + $routeParams.id,
-                    "arguments": {
-                        "filter": {
-                            "parentEntry":$routeParams.id,
-                            "type":2,
-                            "class":"PERSON"
-                        },
-                        "order": {
-                            "lastName":"asc"
-                        }
-                    }
-                }
-            }
-            request = angular.merge(request, addRequest);
-        }
-        
-        $http
-            .post(globalParams.static.apiurl, request)
-            .then(function(response) {
-                $scope.resource = {};
-                $scope.resource = response.data.entrylist.data.items;
-                $scope.organization = response.data.organization;
-                $scope.request = request.entrylist;
-                $scope.types = response.data.entrytype.data;
-                
-                angular.forEach($scope.resource, function(value, key) {
-                    if(value.class == 'PERSON')
-                        $scope.resource[key].name = value.lastName + ', ' + value.firstName;
-                });
-            })
-            .catch(function(response) {
-                $log.error(response);
-                $location.path('/user/login');
-            });
-        */
     })
     .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
         $scope.today = new Date();
