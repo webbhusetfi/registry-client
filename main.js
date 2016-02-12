@@ -518,6 +518,10 @@ var regApp = angular
                         }else if(active > total - 5 && total > 10){
                             var lower = total - 10;
                             var upper = total;
+                        }else if(active < 5 && total > 9)
+                        {
+                            lower = 0;
+                            upper = 9;
                         }else{
                             var lower = 0;
                             var upper = total;
