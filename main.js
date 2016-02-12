@@ -416,7 +416,8 @@ var regApp = angular
                         "arguments":{
                             "filter":{
                                 "name":query
-                            }
+                            },
+                            "offset":0
                         }
                     }
                 }else{
@@ -425,7 +426,8 @@ var regApp = angular
                             "filter":{
                                 "lastName":$scope.lastName,
                                 "firstName":$scope.firstName
-                            }
+                            },
+                            "offset":0
                         }
                     }
                 }
