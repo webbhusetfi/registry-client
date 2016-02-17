@@ -3,7 +3,7 @@ var regApp = angular
     .factory('globalParams', function($window, $location, $log, $routeParams) {
         var get = function(key)
         {
-            var stringValue = $window.localStorage.getItem('registryParams');
+            var stringValue = $window.sessionStorage.getItem('registryParams');
             var jsonValue = $window.JSON.parse(stringValue) || {};
             
             if(jsonValue[key] !== undefined)
@@ -14,84 +14,20 @@ var regApp = angular
         
         var set = function(key, value)
         {
-            var stringValue = $window.localStorage.getItem('registryParams');
+            var stringValue = $window.sessionStorage.getItem('registryParams');
             var jsonValue = $window.JSON.parse(stringValue) || {};
             
             jsonValue[key] = value;
-            $window.localStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));
+            $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));
         }
         
         var unset = function(key)
         {
-            var stringValue = $window.localStorage.getItem('registryParams');
+            var stringValue = $window.sessionStorage.getItem('registryParams');
             var jsonValue = $window.JSON.parse(stringValue) || {};
             
             delete jsonValue[key];
-            $window.localStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));            
-        }
-        
-        var parseQS = function(objectKV)
-        {
-            var result = angular.merge($routeParams, objectKV);
-            var queryString = '?';
-            var iteration = 0;
-            
-            angular.forEach(result, function(value, key)
-            {
-                if(key !== 'id') {
-                    queryString = queryString + key + '=' + value;
-                    iteration = iteration+1;
-                    if(iteration <= (Object.keys(result).length - 1))
-                        queryString = queryString + '&';
-                }
-            });
-            
-            return queryString;
-        }
-        
-        var getToQuery = function(query) {
-            try {
-                angular.forEach($routeParams, function(value, key) {
-                    switch(key)
-                    {
-                        case 'id':
-                        break;
-                        
-                        case 'offset':
-                        case 'limit':
-                            query.arguments[key] = value;
-                        break;
-                        
-                        case 'class':
-                            if(value == 'ORGANIZATION')
-                            {
-                                query.arguments.order = {
-                                    "name":"asc"
-                                }
-                            }else if(value == 'PERSON'){
-                                query.arguments.order = {
-                                    "lastName":"asc"
-                                }
-                            }
-                            query.arguments.filter[key] = value;
-                        break;
-                        
-                        default:
-                            query.arguments.filter[key] = value;
-                        break;
-                    }
-                });
-                
-                return query;
-            }
-            catch(error) {
-                $log.error(error);
-            }
-        }
-        
-        var redirect = function(url, args)
-        {
-            $location.url(url + this.parseQS(args));
+            $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));            
         }
         
         var dateToObject = function(date)
@@ -128,10 +64,7 @@ var regApp = angular
             get: get,
             set: set,
             unset: unset,
-            parseQS: parseQS,
             dateToObject: dateToObject,
-            getToQuery: getToQuery,
-            redirect: redirect
         };
     })
     .config(function($httpProvider, $routeProvider, $locationProvider) {
@@ -349,8 +282,6 @@ var regApp = angular
             $uibModalInstance.close(id);
         };
     })
-    .controller('registryView',  function ($scope, $routeParams, $http) {
-    })
     .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, defaultParams, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
@@ -549,6 +480,15 @@ var regApp = angular
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
         
+        $scope.checkProperty = function(id)
+        {
+            var index = Number($scope.entry.properties.indexOf(id));
+            if(index == -1)
+                $scope.entry.properties.push(id);
+            else
+                $scope.entry.properties.splice(index,1);                
+        }
+        
         $scope.removeMembership = function(key) {
             if($scope.meta.membershipDelete === undefined)
                 $scope.meta.membershipDelete = new Array();
@@ -596,12 +536,14 @@ var regApp = angular
                             "type":[3,1]
                         }
                     })
+                    .getProperties()
                     .runQuery()
                     .then(function(response) {
                         $scope.entryTypes = response.entryTypes;
                         $scope.statusTypes = response.statusTypes;
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
+                        $scope.propertyGroups = response.propertyGroups;
                         
                         $scope.entry = {
                             "type": "3",
@@ -614,7 +556,8 @@ var regApp = angular
                         $scope.meta = {
                             "addressActive": "0",
                             "address": {},
-                            "birthYear": $scope.today
+                            "birthYear": $scope.today,
+                            "activeProperty": Object.keys($scope.propertyGroups)[0]
                         }
                         
                         $scope.$watch('entry.type', function() {
@@ -629,6 +572,7 @@ var regApp = angular
                     .getEntryTypes()
                     .getStatusTypes()
                     .getConnectionTypes()
+                    .getProperties()
                     .getEntries({
                         "name":"organizations",
                         "filter": {
@@ -636,6 +580,7 @@ var regApp = angular
                             "type":[3,1]
                         }
                     })
+                    .getProperties()
                     .getFullEntry($routeParams.id)
                     .runQuery()
                     .then(function(response) {
@@ -643,6 +588,7 @@ var regApp = angular
                         $scope.statusTypes = response.statusTypes;
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
+                        $scope.propertyGroups = response.propertyGroups;
                         $scope.entry = response.fullEntry;
                         
                         $scope.meta = {};
@@ -660,6 +606,8 @@ var regApp = angular
                             $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
                         }
                         $scope.meta.addressActive = 0;
+                        $scope.meta.activeProperty = Object.keys($scope.propertyGroups)[0];
+
                         
                         angular.forEach($scope.entry.address, function(value, key) {
                             if(value.country == null)

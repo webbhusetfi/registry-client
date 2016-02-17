@@ -52,6 +52,10 @@ img.webbhuset { max-width:14rem; vertical-align:baseline; }
 .toolbar-top { margin-bottom:4rem; }
 .toolbar-top h2 { margin:0; }
 
+.checkbox-2col { min-width:50%; display:inline-block; padding-right:1rem; }
+.property-all { margin-bottom:2rem; }
+.property-all:last-child { margin-bottom:0; }
+
 .outer-section { background:#333333; }
 .mainList-ct { min-height:80rem; padding-left:2rem; padding-right:2rem; padding-bottom:2rem; margin-left:5%; background:#e1e1e1; box-shadow:0 0 2px rgba(0,0,0,0.05) inset }
 .mainList { border:0.1rem solid #ccc; width:100%; margin-bottom:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }

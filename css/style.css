@@ -136,6 +136,17 @@ img.webbhuset {
 .toolbar-top h2 {
   margin: 0; }
 
+.checkbox-2col {
+  min-width: 50%;
+  display: inline-block;
+  padding-right: 1rem; }
+
+.property-all {
+  margin-bottom: 2rem; }
+
+.property-all:last-child {
+  margin-bottom: 0; }
+
 .outer-section {
   background: #333333; }
 
