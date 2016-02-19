@@ -102,28 +102,7 @@ var regApp = angular
             })
             .when('/entry/list/:id?', {
                 templateUrl: '/template/entryList.html',
-                controller: 'entryList',
-                resolve: {
-                    defaultParams: function(globalParams)
-                    {
-                        return {
-                            service: 'entry/search',
-                            url: '/entry/list',
-                            arguments: {
-                                filter: {
-                                    registry: Number(globalParams.get('user').registry),
-                                    type: 3,
-                                    class: 'ORGANIZATION'
-                                },
-                                order: {
-                                  name: 'asc'  
-                                },
-                                offset: 0,
-                                limit:  50
-                            },
-                        };
-                    }
-                }
+                controller: 'entryList'
             })
             .when('/entry/:id/edit', {
                 templateUrl: '/template/entryEdit.html',
@@ -282,7 +261,7 @@ var regApp = angular
             $uibModalInstance.close(id);
         };
     })
-    .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, defaultParams, dbHandler) {
+    .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
         $scope.meta = {};
@@ -323,11 +302,20 @@ var regApp = angular
         
         $scope.checkProperty = function(id)
         {
-            var index = Number($scope.params.withProperty.indexOf(id));
-            if(index == -1)
+            var onIndex = Number($scope.params.withProperty.indexOf(id));
+            var offIndex = Number($scope.params.withoutProperty.indexOf(id));
+            
+            if(onIndex == -1 && offIndex == -1)
                 $scope.params.withProperty.push(id);
+            else if(offIndex == -1)
+            {
+                $scope.params.withProperty.splice(onIndex,1);
+                $scope.params.withoutProperty.push(id);
+            }
             else
-                $scope.params.withProperty.splice(index,1);
+            {
+                $scope.params.withoutProperty.splice(offIndex,1);
+            }
             
             $scope.init();
         }
@@ -337,7 +325,8 @@ var regApp = angular
             "class":"ORGANIZATION",
             "limit":50,
             "offset":0,
-            "withProperty":[]
+            "withProperty":[],
+            "withoutProperty":[]
         }
         
         if($routeParams.id !== undefined)
