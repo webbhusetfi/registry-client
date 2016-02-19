@@ -285,6 +285,7 @@ var regApp = angular
     .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, defaultParams, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
+        $scope.meta = {};
         
         $scope.deleteConfirm = function(item)
         {
@@ -320,11 +321,23 @@ var regApp = angular
             }
         }
         
+        $scope.checkProperty = function(id)
+        {
+            var index = Number($scope.params.withProperty.indexOf(id));
+            if(index == -1)
+                $scope.params.withProperty.push(id);
+            else
+                $scope.params.withProperty.splice(index,1);
+            
+            $scope.init();
+        }
+        
         $scope.params = {
             "type":3,
             "class":"ORGANIZATION",
             "limit":50,
-            "offset":0
+            "offset":0,
+            "withProperty":[]
         }
         
         if($routeParams.id !== undefined)
@@ -413,9 +426,11 @@ var regApp = angular
                     "id": $scope.params.orgId
                 })
                 .getEntryTypes()
+                .getProperties()
                 .getEntries({
                     "name":"entrylist",
                     "filter": {
+                        "withProperty":$scope.params.withProperty,
                         "class":$scope.params.class,
                         "type":$scope.params.type,
                         "parentEntry":$scope.params.parentEntry
@@ -432,8 +447,12 @@ var regApp = angular
                 .then(function(response) {
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
+                    $scope.properties = response.propertyGroups;
                     $scope.entryTypes = response.entryTypes;
                     $scope.foundCount = response.foundCount;
+
+                    if($scope.meta.propertyGroup === undefined)
+                        $scope.meta.propertyGroup = Object.keys($scope.properties)[0];
                     
                     if($scope.foundCount.entrylist > 0)
                     {

@@ -1,3 +1,4 @@
+<!-- pre style="position:fixed; left:10px; top:10px; overflow:scroll; height:98%; max-width:300px; z-index:10">{{ meta | json }}<br></pre-->
 <div class="controls list-functions">
     <div class="functions">
         <div class="row functions">
@@ -11,6 +12,28 @@
                     class="btn btn-default"
                     href="/entry/-1/edit"><i class="fa fa-pencil"></i> Skapa
                 </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2">
+                <select class="form-control" ng-model="meta.propertyGroup">
+                    <option ng-repeat="(key, value) in properties" value="{{ value.id }}">{{ value.name }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom:1rem;">
+            <div class="col-xs-12" style="margin-top:1rem;">
+                <div ng-repeat="(key, value) in properties" ng-show="meta.propertyGroup == value.id">
+                    <div class="btn-group">
+                        <button
+                            class="btn btn-xs btn-default"
+                            ng-class="{ 'btn-success' : params.withProperty.indexOf(value2.id) > -1 }"
+                            ng-click="checkProperty(value2.id);"
+                            ng-repeat="(key2, value2) in value.children">
+                            {{ value2.name }}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row" ng-if="routeParams.id == undefined">
