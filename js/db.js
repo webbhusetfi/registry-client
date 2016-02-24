@@ -90,6 +90,8 @@ var regApp = angular.module('RegistryClient')
                 }
             }
             
+            if(args.include !== undefined)
+                query[args.name].arguments.include = args.include;
             if(args.filter !== undefined)
                 query[args.name].arguments.filter = angular.merge(query[args.name].arguments.filter, args.filter)
             if(args.order !== undefined)
@@ -158,6 +160,7 @@ var regApp = angular.module('RegistryClient')
                 .post(config().apiurl, query)
                 .then(function(response)
                 {
+                    $log.log(response);
                     if(options.propertyTree !== undefined)
                     {
                         if(response.data[options.propertyTree].data.foundCount > 0)

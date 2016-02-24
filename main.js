@@ -320,13 +320,31 @@ var regApp = angular
             $scope.init();
         }
         
+        $scope.setAdditionals = function(id)
+        {
+            var onIndex = Number($scope.params.additionals.indexOf(id));
+            
+            if(onIndex == -1)
+            {
+                $scope.params.additionals = [];
+                $scope.params.additionals.push(id);
+            }
+            else
+                $scope.params.additionals.splice(onIndex,1);
+            
+            $scope.init();
+        }
+        
+        $log.log(globalParams.get('entryList'));
+        
         $scope.params = {
             "type":3,
             "class":"ORGANIZATION",
             "limit":50,
             "offset":0,
             "withProperty":[],
-            "withoutProperty":[]
+            "withoutProperty":[],
+            "additionals":[]
         }
         
         if($routeParams.id !== undefined)
@@ -404,6 +422,7 @@ var regApp = angular
         
         $scope.go = function(location)
         {
+            globalParams.set('entryList', $scope.params);
             $location.path(location);
         }
         
@@ -418,6 +437,7 @@ var regApp = angular
                 .getProperties()
                 .getEntries({
                     "name":"entrylist",
+                    "include":$scope.params.additionals,
                     "filter": {
                         "withProperty":$scope.params.withProperty,
                         "class":$scope.params.class,
@@ -439,7 +459,7 @@ var regApp = angular
                     $scope.properties = response.propertyGroups;
                     $scope.entryTypes = response.entryTypes;
                     $scope.foundCount = response.foundCount;
-
+                    
                     if($scope.meta.propertyGroup === undefined)
                         $scope.meta.propertyGroup = Object.keys($scope.properties)[0];
                     
