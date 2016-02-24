@@ -264,7 +264,6 @@ var regApp = angular
     .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
-        $scope.meta = {};
         
         $scope.deleteConfirm = function(item)
         {
@@ -327,24 +326,41 @@ var regApp = angular
             if(onIndex == -1)
             {
                 $scope.params.additionals = [];
-                $scope.params.additionals.push(id);
+                $scope.params.additionals = id;
+                switch(id)
+                {
+                    case 'address':
+                        $scope.params.includes = ['address'];
+                    break;
+                    case 'contact':
+                        $scope.params.includes = ['address'];
+                    break;
+                }
             }
             else
-                $scope.params.additionals.splice(onIndex,1);
+            {
+                $scope.params.includes = [];
+                delete $scope.params.additionals;
+            }
             
             $scope.init();
         }
         
-        $log.log(globalParams.get('entryList'));
-        
-        $scope.params = {
-            "type":3,
-            "class":"ORGANIZATION",
-            "limit":50,
-            "offset":0,
-            "withProperty":[],
-            "withoutProperty":[],
-            "additionals":[]
+        if(globalParams.get('entryList'))
+        {
+            $scope.params = globalParams.get('entryList');
+            globalParams.unset('entryList');
+        }else{
+            $scope.params = {
+                "type":3,
+                "class":"ORGANIZATION",
+                "limit":50,
+                "offset":0,
+                "withProperty":[],
+                "withoutProperty":[],
+                "additionals":[],
+                "includes":[]
+            }
         }
         
         if($routeParams.id !== undefined)
@@ -420,9 +436,13 @@ var regApp = angular
             $window.scroll(0,0);
         }
         
-        $scope.go = function(location)
+        $scope.go = function(location, savestate)
         {
-            globalParams.set('entryList', $scope.params);
+            if(savestate)
+                globalParams.set('entryList', $scope.params);
+            else
+                globalParams.unset('entryList');
+            
             $location.path(location);
         }
         
@@ -437,7 +457,7 @@ var regApp = angular
                 .getProperties()
                 .getEntries({
                     "name":"entrylist",
-                    "include":$scope.params.additionals,
+                    "include":$scope.params.includes,
                     "filter": {
                         "withProperty":$scope.params.withProperty,
                         "class":$scope.params.class,
@@ -454,14 +474,15 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
+                    $log.log(response.entrylist);
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
                     $scope.properties = response.propertyGroups;
                     $scope.entryTypes = response.entryTypes;
                     $scope.foundCount = response.foundCount;
                     
-                    if($scope.meta.propertyGroup === undefined)
-                        $scope.meta.propertyGroup = Object.keys($scope.properties)[0];
+                    if($scope.params.propertyGroup === undefined)
+                        $scope.params.propertyGroup = Object.keys($scope.properties)[0];
                     
                     if($scope.foundCount.entrylist > 0)
                     {

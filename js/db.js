@@ -160,7 +160,6 @@ var regApp = angular.module('RegistryClient')
                 .post(config().apiurl, query)
                 .then(function(response)
                 {
-                    $log.log(response);
                     if(options.propertyTree !== undefined)
                     {
                         if(response.data[options.propertyTree].data.foundCount > 0)

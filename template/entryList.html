@@ -32,8 +32,11 @@
                                 placeholder="Förnamn"
                                 class="form-control">
                         </td>
-                        <td ng-show="params.additionals.indexOf('address') > -1">Adress</td>
-                        <td ng-show="params.additionals.indexOf('address') > -1">Postnummer</td>
+                        <td ng-show="params.additionals == 'address'">Adress</td>
+                        <td ng-show="params.additionals == 'address'">Postnummer</td>
+                        <td ng-show="params.additionals == 'address'">Postort</td>
+                        <td ng-show="params.additionals == 'contact'">Epost</td>
+                        <td ng-show="params.additionals == 'contact'">Telefon</td>                        
                         <td></td>
                     </thead>
                     <tr ng-repeat="(key, item) in entrylist">
@@ -42,11 +45,14 @@
                             <span ng-show="item.class == 'PERSON'"><i ng-show="item.class == 'PERSON'" class="fa fa-user"></i> {{ item.lastName }}</span>
                         </td>
                         <td ng-show="params.class == 'PERSON'">{{ item.firstName }}</td>
-                        <td ng-show="params.additionals.indexOf('address') > -1">{{ item.address.street }}</td>
-                        <td ng-show="params.additionals.indexOf('address') > -1">{{ item.address.postalCode }}</td>
+                        <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
+                        <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
+                        <td ng-show="params.additionals == 'address'">{{ item.address.town }}</td>
+                        <td ng-show="params.additionals == 'contact'">{{ item.address.email }}</td>
+                        <td ng-show="params.additionals == 'contact'">{{ item.address.mobile }}</td>                        
                         <td>
                             <a class="btn btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>
-                            <a class="btn btn-primary" ng-click="go('/entry/' + item.id + '/edit');"><i class="fa fa-pencil"></i></a>
+                            <a class="btn btn-primary" ng-click="go('/entry/' + item.id + '/edit', true);"><i class="fa fa-pencil"></i></a>
                             <a ng-show="item.class == 'ORGANIZATION'" class="btn btn-default" ng-click="go('/entry/list/' + item.id);"><i class="fa fa-sign-in"></i></a>
                         </td>
                     </tr>
