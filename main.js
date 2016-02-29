@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ui.bootstrap', 'chart.js'])
+    .module('RegistryClient', ['ngRoute', 'ui.bootstrap'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
         var get = function(key)
         {
