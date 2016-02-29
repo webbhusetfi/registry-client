@@ -1,6 +1,7 @@
 @import url("//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css");
 @import url("//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,700,300);
+@import url(https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,300,300italic);
 /* angular-ui desktop compatibility */
 .nav, .pagination, .carousel, .panel-title a {
   cursor: pointer; }
@@ -93,7 +94,7 @@ body {
       padding: 1.5rem; }
 
 h1, h2, h3 {
-  font-family: Raleway, Arial, Tahoma, Sans-serif;
+  font-family: Lato, Arial, Tahoma, Sans-serif;
   font-weight: 300; }
 
 h1 {
@@ -106,21 +107,55 @@ h3 {
   font-size: 2rem; }
 
 .outer-topbar {
-  height: 0.5rem;
-  line-height: 0.5rem;
+  height: 5rem;
+  line-height: 5rem;
   position: relative;
-  z-index: 1; }
-  .outer-topbar > * {
-    height: 0.5rem;
+  z-index: 1;
+  box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.2);
+  background: #111; }
+  .outer-topbar h2 {
+    margin: 0;
+    padding: 0.6rem 0 0.6rem 0; }
+  .outer-topbar .row > div {
+    padding-top: 0.6rem;
+    max-height: 5rem; }
+  .outer-topbar .row > div:last-child {
+    background: #f00;
+    min-height: 5rem; }
+  .outer-topbar * {
+    color: #fff; }
+  .outer-topbar a:hover {
+    color: #fff;
+    text-decoration: underline; }
+
+.mainNav {
+  padding: 2rem 0;
+  color: #ccc; }
+  .mainNav * {
+    color: inherit; }
+  .mainNav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0; }
+  .mainNav ul ul {
+    padding-left: 3rem; }
+  .mainNav i {
     display: inline-block;
-    line-height: 0.5rem;
-    vertical-align: top; }
-  .outer-topbar > :first-child {
-    width: 5%;
-    background: #111; }
-  .outer-topbar > :last-child {
-    width: 95%;
-    background: #40C1B5; }
+    width: 3rem;
+    text-align: center;
+    color: #666; }
+  .mainNav a {
+    display: block;
+    font-size: 2rem;
+    line-height: 3rem;
+    font-weight: 300 !important;
+    font-family: Lato, Arial, Tahoma, Sans-serif;
+    transition: all 0.2s; }
+  .mainNav ul ul a {
+    font-size: 1.8rem; }
+  .mainNav a:hover {
+    color: #fff;
+    text-decoration: none; }
 
 img.webbhuset {
   max-width: 14rem;
@@ -152,11 +187,8 @@ img.webbhuset {
 
 .mainList-ct {
   min-height: 80rem;
-  padding-left: 2rem;
-  padding-right: 2rem;
   padding-bottom: 2rem;
-  margin-left: 5%;
-  background: #e1e1e1;
+  background: #f9f9f9;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.05) inset; }
 
 .mainList {
@@ -173,15 +205,15 @@ img.webbhuset {
   margin-bottom: 2rem;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.05); }
 
-.mainList tr td {
+.mainList td {
   border: 0.1rem solid #ccc;
-  padding: 1rem; }
+  padding: 0.5rem 1rem; }
 
 .mainList tr:nth-child(2n) td {
   background: #f5f5f5; }
 
 .mainList tr td:last-child {
-  width: 15rem; }
+  width: 10rem; }
 
 .mainList thead td, .mainList tr:nth-child(2n-1) td {
   background: #fff; }

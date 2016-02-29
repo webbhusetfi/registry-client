@@ -1,19 +1,10 @@
-<div class="toolbar-top">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xs-12">
-                <h3><img class="webbhuset" src="/svg/webbhuset_logo.svg"> Medlemsregister</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-10">
-                <h2 ng-show="organization.name">{{ organization.name }}</h2>
-            </div>
-            <div class="col-xs-2">
-                <p class="text-right">
-                    <a class="btn btn-xs btn-default" href="/user/logout">Logga ut</a>
-                </p>
-            </div>
-        </div>
+<div class="row">
+    <div class="col-xs-8">
+        <h2>Medlemsregister</h2>
+        <h3 ng-show="organization.name !== undefined">{{ organization.name }}</h3>
+    </div>
+    <div class="col-xs-4 text-right" style="padding-top:2rem;">
+        <a ng-show="routeParams.id !== undefined" class="btn btn-default" href="/entry/list"><i class="fa fa-reply"></i> Tillbaka</a>                
+        <a ng-show="globalParams.get('user').sa && routeParams.id == undefined" class="btn btn-default" href="/registry/list"><i class="fa fa-reply"></i> Tillbaka</a>
     </div>
 </div>

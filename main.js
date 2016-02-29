@@ -52,7 +52,7 @@ var regApp = angular
         
         return {
             static: {
-                "apiurl":"http://api.registry.huset.fi/",
+                "apiurl":"https://api.registry.huset.fi/",
                 "datepickerPopupConfig":{
                     "uib-datepicker-popup":"dd.MM.yyyy",
                     "current-text":"Idag",
@@ -315,7 +315,6 @@ var regApp = angular
             {
                 $scope.params.withoutProperty.splice(offIndex,1);
             }
-            
             $scope.init();
         }
         
@@ -340,7 +339,7 @@ var regApp = angular
             else
             {
                 $scope.params.includes = [];
-                delete $scope.params.additionals;
+                $scope.params.additionals = [];
             }
             
             $scope.init();
@@ -400,6 +399,7 @@ var regApp = angular
                 }
             }
             
+            $scope.params.offset = 0;
             $scope.init();
         }
         
@@ -460,6 +460,7 @@ var regApp = angular
                     "include":$scope.params.includes,
                     "filter": {
                         "withProperty":$scope.params.withProperty,
+                        "withoutProperty":$scope.params.withoutProperty,
                         "class":$scope.params.class,
                         "type":$scope.params.type,
                         "parentEntry":$scope.params.parentEntry
@@ -474,7 +475,6 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
-                    $log.log(response.entrylist);
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
                     $scope.properties = response.propertyGroups;

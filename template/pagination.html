@@ -13,6 +13,9 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
+            <div class="fc text-center">
+                Visar {{ params.offset+1 }}-{{ params.offset+params.limit > foundCount.entrylist ? foundCount.entrylist : params.offset+params.limit }} av {{ foundCount.entrylist }}
+            </div>            
             <ul class="pagination">
                 <li
                     ng-repeat="item in pagination"
@@ -20,5 +23,5 @@
                     ><a ng-click="setOffset(item.name * params.limit);">{{ item.name +1 }}</a></li>
             </ul>
         </div>
-    </div>
+    </div>    
 </div>

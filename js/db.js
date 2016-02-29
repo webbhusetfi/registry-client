@@ -2,7 +2,7 @@ var regApp = angular.module('RegistryClient')
 .factory('dbHandler', ['$http', '$log', '$location', 'globalParams', function($http, $log, $location, globalParams) {
     var config = function() {
         return {
-            apiurl: "http://api.registry.huset.fi/",
+            apiurl: "https://api.registry.huset.fi/",
             registry: Number(globalParams.get('user').registry)
         }
     }
@@ -128,7 +128,8 @@ var regApp = angular.module('RegistryClient')
             query.fullEntry = {
                 "service":"entry/read",
                 "arguments": {
-                    "id": id
+                    "id": id,
+                    "include":["properties"]
                 }
             }
             query.connection = {
@@ -146,6 +147,8 @@ var regApp = angular.module('RegistryClient')
                         "entry":id
                     }
                 }
+            }
+            query.properties = {
             }
             
             return this;

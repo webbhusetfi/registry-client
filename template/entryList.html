@@ -1,67 +1,73 @@
-<!-- pre style="position:absolute; left:10px; top:10px; width:400px; z-index:10;">{{ resource.length }}</pre -->
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
-    <div class="mainList-ct">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-12">
-                <div ng-include="'/template/header.html'"></div>
-                <div ng-include="'/template/entryListMenu.html'"></div>
-                <table ng-show="1" class="mainList">
-                    <thead>
-                        <td>
-                            <input
-                                ng-model="name"
-                                ng-show="params.class == 'ORGANIZATION'"
-                                ng-model-options="{ debounce:500 }"
-                                ng-change="setSearch(name);"
-                                placeholder="Föreningsnamn"
-                                class="form-control">
-                           <input
-                                ng-model="lastName"
-                                ng-show="params.class == 'PERSON'"
-                                ng-model-options="{ debounce:500 }"
-                                ng-change="setSearch(lastName);"
-                                placeholder="Efternamn"
-                                class="form-control">
-                        </td>
-                        <td ng-show="params.class == 'PERSON'">
-                            <input
-                                ng-model="firstName"
-                                ng-model-options="{ debounce:500 }"
-                                ng-change="setSearch(firstName);"
-                                placeholder="Förnamn"
-                                class="form-control">
-                        </td>
-                        <td ng-show="params.additionals == 'address'">Adress</td>
-                        <td ng-show="params.additionals == 'address'">Postnummer</td>
-                        <td ng-show="params.additionals == 'address'">Postort</td>
-                        <td ng-show="params.additionals == 'contact'">Epost</td>
-                        <td ng-show="params.additionals == 'contact'">Telefon</td>                        
-                        <td></td>
-                    </thead>
-                    <tr ng-repeat="(key, item) in entrylist">
-                        <td>
-                            <span ng-show="item.class == 'ORGANIZATION'"><i class="fa fa-cubes"></i> {{ item.name }}</span>
-                            <span ng-show="item.class == 'PERSON'"><i ng-show="item.class == 'PERSON'" class="fa fa-user"></i> {{ item.lastName }}</span>
-                        </td>
-                        <td ng-show="params.class == 'PERSON'">{{ item.firstName }}</td>
-                        <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
-                        <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
-                        <td ng-show="params.additionals == 'address'">{{ item.address.town }}</td>
-                        <td ng-show="params.additionals == 'contact'">{{ item.address.email }}</td>
-                        <td ng-show="params.additionals == 'contact'">{{ item.address.mobile }}</td>                        
-                        <td>
-                            <a class="btn btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>
-                            <a class="btn btn-primary" ng-click="go('/entry/' + item.id + '/edit', true);"><i class="fa fa-pencil"></i></a>
-                            <a ng-show="item.class == 'ORGANIZATION'" class="btn btn-default" ng-click="go('/entry/list/' + item.id);"><i class="fa fa-sign-in"></i></a>
-                        </td>
-                    </tr>
-                </table>
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
             </div>
-        </div>
-        <div ng-include="'/template/pagination.html'"></div>
-        <div class="alert alert-info" ng-show="foundCount.entrylist == 0">
-            Inga poster.
+            <div class="col-xs-8 col-sm-9 col-md-10 mainList-ct">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div ng-include="'/template/header.html'"></div>
+                        <div ng-include="'/template/entryListMenu.html'"></div>
+                        <table ng-show="1" class="mainList">
+                            <thead>
+                                <td>
+                                    <input
+                                        ng-model="name"
+                                        ng-show="params.class == 'ORGANIZATION'"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch(name);"
+                                        placeholder="Föreningsnamn"
+                                        class="form-control">
+                                   <input
+                                        ng-model="lastName"
+                                        ng-show="params.class == 'PERSON'"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch(lastName);"
+                                        placeholder="Efternamn"
+                                        class="form-control">
+                                </td>
+                                <td ng-show="params.class == 'PERSON'">
+                                    <input
+                                        ng-model="firstName"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch(firstName);"
+                                        placeholder="Förnamn"
+                                        class="form-control">
+                                </td>
+                                <td ng-show="params.additionals == 'address'">Adress</td>
+                                <td ng-show="params.additionals == 'address'">Postnummer</td>
+                                <td ng-show="params.additionals == 'address'">Postort</td>
+                                <td ng-show="params.additionals == 'contact'">Epost</td>
+                                <td ng-show="params.additionals == 'contact'">Telefon</td>                        
+                                <td></td>
+                            </thead>
+                            <tr ng-repeat="(key, item) in entrylist">
+                                <td>
+                                    <span ng-show="item.class == 'ORGANIZATION'"><i class="fa fa-cube"></i> {{ item.name }}</span>
+                                    <span ng-show="item.class == 'PERSON'"><i ng-show="item.class == 'PERSON'" class="fa fa-user"></i> {{ item.lastName }}</span>
+                                </td>
+                                <td ng-show="params.class == 'PERSON'">{{ item.firstName }}</td>
+                                <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
+                                <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
+                                <td ng-show="params.additionals == 'address'">{{ item.address.town }}</td>
+                                <td ng-show="params.additionals == 'contact'">{{ item.address.email }}</td>
+                                <td ng-show="params.additionals == 'contact'">{{ item.address.mobile }}</td>                        
+                                <td class="text-right">
+                                    <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>
+                                    <a class="btn btn-xs btn-primary" ng-click="go('/entry/' + item.id + '/edit', true);"><i class="fa fa-pencil"></i></a>
+                                    <a ng-show="item.class == 'ORGANIZATION'" class="btn btn-xs btn-default" ng-click="go('/entry/list/' + item.id);"><i class="fa fa-sign-in"></i></a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div ng-include="'/template/pagination.html'"></div>
+                <div class="alert alert-info" ng-show="foundCount.entrylist == 0">
+                    Inga poster.
+                </div>
+            </div>
         </div>
     </div>
 </div>
