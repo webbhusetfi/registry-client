@@ -345,56 +345,28 @@ var regApp = angular
             $scope.init();
         }
         
-        if(globalParams.get('entryList'))
+        $scope.setSearch = function()
         {
-            $scope.params = globalParams.get('entryList');
-            globalParams.unset('entryList');
-        }else{
-            $scope.params = {
-                "type":3,
-                "class":"ORGANIZATION",
-                "limit":50,
-                "offset":0,
-                "withProperty":[],
-                "withoutProperty":[],
-                "additionals":[],
-                "includes":[],
-                "filter":{}
-            }
-        }
-        
-        if($routeParams.id !== undefined)
-        {
-            $scope.params.type = 2;
-            $scope.params.class = "PERSON";
-            $scope.params.parentEntry = $routeParams.id;
-            $scope.params.orgId = $routeParams.id;
-        }else{
-            $scope.params.orgId = 1;
-        }
-        
-        $scope.setSearch = function(query)
-        {
-            if(query.length > 0)
-            {
-                if($scope.params.class == 'ORGANIZATION')
-                {
-                    $scope.params.filter = {
-                        "name":query
-                    }
-                }else{
-                    $scope.params.filter = {
-                        "lastName":$scope.lastName,
-                        "firstName":$scope.firstName
-                    }
-                }
-                $scope.params.offset = 0;
-            }
+            $scope.params.offset = 0;
             $scope.init();
         }
         
-        $scope.$watch('name + firstName + lastName', function(newVal) {
-            angular.forEach(['name', 'firstName', 'lastName'], function(value) {
+        $scope.checkKeys = function() {
+            var keys = '';
+            var i = 1;
+
+            if($scope.params !== undefined)
+            {
+                angular.forEach($scope.params.filter, function(val, key) {
+                    keys += key + (i < Object.keys($scope.params.filter).length ? ' + ' : '');
+                    i = i+1;
+                });
+            }
+            return keys;
+        }
+        
+        $scope.$watch($scope.checkKeys(), function(newVal) {
+            angular.forEach(Object.keys($scope.params.filter), function(value) {
                 if($scope[value] !== undefined)
                 {
                     if($scope[value].length == 0)
@@ -439,6 +411,34 @@ var regApp = angular
             $location.path(location);
         }
         
+        if(globalParams.get('entryList'))
+        {
+            $scope.params = globalParams.get('entryList');
+            globalParams.unset('entryList');
+        }else{
+            $scope.params = {
+                "type":3,
+                "class":"ORGANIZATION",
+                "limit":50,
+                "offset":0,
+                "withProperty":[],
+                "withoutProperty":[],
+                "additionals":[],
+                "includes":[],
+                "filter":{}
+            }
+        }
+        
+        if($routeParams.id !== undefined)
+        {
+            $scope.params.type = 2;
+            $scope.params.class = "PERSON";
+            $scope.params.parentEntry = $routeParams.id;
+            $scope.params.orgId = $routeParams.id;
+        }else{
+            $scope.params.orgId = 1;
+        }        
+        
         $scope.init = function()
         {
             dbHandler
@@ -463,8 +463,7 @@ var regApp = angular
                     "order": {
                         "lastName":"asc",
                         "name":"asc"
-                    },
-                    "append":$scope.entrylistAppend
+                    }
                 })
                 .runQuery()
                 .then(function(response) {
@@ -676,11 +675,11 @@ var regApp = angular
                         $scope.meta.addressActive = 0;
                         $scope.meta.activeProperty = "all";
                         
-                        if($scope.entry.birthYear !== undefined)
+                        if($scope.entry.birthYear)
                             $scope.meta.birthYear = new Date($scope.entry.birthYear + '-01-01 00:00:00');
-                        if($scope.entry.birthMonth !== undefined)
+                        if($scope.entry.birthMonth)
                             $scope.meta.birthMonth = new Date($scope.entry.birthYear + '-' + $scope.entry.birthMonth + '-01 00:00:00');
-                        if($scope.entry.birthDay !== undefined)
+                        if($scope.entry.birthDay)
                             $scope.meta.birthDate = new Date($scope.entry.birthYear + '-' + $scope.entry.birthMonth + '-' + $scope.entry.birthDay + ' 00:00:00');
                         
                         angular.forEach($scope.entry.address, function(value, key) {
@@ -718,7 +717,8 @@ var regApp = angular
                         "lastName": $scope.entry.lastName,
                         "birthYear": $scope.entry.birthYear,
                         "birthMonth": $scope.entry.birthMonth,
-                        "birthDay": $scope.entry.birthDate
+                        "birthDay": $scope.entry.birthDate,
+                        "notes": $scope.entry.notes
                     }
                 }
                 

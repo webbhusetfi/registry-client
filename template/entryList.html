@@ -14,33 +14,68 @@
                             <thead>
                                 <td>
                                     <input
-                                        ng-model="name"
+                                        ng-model="params.filter.name"
                                         ng-show="params.class == 'ORGANIZATION'"
                                         ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch(name);"
+                                        ng-change="setSearch();"
                                         placeholder="Föreningsnamn"
                                         class="form-control">
                                    <input
-                                        ng-model="lastName"
+                                        ng-model="params.filter.lastName"
                                         ng-show="params.class == 'PERSON'"
                                         ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch(lastName);"
+                                        ng-change="setSearch();"
                                         placeholder="Efternamn"
                                         class="form-control">
                                 </td>
                                 <td ng-show="params.class == 'PERSON'">
                                     <input
-                                        ng-model="firstName"
+                                        ng-model="params.filter.firstName"
                                         ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch(firstName);"
+                                        ng-change="setSearch();"
                                         placeholder="Förnamn"
                                         class="form-control">
                                 </td>
-                                <td ng-show="params.additionals == 'address'">Adress</td>
-                                <td ng-show="params.additionals == 'address'">Postnummer</td>
-                                <td ng-show="params.additionals == 'address'">Postort</td>
-                                <td ng-show="params.additionals == 'contact'">Epost</td>
-                                <td ng-show="params.additionals == 'contact'">Telefon</td>                        
+                                <td ng-show="params.additionals == 'address'">
+                                    <input
+                                        ng-model="params.filter.address.street"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="Adress"
+                                        class="form-control">                                    
+                                </td>
+                                <td ng-show="params.additionals == 'address'">
+                                    <input
+                                        ng-model="params.filter.address.postalCode"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="Postnummer"
+                                        class="form-control">                                    
+                                </td>
+                                <td ng-show="params.additionals == 'address'">
+                                    <input
+                                        ng-model="params.filter.address.town"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="Postort"
+                                        class="form-control">
+                                </td>
+                                <td ng-show="params.additionals == 'contact'">
+                                    <input
+                                        ng-model="params.filter.address.email"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="Epost"
+                                        class="form-control">                                    
+                                </td>
+                                <td ng-show="params.additionals == 'contact'">
+                                    <input
+                                        ng-model="params.filter.address.mobile"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="Mobil"
+                                        class="form-control">
+                                </td>
                                 <td></td>
                             </thead>
                             <tr ng-repeat="(key, item) in entrylist">
