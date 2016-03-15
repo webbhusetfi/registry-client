@@ -264,6 +264,7 @@ var regApp = angular
     .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
+        $scope.params = {};
         
         $scope.deleteConfirm = function(item)
         {
@@ -384,7 +385,6 @@ var regApp = angular
             $scope.params.class = type.class;
             $scope.params.filter = {};
             $scope.params.offset = 0;
-            delete $scope.params.withProperty;
             $scope.init();
         }
         
