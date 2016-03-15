@@ -358,7 +358,8 @@ var regApp = angular
                 "withProperty":[],
                 "withoutProperty":[],
                 "additionals":[],
-                "includes":[]
+                "includes":[],
+                "filter":{}
             }
         }
         
@@ -378,28 +379,17 @@ var regApp = angular
             {
                 if($scope.params.class == 'ORGANIZATION')
                 {
-                    $scope.entrylistAppend = {
-                        "arguments":{
-                            "filter":{
-                                "name":query
-                            },
-                            "offset":0
-                        }
+                    $scope.params.filter = {
+                        "name":query
                     }
                 }else{
-                    $scope.entrylistAppend = {
-                        "arguments":{
-                            "filter":{
-                                "lastName":$scope.lastName,
-                                "firstName":$scope.firstName
-                            },
-                            "offset":0
-                        }
+                    $scope.params.filter = {
+                        "lastName":$scope.lastName,
+                        "firstName":$scope.firstName
                     }
                 }
+                $scope.params.offset = 0;
             }
-            
-            $scope.params.offset = 0;
             $scope.init();
         }
         
@@ -409,7 +399,7 @@ var regApp = angular
                 {
                     if($scope[value].length == 0)
                     {
-                        delete $scope.entrylistAppend.arguments.filter[value];
+                        $scope.params.filter = {};
                         $scope.init();
                     }
                 }
@@ -420,6 +410,9 @@ var regApp = angular
         {
             $scope.params.type = type.id;
             $scope.params.class = type.class;
+            $scope.params.filter = {};
+            $scope.params.offset = 0;
+            delete $scope.params.withProperty;
             $scope.init();
         }
         
@@ -458,13 +451,13 @@ var regApp = angular
                 .getEntries({
                     "name":"entrylist",
                     "include":$scope.params.includes,
-                    "filter": {
+                    "filter": angular.merge({
                         "withProperty":$scope.params.withProperty,
                         "withoutProperty":$scope.params.withoutProperty,
                         "class":$scope.params.class,
                         "type":$scope.params.type,
-                        "parentEntry":$scope.params.parentEntry
-                    },
+                        "parentEntry":$scope.params.parentEntry,
+                    }, $scope.params.filter),
                     "limit":$scope.params.limit,
                     "offset":$scope.params.offset,
                     "order": {
@@ -528,6 +521,43 @@ var regApp = angular
     .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
+        $scope.meta = {};
+        
+        $scope.setCalTime = function(format, date, target) {
+            switch(format)
+            {
+                case 'YYYY':
+                    if(date !== null)
+                    {
+                        $scope.meta.birthMonth = date;
+                        $scope.entry.birthYear = date.getFullYear();
+                    }else{
+                        $scope.entry.birthYear = null;
+                        $scope.meta.birthMonth = null;
+                        $scope.entry.birthMonth = null;
+                        $scope.entry.birthDate = null;
+                        $scope.meta.birthDate = null;
+                    }
+                break;
+                
+                case 'MM':
+                    if(date !== null)
+                    {
+                        $scope.meta.birthDate = date;
+                        $scope.entry.birthMonth = date.getMonth()+1;
+                    }else{
+                        $scope.entry.birthMonth = null;
+                        $scope.entry.birthDate = null;
+                    }
+                break;
+                case 'DD':
+                    if(date !== null)
+                        $scope.entry.birthDate = date.getDate();
+                    else
+                        $scope.entry.birthDate = null;
+                break;
+            }
+        }
         
         $scope.checkProperty = function(id)
         {
@@ -606,7 +636,7 @@ var regApp = angular
                             "addressActive": "0",
                             "address": {},
                             "birthYear": $scope.today,
-                            "activeProperty": Object.keys($scope.propertyGroups)[0]
+                            "activeProperty": "all"
                         }
                         
                         $scope.$watch('entry.type', function() {
@@ -639,24 +669,19 @@ var regApp = angular
                         $scope.organizations = response.organizations;
                         $scope.propertyGroups = response.propertyGroups;
                         $scope.entry = response.fullEntry;
-                        
-                        $scope.meta = {};
-                        $scope.setCalTime = function(format, date, target) {
-                            switch(format)
-                            {
-                                case 'YYYY':
-                                    // virtualize ?
-                                    $scope.entry.birthYear = date.getFullYear();
-                                break;
-                            }
-                        }
                         if($scope.entry.class == 'PERSON')
                         {
                             $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
                         }
                         $scope.meta.addressActive = 0;
-                        $scope.meta.activeProperty = Object.keys($scope.propertyGroups)[0];
-
+                        $scope.meta.activeProperty = "all";
+                        
+                        if($scope.entry.birthYear !== undefined)
+                            $scope.meta.birthYear = new Date($scope.entry.birthYear + '-01-01 00:00:00');
+                        if($scope.entry.birthMonth !== undefined)
+                            $scope.meta.birthMonth = new Date($scope.entry.birthYear + '-' + $scope.entry.birthMonth + '-01 00:00:00');
+                        if($scope.entry.birthDay !== undefined)
+                            $scope.meta.birthDate = new Date($scope.entry.birthYear + '-' + $scope.entry.birthMonth + '-' + $scope.entry.birthDay + ' 00:00:00');
                         
                         angular.forEach($scope.entry.address, function(value, key) {
                             if(value.country == null)
@@ -678,41 +703,40 @@ var regApp = angular
             }
             
             $scope.submit = function() {
-                $scope.entryQuery = {};
+                $scope.entryQuery = $scope.entry;
                 $scope.entryQuery.entry = {
                     "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
                     "arguments":{
                         "registry": globalParams.get('user').registry,
                         "type": $scope.entry.type,
+                        "class": $scope.entryTypes[$scope.entry.type].class,
                         "externalId": $scope.entry.externalId,
                         "notes": $scope.entry.notes,
-                        "class": $scope.entry.class,
-                        "gender": $scope.entry.gender,
+                        "gender": $scope.entry.gender == '' ? null : $scope.entry.gender,
+                        "name": $scope.entry.name,
                         "firstName": $scope.entry.firstName,
                         "lastName": $scope.entry.lastName,
                         "birthYear": $scope.entry.birthYear,
                         "birthMonth": $scope.entry.birthMonth,
-                        "birthDay": $scope.entry.birthDay
+                        "birthDay": $scope.entry.birthDate
                     }
                 }
-
+                
                 if($routeParams.id !== '-1')
                     $scope.entryQuery.entry.arguments.id = $scope.entry.id;
-
+                
                 $http
                     .post(globalParams.static.apiurl, $scope.entryQuery)
                     .then(function(response)
                     {
                         if($routeParams.id == '-1')
                             var entryId = response.data.entry.data.item.id;
-                        else
-                            var entryId = $scope.entry.id;
 
-                        var membership = {};
+                        var connection = {};
                         angular.forEach($scope.entry.connection, function(values, key) {
                             if(values.organization !== '-') {
-                                membership['membership' + key] = {};
-                                membership['membership' + key].arguments = {
+                                connection['connection' + key] = {};
+                                connection['connection' + key].arguments = {
                                     "notes" : values.notes,
                                     "start" : globalParams.dateToObject(values.from),
                                     "end" : globalParams.dateToObject(values.to),
@@ -722,16 +746,17 @@ var regApp = angular
                                     "parentEntry": values.organization,
                                     "connectionType": $scope.connectionType[$scope.entry.type].id
                                 }
+                                
+                                if(values.id !== undefined)
+                                {
+                                    connection['connection' + key].service = 'connection/update';
+                                    connection['connection' + key].arguments.id = values.id;
+                                }else{
+                                    connection['connection' + key].service = 'connection/create';
+                                    connection['connection' + key].arguments.childEntry = entryId;
+                                }
                             }
 
-                            if(values.id !== undefined)
-                            {
-                                membership['membership' + key].service = 'connection/update';
-                                membership['membership' + key].arguments.id = values.id;
-                            }else{
-                                membership['membership' + key].service = 'connection/create';
-                                membership['membership' + key].arguments.childEntry = entryId;
-                            }
                         });
 
                         var address = {}
@@ -759,7 +784,7 @@ var regApp = angular
                             }
                         });
 
-                        var subQuery = angular.merge(membership, address);
+                        var subQuery = angular.merge(connection, address);
                         
                         if($scope.meta.membershipDelete !== undefined)
                         {
@@ -767,7 +792,7 @@ var regApp = angular
                             angular.forEach($scope.meta.membershipDelete, function(values, key) {
                                 if(values.id !== undefined)
                                 {
-                                    membershipDeleteQuery['membership' + key] = {
+                                    membershipDeleteQuery['connection' + key] = {
                                         "service":"connection/delete",
                                         "arguments": {
                                             "id": values.id
@@ -803,8 +828,8 @@ var regApp = angular
         $scope.submit = function() {
             $scope.message = null;
             var request = {
-                "username":$scope.loginform.user.value,
-                "password":$scope.loginform.password.value
+                "username":$scope.user,
+                "password":$scope.password
             }
             $http.post(
                 globalParams.static.apiurl + defaultParams.action,

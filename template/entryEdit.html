@@ -1,4 +1,4 @@
-<!-- pre style="position:absolute; left:10px; top:10px; width:400px; z-index:10;">{{ entry | json }}</pre -->
+<!-- pre style="position:absolute; left:10px; top:10px; width:400px; z-index:10;">{{ entry | json }}</pre-->
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="container-fluid">
@@ -40,14 +40,13 @@
                         </div>
                         <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
                             <label class="control-label col-sm-4">Födelseår</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-3">
                                 <div class="input-group">
                                     <input
                                         placeholder="År"
                                         type="text"
                                         class="form-control"
                                         uib-datepicker-popup="yyyy" 
-                                        init-date="today" 
                                         ng-model="meta.birthYear"
                                         is-open="meta.birthyearOpen"
                                         min-mode="'year'"
@@ -58,6 +57,56 @@
                                         <button
                                             class="btn btn-default"
                                             ng-click="meta.birthyearOpen = true"
+                                        >
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="input-group">
+                                    <input
+                                        placeholder="Månad"
+                                        type="text"
+                                        class="form-control"
+                                        uib-datepicker-popup="M" 
+                                        ng-model="meta.birthMonth"
+                                        init-date="meta.birthMonth" 
+                                        is-open="meta.birthmonthOpen"
+                                        max-mode="'month'"
+                                        min-mode="'month'"
+                                        ng-required="false"
+                                        ng-change="setCalTime('MM', meta.birthMonth, entry.birthMonth);"
+                                        close-text="Stäng" />
+                                    <span class="input-group-btn">
+                                        <button
+                                            class="btn btn-default"
+                                            ng-click="meta.birthmonthOpen = true"
+                                        >
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="input-group">
+                                    <input
+                                        placeholder="Dag"
+                                        type="text"
+                                        class="form-control"
+                                        uib-datepicker-popup="d" 
+                                        ng-model="meta.birthDate"
+                                        init-date="meta.birthDate" 
+                                        is-open="meta.birthDateOpen"
+                                        max-mode="'day'"
+                                        min-mode="'day'"
+                                        ng-required="false"
+                                        ng-change="setCalTime('DD', meta.birthDate, entry.birthDate);"
+                                        close-text="Stäng" />
+                                    <span class="input-group-btn">
+                                        <button
+                                            class="btn btn-default"
+                                            ng-click="meta.birthDateOpen = true"
                                         >
                                             <i class="fa fa-calendar"></i>
                                         </button>
@@ -89,14 +138,6 @@
                                         </div>
                                         <div class="col-xs-4 col-sm-2 text-right">
                                             <button class="btn btn-default" ng-click="removeMembership(key);"><i class="fa fa-times"></i> Radera</button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-4">Status</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" ng-model="entry.connection[key].status">
-                                                <option ng-repeat="(key, status) in statusTypes" value="{{ status.id }}">{{ status.name }}</option>
-                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -254,6 +295,7 @@
                                 </label>
                                 <div class="col-sm-8">
                                     <div ng-repeat="(key, value) in propertyGroups" class="property-group" ng-class="{ 'property-all' : meta.activeProperty == 'all' }">
+                                        <div ng-show="meta.activeProperty == value.id || meta.activeProperty == 'all'"><strong>{{ value.name }}</strong></div>
                                         <div
                                             class="checkbox checkbox-2col"
                                             ng-show="meta.activeProperty == value2.propertyGroup || meta.activeProperty == 'all'"

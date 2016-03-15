@@ -52,7 +52,13 @@
                                 <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
                                 <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
                                 <td ng-show="params.additionals == 'address'">{{ item.address.town }}</td>
-                                <td ng-show="params.additionals == 'contact'">{{ item.address.email }}</td>
+                                <td ng-show="params.additionals == 'contact'"><a
+                                        class="btn btn-xs btn-default"
+                                        ng-if="item.address.email"
+                                        href="mailto:{{ item.address.email }}">
+                                        <i class="fa fa-envelope"></i>
+                                    </a> {{ item.address.email }}
+                                </td>
                                 <td ng-show="params.additionals == 'contact'">{{ item.address.mobile }}</td>                        
                                 <td class="text-right">
                                     <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>

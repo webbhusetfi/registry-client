@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-4 col-lg-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
-        <div class="form-horizontal" ng-form="loginform" novalidate>
+        <div class="form-horizontal" ng-form="loginform" ui-keypress="{13:'submit()'}" novalidate>
             <h2>Logga in</h2>
             <div
                 class="form-group"
@@ -12,7 +12,15 @@
                 novalidate
             >
                 <div class="col-sm-12">
-                    <input class="form-control" required ng-minlength="5" ng-model="loginform.user.value" name="username" type="text" placeholder="Användarnamn">
+                    <input
+                        class="form-control"
+                        required
+                        ng-minlength="5"
+                        ng-model="user"
+                        ng-model-options="{ debounce:1000 }"
+                        type="text"
+                        placeholder="Användarnamn"
+                    >
                 </div>
             </div>
             <div
@@ -24,7 +32,15 @@
                 ng-form="loginform.password"
             >
                 <div class="col-sm-12">
-                    <input class="form-control" required ng-model="loginform.password.value" ng-minlength="4" type="password" placeholder="Lösenord">
+                    <input
+                        class="form-control"
+                        required
+                        ng-model="password"
+                        ng-model-options="{ debounce:1000 }"
+                        ng-minlength="4"
+                        type="password"
+                        placeholder="Lösenord"
+                    >
                 </div>
             </div>
             <div class="alert alert-info" ng-show="message != null">
