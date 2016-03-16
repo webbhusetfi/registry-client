@@ -25,19 +25,6 @@ var regApp = angular.module('RegistryClient')
             
             return this;
         },
-        getStatusTypes: function() {
-            reports.push('statusTypes');
-            query.statusTypes = {
-                "service":"status/search",
-                "arguments": {
-                    "filter": {
-                        "registry": config().registry
-                    }
-                }
-            }
-            
-            return this;
-        },
         getConnectionTypes: function() {
             reports.push('connectionType');
             query.connectionType = {
@@ -242,7 +229,6 @@ var regApp = angular.module('RegistryClient')
                         switch(service)
                         {
                             case 'type':
-                            case 'status':
                             case 'connectionType':
                             case 'propertyGroup':
                                 if(result[value].status === 'success' && result[value].data.foundCount > 0)

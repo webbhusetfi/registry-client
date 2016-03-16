@@ -560,6 +560,8 @@ var regApp = angular
         
         $scope.checkProperty = function(id)
         {
+            if(!$scope.entry.properties)
+                $scope.entry.properties = [];
             var index = Number($scope.entry.properties.indexOf(id));
             if(index == -1)
                 $scope.entry.properties.push(id);
@@ -587,7 +589,6 @@ var regApp = angular
         $scope.addMembership = function() {
             $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
                     "organization": "-",
-                    "status": "1",
                     "from": $scope.today,
                     "to": $scope.today,
                     "fromOpen":false,
@@ -605,7 +606,6 @@ var regApp = angular
             {
                 dbHandler
                     .getEntryTypes()
-                    .getStatusTypes()
                     .getConnectionTypes()
                     .getEntries({
                         "name":"organizations",
@@ -618,7 +618,6 @@ var regApp = angular
                     .runQuery()
                     .then(function(response) {
                         $scope.entryTypes = response.entryTypes;
-                        $scope.statusTypes = response.statusTypes;
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
                         $scope.propertyGroups = response.propertyGroups;
@@ -648,7 +647,6 @@ var regApp = angular
             }else{
                 dbHandler
                     .getEntryTypes()
-                    .getStatusTypes()
                     .getConnectionTypes()
                     .getProperties()
                     .getEntries({
@@ -663,7 +661,6 @@ var regApp = angular
                     .runQuery()
                     .then(function(response) {
                         $scope.entryTypes = response.entryTypes;
-                        $scope.statusTypes = response.statusTypes;
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
                         $scope.propertyGroups = response.propertyGroups;
@@ -693,7 +690,6 @@ var regApp = angular
                             $scope.entry.connection[key] = {
                                 "id" : value.id,
                                 "organization" : String(value.parentEntry.id),
-                                "status" : String(value.status.id),
                                 "from" : value.start ? new Date(value.start) : null,
                                 "to" : value.end ? new Date(value.end) : null
                             }
@@ -718,7 +714,8 @@ var regApp = angular
                         "birthYear": $scope.entry.birthYear,
                         "birthMonth": $scope.entry.birthMonth,
                         "birthDay": $scope.entry.birthDate,
-                        "notes": $scope.entry.notes
+                        "notes": $scope.entry.notes,
+                        "properties": $scope.entry.properties
                     }
                 }
                 
@@ -742,7 +739,6 @@ var regApp = angular
                                     "end" : globalParams.dateToObject(values.to),
                                     "startNotes" : values.startNotes,
                                     "endNotes" : values.endNotes,
-                                    "status" : Number(values.status),
                                     "parentEntry": values.organization,
                                     "connectionType": $scope.connectionType[$scope.entry.type].id
                                 }
