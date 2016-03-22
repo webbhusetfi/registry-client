@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ui.bootstrap'])
+    .module('RegistryClient', ['ngRoute', 'ui.bootstrap', 'chart.js'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
         var get = function(key)
         {
@@ -87,6 +87,10 @@ var regApp = angular
                         };
                     }
                 }
+            })
+            .when('/stat', {
+                templateUrl: '/stat/statView.html',
+                controller: 'statController'
             })
             .when('/registry/:id/delete', {
                 template: ' ',
