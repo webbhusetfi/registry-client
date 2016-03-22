@@ -573,27 +573,25 @@ var regApp = angular
             if($scope.meta.membershipDelete === undefined)
                 $scope.meta.membershipDelete = new Array();
             
-            $scope.meta.membershipDelete.push($scope.entry.membership[key]);
+            $scope.meta.membershipDelete.push($scope.entry.connection[key]);
             
-            delete $scope.entry.membership[key];
+            delete $scope.entry.connection[key];
             var index = 0;
             var newObject = {}
-            angular.forEach($scope.entry.membership, function(value, key)
+            angular.forEach($scope.entry.connection, function(value, key)
             {
-                newObject[index] = $scope.entry.membership[key];
+                newObject[index] = $scope.entry.connection[key];
                 index++;
             });
-            $scope.entry.membership = newObject;
+            $scope.entry.connection = newObject;
         }
 
         $scope.addMembership = function() {
             $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
-                    "organization": "-",
-                    "from": $scope.today,
-                    "to": $scope.today,
-                    "fromOpen":false,
-                    "toOpen":false
-                }
+                "organization": "-",
+                "from": $scope.today,
+                "fromOpen":false,
+            }
         }
         
         $scope.addContactsheet = function() {
@@ -672,12 +670,13 @@ var regApp = angular
                         $scope.meta.addressActive = 0;
                         $scope.meta.activeProperty = "all";
                         
-                        if($scope.entry.birthYear)
-                            $scope.meta.birthYear = new Date($scope.entry.birthYear + '-01-01 00:00:00');
-                        if($scope.entry.birthMonth)
-                            $scope.meta.birthMonth = new Date($scope.entry.birthYear + '-' + $scope.entry.birthMonth + '-01 00:00:00');
-                        if($scope.entry.birthDay)
-                            $scope.meta.birthDate = new Date($scope.entry.birthYear + '-' + $scope.entry.birthMonth + '-' + $scope.entry.birthDay + ' 00:00:00');
+                        
+                        if($scope.entry.birthYear !== null)
+                            $scope.meta.birthYear = new Date($scope.entry.birthYear, 1, 1);
+                        if($scope.entry.birthMonth !== null)
+                            $scope.meta.birthMonth = new Date($scope.entry.birthYear, $scope.entry.birthMonth-1, 1);
+                        if($scope.entry.birthDay !== null)
+                            $scope.meta.birthDate = new Date($scope.entry.birthYear, $scope.entry.birthMonth-1, $scope.entry.birthDay);
                         
                         angular.forEach($scope.entry.address, function(value, key) {
                             if(value.country == null)
@@ -691,7 +690,6 @@ var regApp = angular
                                 "id" : value.id,
                                 "organization" : String(value.parentEntry.id),
                                 "from" : value.start ? new Date(value.start) : null,
-                                "to" : value.end ? new Date(value.end) : null
                             }
                         })
                 });
@@ -726,8 +724,7 @@ var regApp = angular
                     .post(globalParams.static.apiurl, $scope.entryQuery)
                     .then(function(response)
                     {
-                        if($routeParams.id == '-1')
-                            var entryId = response.data.entry.data.item.id;
+                        var entryId = response.data.entry.data.item.id;
 
                         var connection = {};
                         angular.forEach($scope.entry.connection, function(values, key) {
@@ -736,7 +733,6 @@ var regApp = angular
                                 connection['connection' + key].arguments = {
                                     "notes" : values.notes,
                                     "start" : globalParams.dateToObject(values.from),
-                                    "end" : globalParams.dateToObject(values.to),
                                     "startNotes" : values.startNotes,
                                     "endNotes" : values.endNotes,
                                     "parentEntry": values.organization,
@@ -788,7 +784,7 @@ var regApp = angular
                             angular.forEach($scope.meta.membershipDelete, function(values, key) {
                                 if(values.id !== undefined)
                                 {
-                                    membershipDeleteQuery['connection' + key] = {
+                                    membershipDeleteQuery['deleteconnection' + key] = {
                                         "service":"connection/delete",
                                         "arguments": {
                                             "id": values.id
