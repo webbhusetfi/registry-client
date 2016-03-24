@@ -6,8 +6,9 @@
                 <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
             </div>
             <div class="col-xs-10 mainList-ct">
-
-                <div class="container-fluid" data-apa="statsController" style="width:50%;">
+                
+                <div ng-hide="config().registry" class="alert alert-warning">Inget register finns valt!</div>
+                <div class="container-fluid" style="width:50%;" ng-show="config().registry">
                     <div class="row">
                         <div class="col-md-12">
                             <p>Välj filtrering:</p>

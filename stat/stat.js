@@ -6,6 +6,8 @@ regApp.controller('statController', function ($scope, $http, globalParams) {
             registry: Number(globalParams.get('user').registry)
         }
     }
+    
+    $scope.config = config;
 
     $scope.headorg = null;
     $scope.headorg_members_count = null;
