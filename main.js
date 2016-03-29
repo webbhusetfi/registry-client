@@ -352,36 +352,13 @@ var regApp = angular
         
         $scope.setSearch = function()
         {
+            angular.forEach($scope.params.filter, function(val, key) {
+                if(val == null || val == undefined || val == "")
+                    delete $scope.params.filter[key];
+            });
             $scope.params.offset = 0;
             $scope.init();
         }
-        
-        $scope.checkKeys = function() {
-            var keys = '';
-            var i = 1;
-
-            if($scope.params !== undefined)
-            {
-                angular.forEach($scope.params.filter, function(val, key) {
-                    keys += key + (i < Object.keys($scope.params.filter).length ? ' + ' : '');
-                    i = i+1;
-                });
-            }
-            return keys;
-        }
-        
-        $scope.$watch($scope.checkKeys(), function(newVal) {
-            angular.forEach(Object.keys($scope.params.filter), function(value) {
-                if($scope[value] !== undefined)
-                {
-                    if($scope[value].length == 0)
-                    {
-                        $scope.params.filter = {};
-                        $scope.init();
-                    }
-                }
-            });
-        });
         
         $scope.setType = function(type)
         {
