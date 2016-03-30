@@ -326,6 +326,12 @@
                             <hr>
                         </div>
                         <h2>Meta</h2>
+                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'ORGANIZATION'">
+                            <label class="control-label col-sm-4">Beskrivning</label>
+                            <div class="col-sm-8">
+                                <textarea placeholder="Beskrivning" class="form-control" ng-model="entry.description"></textarea>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label class="control-label col-sm-4">Anteckningar</label>
                             <div class="col-sm-8">

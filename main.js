@@ -694,6 +694,7 @@ var regApp = angular
                         "birthMonth": $scope.entry.birthMonth,
                         "birthDay": $scope.entry.birthDate,
                         "notes": $scope.entry.notes,
+                        "description": (($scope.entry.description === undefined) ? null : $scope.entry.description),
                         "properties": $scope.entry.properties
                     }
                 }
