@@ -21,6 +21,15 @@
                                         placeholder="Föreningsnamn"
                                         class="form-control">
                                    <input
+                                        ng-model="params.filter.id"
+                                        ng-show="params.class == 'PERSON'"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="MedlemsID"
+                                        class="form-control">
+                                </td>
+                                <td ng-show="params.class == 'PERSON'">
+                                   <input
                                         ng-model="params.filter.lastName"
                                         ng-show="params.class == 'PERSON'"
                                         ng-model-options="{ debounce:500 }"
@@ -81,8 +90,9 @@
                             <tr ng-repeat="(key, item) in entrylist">
                                 <td>
                                     <span ng-show="item.class == 'ORGANIZATION'"><i class="fa fa-cube"></i> {{ item.name }}</span>
-                                    <span ng-show="item.class == 'PERSON'"><i ng-show="item.class == 'PERSON'" class="fa fa-user"></i> {{ item.lastName }}</span>
+                                    <span ng-show="item.class == 'PERSON'"><i ng-show="item.class == 'PERSON'" class="fa fa-user"></i> {{ item.id }}</span>
                                 </td>
+                                <td ng-show="params.class == 'PERSON'">{{ item.lastName }}</td>
                                 <td ng-show="params.class == 'PERSON'">{{ item.firstName }}</td>
                                 <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
                                 <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
