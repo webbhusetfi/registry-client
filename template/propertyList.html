@@ -1,0 +1,46 @@
+<div class="outer-section">
+    <div ng-include="'/template/topbar.html'"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
+            </div>
+            <div class="col-xs-8 col-sm-9 col-md-10 mainList-ct">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h2>Egenskaper</h2>
+                            </div>
+                        </div>
+                        <table class="mainList">
+                            <thead>
+                                <td><strong>Namn</strong></td>
+                            </thead>
+                            <tbody ng-repeat="propertyGroup in propertyGroups">
+                                <tr>
+                                    <td>
+                                        <a href="#" class="editable" editable-text="propertyGroup.name" e-name="{{ propertyGroup.id }}">
+                                            <i class="fa fa-angle-right"></i> {{ propertyGroup.name }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="property in propertyGroup.children">
+                                    <td>
+                                        <span class="spacer"></span>
+                                        <a href="#" class="editable" editable-text="property.name" e-name="{{ property.id }}">
+                                            <i class="fa fa-angle-right"></i> {{ property.name }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="alert alert-info" ng-show="foundCount.entrylist == 0">
+                    Inga poster.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
