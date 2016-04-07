@@ -1,5 +1,6 @@
 @import url("//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css");
 @import url("//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/angular-xeditable/0.1.11/css/xeditable.min.css");
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,700,300);
 @import url(https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,300,300italic);
 @import 'scss/_compatibility';
@@ -119,3 +120,12 @@ img.webbhuset { max-width:14rem; vertical-align:baseline; }
 
 .pagination { text-align:center; display:block; }
 .pagination > li > a { float:none; }
+
+
+span.spacer {
+    display:inline-block;
+    width:2rem;
+}
+.editable-click, a.editable-click { border-bottom:none; }
+a.editable-click { padding-top:0.4rem; padding-bottom:0.4rem; display:inline-block; }
+.editable-controls input.form-control, .editable-controls button { padding-top:0.3rem!important; padding-bottom:0.3rem!important; height:28px; }

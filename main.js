@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ui.bootstrap', 'chart.js'])
+    .module('RegistryClient', ['ngRoute', 'ui.bootstrap', 'xeditable', 'chart.js'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
         var get = function(key)
         {
@@ -67,6 +67,9 @@ var regApp = angular
             dateToObject: dateToObject,
         };
     })
+    .run(function(editableOptions) {
+        editableOptions.theme = 'bs3';
+    })
     .config(function($httpProvider, $routeProvider, $locationProvider) {
         $httpProvider.defaults.headers.post['Content-Type'] = 'application/json; charset=UTF-8';
         $httpProvider.defaults.useXDomain = true;
@@ -88,7 +91,7 @@ var regApp = angular
                     }
                 }
             })
-            .when('/stat', {
+            .when('/stat/', {
                 templateUrl: '/stat/statView.html',
                 controller: 'statController'
             })
@@ -111,6 +114,10 @@ var regApp = angular
             .when('/entry/:id/edit', {
                 templateUrl: '/template/entryEdit.html',
                 controller: 'entryEdit'
+            })
+            .when('/property/list/:id?', {
+                templateUrl: '/template/propertyList.html',
+                controller: 'propertyList'
             })
             .when('/user/login', {
                 templateUrl: '/template/userLogin.html',
@@ -416,9 +423,7 @@ var regApp = angular
             $scope.params.class = "PERSON";
             $scope.params.parentEntry = $routeParams.id;
             $scope.params.orgId = $routeParams.id;
-        }else{
-            $scope.params.orgId = 1;
-        }        
+        }
         
         $scope.init = function()
         {
@@ -694,6 +699,7 @@ var regApp = angular
                         "birthMonth": $scope.entry.birthMonth,
                         "birthDay": $scope.entry.birthDate,
                         "notes": $scope.entry.notes,
+                        "description": (($scope.entry.description === undefined) ? null : $scope.entry.description),
                         "properties": $scope.entry.properties
                     }
                 }
@@ -792,6 +798,21 @@ var regApp = angular
         };
         
         $scope.init();
+    })
+    .controller('propertyList', function($scope, $http, $location, $log, $routeParams, dbHandler) {
+        var db = dbHandler;
+        
+        if(!isNaN(Number($routeParams.id)))
+            db.getProperties()
+        else
+            db.getProperties($routeParams.id);
+        
+        db
+            .runQuery()
+            .then(function(response) {
+                $scope.propertyGroups = response.propertyGroups;
+                $log.log($scope.propertyGroups);
+            });
     })
     .controller('userLogin', function($scope, $http, $location, $log, globalParams, defaultParams) {
         $scope.loginform = {};

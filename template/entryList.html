@@ -12,14 +12,23 @@
                         <div ng-include="'/template/entryListMenu.html'"></div>
                         <table ng-show="1" class="mainList">
                             <thead>
-                                <td>
+                                <td class="col-xs-1">
+                                   <input
+                                        ng-model="params.filter.id"
+                                        ng-model-options="{ debounce:500 }"
+                                        ng-change="setSearch();"
+                                        placeholder="ID"
+                                        class="form-control">                                    
+                                </td>
+                                <td ng-show="params.class == 'ORGANIZATION'">
                                     <input
                                         ng-model="params.filter.name"
-                                        ng-show="params.class == 'ORGANIZATION'"
                                         ng-model-options="{ debounce:500 }"
                                         ng-change="setSearch();"
                                         placeholder="Föreningsnamn"
                                         class="form-control">
+                                </td>
+                                <td ng-show="params.class == 'PERSON'">
                                    <input
                                         ng-model="params.filter.lastName"
                                         ng-show="params.class == 'PERSON'"
@@ -79,10 +88,11 @@
                                 <td></td>
                             </thead>
                             <tr ng-repeat="(key, item) in entrylist">
-                                <td>
-                                    <span ng-show="item.class == 'ORGANIZATION'"><i class="fa fa-cube"></i> {{ item.name }}</span>
-                                    <span ng-show="item.class == 'PERSON'"><i ng-show="item.class == 'PERSON'" class="fa fa-user"></i> {{ item.lastName }}</span>
+                                <td class="text-center">{{ item.id }}</td>
+                                <td ng-show="item.class == 'ORGANIZATION'">
+                                    <i class="fa fa-cube"></i> {{ item.name }}
                                 </td>
+                                <td ng-show="params.class == 'PERSON'">{{ item.lastName }}</td>
                                 <td ng-show="params.class == 'PERSON'">{{ item.firstName }}</td>
                                 <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
                                 <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
