@@ -52,7 +52,6 @@ var regApp = angular
         
         return {
             static: {
-                "apiurl":"https://api.registry.huset.fi/",
                 "datepickerPopupConfig":{
                     "uib-datepicker-popup":"dd.MM.yyyy",
                     "current-text":"Idag",
@@ -399,7 +398,7 @@ var regApp = angular
                     $scope.entryTypes = response.entryTypes;
                     $scope.foundCount = response.foundCount;
                     
-                    if($scope.params.propertyGroup === undefined)
+                    if($scope.params.propertyGroup === undefined && $scope.params.propertyGroup !== undefined)
                         $scope.params.propertyGroup = Object.keys($scope.properties)[0];
                     
                     if($scope.foundCount.entrylist > 0)

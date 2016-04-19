@@ -105,7 +105,7 @@ var regApp = angular.module('RegistryClient')
                 "service":"type/search",
                 "arguments": {
                     "filter": {
-                        "registry": config().registry
+                        "registry": globalParams.get('user').registry
                     }
                 }
             }
@@ -118,7 +118,7 @@ var regApp = angular.module('RegistryClient')
                 "service":"connectionType/search",
                 "arguments": {
                     "filter": {
-                        "registry": config().registry
+                        "registry": globalParams.get('user').registry
                     }
                 }
             }
@@ -138,7 +138,7 @@ var regApp = angular.module('RegistryClient')
                 "service":"propertyGroup/search",
                 "arguments": {
                     "filter": {
-                        "registry": config().registry
+                        "registry": globalParams.get('user').registry
                     }
                 },
                 "order": {
@@ -156,7 +156,7 @@ var regApp = angular.module('RegistryClient')
                 "service":"entry/search",
                 "arguments":{
                     "filter": {
-                        "registry": config().registry
+                        "registry": globalParams.get('user').registry
                     },
                     "order": {
                         "name":"asc"
@@ -254,7 +254,7 @@ var regApp = angular.module('RegistryClient')
                                     }
                                 });
                                 $http
-                                    .post(config().apiurl, subQuery)
+                                    .post(config.apiurl + url, subQuery)
                                     .then(function(SQResponse) {
                                         angular.forEach(SQResponse.data, function(value, key) {
                                             response.data[options.propertyTree + key] = value.data.items;
