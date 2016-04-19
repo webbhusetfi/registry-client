@@ -1,5 +1,5 @@
 var regApp = angular.module('RegistryClient')
-.factory('dialogHandler', ['$http', '$q', '$log', '$location', '$uibModal', function($http, $q, $log, $location, $uibModal) {
+.factory('dialogHandler', ['$http', '$q', '$log', '$route', '$location', '$uibModal', 'dbHandler', function($http, $q, $log, $route, $location, $uibModal, dbHandler) {
     var dialogHandler = {
         deleteConfirm: function(item, action)
         {
@@ -7,7 +7,16 @@ var regApp = angular.module('RegistryClient')
             {
                 var modalInstance = $uibModal.open({
                     templateUrl: 'template/entryListDelete.html',
-                    controller: 'entryListDelete',
+                    controller: function($scope, $uibModalInstance, $log, item) {
+                        $scope.item = item;
+                        $scope.dismiss = function() {
+                            $uibModalInstance.dismiss();
+                        }
+
+                        $scope.go = function(id) {
+                            $uibModalInstance.close(id);
+                        }
+                    },
                     size: 'sm',
                     resolve: {
                         item: item
@@ -15,16 +24,9 @@ var regApp = angular.module('RegistryClient')
                 });
                 
                 modalInstance.result.then(function (id) {
-                    var deleteQuery = {
-                        "entry": {
-                            "service":"entry/delete",
-                            "arguments": {
-                                "id": id
-                            }
-                        }
-                    }
-                    $http
-                        .post(globalParams.static.apiurl, deleteQuery)
+                    dbHandler
+                        .setQuery(action)
+                        .runQuery()
                         .then(function(response) {
                             $route.reload();
                         })

@@ -293,6 +293,15 @@ var regApp = angular.module('RegistryClient')
                     case 'read':
                         switch(service)
                         {
+                            case 'registry':
+                                if(result[value].status == 'success')
+                                {
+                                    parsedResult[value] = result[value].data.item;
+                                }else{
+                                        parsedResult.entry = false;
+                                }
+                            break;
+                            
                             case 'entry':
                                 if(options['fullEntry'] !== undefined)
                                 {
@@ -318,9 +327,13 @@ var regApp = angular.module('RegistryClient')
                         }
                     break;
                     
+                    case 'delete':
+                        parsedResult[value] = result[value];
+                    break;
+                    
                     case 'create':
                     case 'update':
-                        $log.log(result[value]);
+                        parsedResult[value] = result[value];
                     break;
                     
                     default:

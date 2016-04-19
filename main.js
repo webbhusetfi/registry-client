@@ -144,6 +144,17 @@ var regApp = angular
         }
         $scope.user = globalParams.get('user');
         
+        $scope.deleteConfirm = function(item) {
+            dialogHandler.deleteConfirm(item, {
+                "entry": {
+                    "service":"registry/delete",
+                    "arguments": {
+                        "id": item.id
+                    }
+                }
+            })
+        };
+        
         dbHandler
             .getRegistries({
                 "offset":0,
@@ -161,12 +172,14 @@ var regApp = angular
     .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
         $scope.routeParams = $routeParams;
         $scope.registry = {};
+        
         if(Number($routeParams.id) !== -1)
         {
             dbHandler
                 .getRegistry({"id":$routeParams.id})
+                .runQuery()
                 .then(function(response) {
-                    $scope.registry = response;
+                    $scope.registry = response.registry;
                 })
                 .catch(function(response) {
                     $log.error(response);
@@ -195,49 +208,8 @@ var regApp = angular
                     $location.path('/registry/list');
                 })
                 .catch(function(response) {
-                    // $log.error(response);
                     $location.path('/logout');
                 });
-        };
-    })
-    .controller('registryDelete', function($scope, $uibModalInstance, $log, item) {
-        $scope.item = item;
-        $scope.dismiss = function() {
-            $uibModalInstance.dismiss();
-        }
-        
-        $scope.go = function(id) {
-            $uibModalInstance.close(id);
-        };
-    })
-    /*
-    .controller('registryDelete', function($routeParams, $http, $location, $log, globalParams) {
-        var request = {
-            "request1":{
-                "service":"registry/delete",
-                "arguments":{
-                    "id":Number($routeParams.id)
-                }
-            }
-        }
-        
-        $http
-            .post(globalParams.static.apiurl, request)
-            .then(function(response) {
-                $location.path('registry/list');
-            }).catch(function(response) {
-                $log.error(response);
-            });
-    })
-    */
-    .controller('entryListDelete', function($scope, $uibModalInstance, $log, item) {
-        $scope.item = item;
-        $scope.dismiss = function() {
-            $uibModalInstance.dismiss();
-        }
-        
-        $scope.go = function(id) {
-            $uibModalInstance.close(id);
         };
     })
     .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dbHandler) {
