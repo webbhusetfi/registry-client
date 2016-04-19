@@ -5,6 +5,6 @@
     </div>
     <div class="col-xs-4 text-right" style="padding-top:2rem;">
         <a ng-show="routeParams.id !== undefined" class="btn btn-default" href="/entry/list"><i class="fa fa-reply"></i> Tillbaka</a>                
-        <a ng-show="globalParams.get('user').sa && routeParams.id == undefined" class="btn btn-default" href="/registry/list"><i class="fa fa-reply"></i> Tillbaka</a>
+        <a ng-show="globalParams.get('user').role == 'SUPER_ADMIN' && routeParams.id == undefined" class="btn btn-default" href="/registry/list"><i class="fa fa-reply"></i> Tillbaka</a>
     </div>
 </div>

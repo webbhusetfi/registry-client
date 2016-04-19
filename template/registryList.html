@@ -1,27 +1,26 @@
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
-    <div class="container-fluid">
+    <div class="inner-section container-fluid">
         <div class="row">
             <div class="col-xs-2">
                 <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
             </div>
-            <div class="col-xs-10 mainList-ct">
-                <div ng-include="'/template/header.html'"></div>
+            <div class="col-xs-offset-2 col-xs-10 mainList-ct">
                 <div ng-include="'/template/registryListMenu.html'"></div>
                 <div class="row">
                     <div class="col-sm-12">
                         <table class="mainList">
-                            <tr ng-repeat="item in resource">
+                            <tr ng-repeat="item in resource.registries">
                                 <td><a href="/registry/{{item.id}}/edit">{{item.name}}</a></td>
                                 <td>
-                                    <a href="/registry/{{item.id}}/delete" ng-disabled="1" onclick="confirm('Radera?') ? return true : return false;" class="btn btn-default btn-sm"><i class="fa fa-times fa-lg"></i></a>
-                                    <a ng-click="goto(item.id)" class="btn btn-default btn-sm"><i class="fa fa-sign-in"></i></a>
+                                    <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>
+                                    <a ng-click="goto(item.id)" class="btn btn-xs btn-primary"><i class="fa fa-sign-in"></i></a>
                                 </td>
                             </tr>
                         </table>
                     </div>
                 </div>
-                <div class="alert alert-info" ng-show="resource == 0">
+                <div class="alert alert-info" ng-show="resource.foundCount.registries == 0">
                     Inga poster.
                 </div>
                 <div ng-include="'/template/pagination.html'"></div>

@@ -8,18 +8,37 @@
 @import 'scss/_offcanvas';
 @import 'scss/_toolbars';
 
-html { min-height:100%; }
+html { height:100%; background:#333; }
 body {
     min-height:100%;
-    overflow-x:hidden;
-    > .outer {
-        margin:0 -1.5rem;
+    > .main {
+        position:absolute;
+        width:100%;
         min-height:100%;
-        background:$background;
-        > .main {
-            padding:1.5rem;
+        .outer-section {
+            > .inner-section {
+                position:absolute;
+                width:100%;
+                min-height:calc(100% - 50px);
+                > .row {
+                    position:absolute;
+                    min-height:100%;
+                    width:100%;
+                    > * {
+                        position:absolute;
+                        min-height:100%;
+                        &:first-child {
+                            background:#333;
+                        }
+                    }
+                }
+            }
+            width:100%;
+            position:absolute;
+            min-height:100%;
         }
     }
+    overflow-x:hidden;
 }
 
 h1, h2, h3 { font-family:Lato, Arial, Tahoma, Sans-serif; font-weight:300; }
@@ -89,6 +108,13 @@ h3 { font-size:2rem; }
     a:hover {
         color:#fff;
         text-decoration:none;
+    }
+}
+
+.list-functions {
+    margin-top:4rem;
+    h2 {
+        margin-top:0; margin-bottom:0;
     }
 }
 

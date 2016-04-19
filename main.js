@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ui.bootstrap', 'xeditable', 'chart.js'])
+    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
         var get = function(key)
         {
@@ -67,7 +67,7 @@ var regApp = angular
             dateToObject: dateToObject,
         };
     })
-    .run(function(editableOptions) {
+    .run(function($window, $log, editableOptions) {
         editableOptions.theme = 'bs3';
     })
     .config(function($httpProvider, $routeProvider, $locationProvider) {
@@ -77,19 +77,7 @@ var regApp = angular
         $routeProvider
             .when('/registry/list', {
                 templateUrl: '/template/registryList.html',
-                controller: 'registryList',
-                resolve: {
-                   defaultParams: function()
-                    {
-                        return {
-                            service: 'registry/search',
-                            arguments: {
-                                offset: 0,
-                                limit:  20
-                            }
-                        };
-                    }
-                }
+                controller: 'registryList'
             })
             .when('/stat/', {
                 templateUrl: '/stat/statView.html',
@@ -147,103 +135,82 @@ var regApp = angular
             
         $locationProvider.html5Mode(true);
     })
-    .controller('registryList', function ($scope, $routeParams, $http, $location, $log, globalParams, defaultParams) {
-        $scope.request = request;
-        $scope.user = globalParams.get('user');
-        
+    .controller('registryList', function ($scope, $routeParams, $http, $location, $window, $log, dbHandler, dialogHandler, globalParams) {
         $scope.goto = function(id) {
             var user = globalParams.get('user');
             user.registry = Number(id);
             globalParams.set('user', user);
             $location.path('entry/list');
         }
+        $scope.user = globalParams.get('user');
         
-        var request = {};
-        request = angular.merge(defaultParams, $routeParams);
-        
-        $http.post(
-                globalParams.static.apiurl,
-                {"request1":request}
-            ).then(function(response) {
-                // internal handling on successful load
-                $scope.request = request;
-                $scope.resource = response.data.request1.data.items;
-
-                if(response.data.count !== undefined)
-                {
-                    var pagination = [];
-                    for(i = 0; i < Math.ceil(response.data.count/20); i++)
-                    {
-                        var page = {}
-                        page.name = i;
-                        if(i == request.offset/request.limit)
-                            page.class = 'active';
-                        pagination.push(page);
-                    }
-                }
-                $scope.resource.pagination = pagination;
-            // http failure
-            }).catch(function(response) {
-                $location.path('/user/logout');
+        dbHandler
+            .getRegistries({
+                "offset":0,
+                "limit":20
+            })
+            .runQuery()
+            .then(function(response) {
+                $scope.resource = response;
+            })
+            .catch(function(response) {
+                $log.error(response);
+                $location.path('/logout');
             });
     })
-    .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, globalParams) {
+    .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
         $scope.routeParams = $routeParams;
-        $scope.post = {};
+        $scope.registry = {};
         if(Number($routeParams.id) !== -1)
         {
-            var request = {
-                "request1": {
-                    "service":"registry/read",
-                    "arguments":{
-                        "id": $routeParams.id
-                    }
-                }
-            }
-            $http
-                .post(globalParams.static.apiurl, request)
+            dbHandler
+                .getRegistry({"id":$routeParams.id})
                 .then(function(response) {
-                    $scope.post = response.data.request1.data.item;
+                    $scope.registry = response;
                 })
                 .catch(function(response) {
                     $log.error(response);
+                    $location.path('/logout');
                 });
         }
         $scope.submit = function() {
-            if(Number($routeParams.id) === -1)
-            {
-                var request = {
-                    "request1": {
-                        "service":"registry/create",
-                        "arguments": {
-                            "name":$scope.post.name.value
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var request = {
-                    "request1": {
-                        "service":"registry/update",
-                        "arguments": {
-                            "id":Number($routeParams.id),
-                            "name":$scope.post.name.value
-                        }
+            var request = {
+                "registry": {
+                    "service":"registry/update",
+                    "arguments":{
+                        "name":$scope.registry.name
                     }
                 }
             }
             
-            $http
-                .post(globalParams.static.apiurl, request)
+            if(Number($routeParams.id) !== -1)
+                request.registry.arguments.id = $scope.registry.id;
+            else
+                request.registry.service = 'registry/create';
+            
+            dbHandler
+                .setQuery(request)
+                .runQuery()
                 .then(function(response) {
-                    $location.path('/registry/list')
+                    $location.path('/registry/list');
                 })
                 .catch(function(response) {
-                    $log.error(response);
+                    // $log.error(response);
+                    $location.path('/logout');
                 });
         };
     })
+    .controller('registryDelete', function($scope, $uibModalInstance, $log, item) {
+        $scope.item = item;
+        $scope.dismiss = function() {
+            $uibModalInstance.dismiss();
+        }
+        
+        $scope.go = function(id) {
+            $uibModalInstance.close(id);
+        };
+    })
+    /*
     .controller('registryDelete', function($routeParams, $http, $location, $log, globalParams) {
         var request = {
             "request1":{
@@ -262,6 +229,7 @@ var regApp = angular
                 $log.error(response);
             });
     })
+    */
     .controller('entryListDelete', function($scope, $uibModalInstance, $log, item) {
         $scope.item = item;
         $scope.dismiss = function() {
@@ -814,30 +782,30 @@ var regApp = angular
                 $log.log($scope.propertyGroups);
             });
     })
-    .controller('userLogin', function($scope, $http, $location, $log, globalParams, defaultParams) {
+    .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, defaultParams, dbHandler) {
         $scope.loginform = {};
         $scope.loginform.user = {};
         $scope.loginform.password = {};
         
         $scope.submit = function() {
             $scope.message = null;
-            var request = {
-                "username":$scope.user,
-                "password":$scope.password
-            }
-            $http.post(
-                globalParams.static.apiurl + defaultParams.action,
-                request)
+            
+            dbHandler
+                .setUrl('login/')
+                .setLogin({
+                    "username":$scope.user,
+                    "password":$scope.password
+                })
                 .then(function(response) {
-                    $scope.response = response;
-                    
-                    if(response.data.registry == null)
-                        response.data.sa = true;
-                    
-                    globalParams.set('user', response.data);
-                    $location.path('/registry/list');
-                }).catch(function(response) {
-                    $scope.message = response.data.message;
+                    if(response.message !== undefined)
+                    {
+                        $scope.message = response.message;
+                    }else{
+                        if(response.role == 'SUPER_ADMIN')
+                            $location.path('/registry/list');
+                        else
+                            $location.path('/entry/list');
+                    }
                 });
         };
     })

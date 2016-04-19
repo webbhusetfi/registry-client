@@ -1,17 +1,104 @@
 var regApp = angular.module('RegistryClient')
-.factory('dbHandler', ['$http', '$log', '$location', 'globalParams', function($http, $log, $location, globalParams) {
-    var config = function() {
-        return {
-            apiurl: "https://api.registry.huset.fi/",
-            registry: Number(globalParams.get('user').registry)
-        }
-    }
-    
+.factory('dbHandler', ['$http', '$q', '$log', '$location', 'globalParams', function($http, $q, $log, $location, globalParams) {
     var reports = []
     var query = {};
     var options = {};
-        
+    var url = "";
+
+    // internal functions
+    var dbInternals = {
+        getConfig: function() {
+            var defer = $q.defer();
+            var defaults = {
+                apiurl: "https://api.registry.huset.fi/",
+                url: url,
+                registry: Number(globalParams.get('user').registry)
+            }
+            $http
+                .get('/config.local.json')
+                .then(function(response) {
+                    if(angular.isObject(response))
+                        defer.resolve(angular.merge(defaults, response.data));
+                    else
+                        defer.resolve(defaults);
+                });
+            return defer.promise;
+        }
+    }
+    
     var dbHandler = {
+        // external functions
+        setUrl: function(urlString) {
+            if(angular.isString(urlString))
+                url = urlString;
+            else
+                $log.error('Not a string in setUrl(urlString)');
+            
+            return this;
+        },
+        // overwrites query buffer
+        setQuery: function(newQuery) {
+            if(newQuery !== undefined)
+                query = newQuery;
+            
+            angular.forEach(Object.keys(newQuery), function(value, key) {
+                reports.push(value);
+            });
+            
+            return this;
+        },
+        setLogin: function(queryData) {
+            var defer = $q.defer();
+            
+            dbInternals.getConfig().then(function(config) {
+                $http
+                    .post(config.apiurl + config.url, queryData)
+                    .then(function(response) {
+                        globalParams.set('user', response.data);
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    }).catch(function(response) {
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    });
+            });
+            
+            return defer.promise;
+        },
+        getRegistries: function(arguments) {
+            if(arguments === undefined)
+                arguments = {};
+            
+            reports.push('registries');
+            query.registries = {
+                "service":"registry/search",
+                "arguments": angular.merge({
+                    "offset":0,
+                    "limit":20
+                }, arguments)
+            }
+            
+            return this;
+        },
+        getRegistry: function(arguments) {
+            if(arguments.id !== undefined)
+            {
+                if(arguments === undefined)
+                    arguments = {};
+
+                reports.push('registry');
+                query.registry = {
+                    "service":"registry/read",
+                    "arguments": angular.merge({
+                        "id":null
+                    }, arguments)
+                }
+            }else{
+                $log.error('read must have id');
+            }
+            
+            return this;
+        },
         getEntryTypes: function() {
             reports.push('entryTypes');
             query.entryTypes = {
@@ -140,52 +227,59 @@ var regApp = angular.module('RegistryClient')
             
             return this;
         },
-        reset: function() {
-            query = {};
-            
-            return this;
-        },
         runQuery: function() {
-            var promise = $http
-                .post(config().apiurl, query)
-                .then(function(response)
-                {
-                    if(options.propertyTree !== undefined)
+            var result = $q.defer();
+            
+            dbInternals.getConfig().then(function(config) {
+                $http
+                    .post(config.apiurl + url, query)
+                    .then(function(response)
                     {
-                        if(response.data[options.propertyTree].data.foundCount > 0)
+                        if(options.propertyTree !== undefined)
                         {
-                            var subQuery = {}
-                            angular.forEach(response.data[options.propertyTree].data.items, function(value, key) {
-                                subQuery[value.id] = {
-                                    "service":"property/search",
-                                    "arguments": {
-                                        "filter": {
-                                            "propertyGroup":value.id
-                                        },
-                                        "order": {
-                                            "name":"asc"
+                            if(response.data[options.propertyTree].data.foundCount > 0)
+                            {
+                                var subQuery = {}
+                                angular.forEach(response.data[options.propertyTree].data.items, function(value, key) {
+                                    subQuery[value.id] = {
+                                        "service":"property/search",
+                                        "arguments": {
+                                            "filter": {
+                                                "propertyGroup":value.id
+                                            },
+                                            "order": {
+                                                "name":"asc"
+                                            }
                                         }
                                     }
-                                }
-                            });
-                            $http
-                                .post(config().apiurl, subQuery)
-                                .then(function(SQResponse) {
-                                    angular.forEach(SQResponse.data, function(value, key) {
-                                        response.data[options.propertyTree + key] = value.data.items;
-                                    });
-                                    return dbHandler.parseResult(response.data);
-                                })
+                                });
+                                $http
+                                    .post(config().apiurl, subQuery)
+                                    .then(function(SQResponse) {
+                                        angular.forEach(SQResponse.data, function(value, key) {
+                                            response.data[options.propertyTree + key] = value.data.items;
+                                        });
+                                        result.resolve(dbHandler.parseResult(response.data));
+                                    })
+                            }
                         }
-                    }
-                    return dbHandler.parseResult(response.data);
-                })
-                .catch(function(response)
-                {
-                    if(response.status === 403)
-                        $location.path('/logout');
-                })
-            return promise;
+                        result.resolve(dbHandler.parseResult(response.data));
+                    })
+                    .catch(function(response)
+                    {
+                        if(response.status === 403)
+                            $location.path('/logout');
+                    })
+            });
+            return result.promise;
+        },
+        reset: function() {
+            reports = [];
+            query = {};
+            options = {};
+            url = "";
+            
+            return this;
         },
         parseResult: function(result) {
             var parsedResult = {};
@@ -223,7 +317,12 @@ var regApp = angular.module('RegistryClient')
                             break;
                         }
                     break;
-
+                    
+                    case 'create':
+                    case 'update':
+                        $log.log(result[value]);
+                    break;
+                    
                     default:
                     case 'search':
                         switch(service)
@@ -268,6 +367,8 @@ var regApp = angular.module('RegistryClient')
                     break;
                 }
             });
+            
+            dbHandler.reset();
             return parsedResult;
         }
     }
