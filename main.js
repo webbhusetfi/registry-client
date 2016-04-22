@@ -381,11 +381,10 @@ var regApp = angular
                     
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
-                    $scope.properties = response.propertyGroups;
+                    $scope.properties = response.properties;
                     $scope.foundCount = response.foundCount;
                     
-                    if($scope.params.propertyGroup === undefined && $scope.params.propertyGroup !== undefined)
-                        $scope.params.propertyGroup = Object.keys($scope.properties)[0];
+                    $scope.params.propertyGroup = Object.keys($scope.properties)[0];
                     
                     if($scope.foundCount.entrylist > 0)
                     {
