@@ -6,7 +6,7 @@ var regApp = angular.module('RegistryClient')
             if(item.id !== undefined)
             {
                 var modalInstance = $uibModal.open({
-                    templateUrl: 'template/entryListDelete.html',
+                    templateUrl: 'template/dialogDelete.html',
                     controller: function($scope, $uibModalInstance, $log, item) {
                         $scope.item = item;
                         $scope.dismiss = function() {

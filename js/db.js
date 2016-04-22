@@ -1,8 +1,11 @@
 var regApp = angular.module('RegistryClient')
 .factory('dbHandler', ['$http', '$q', '$log', '$location', 'globalParams', function($http, $q, $log, $location, globalParams) {
-    var reports = []
     var query = {};
     var options = {};
+    var joins = {};
+    
+    var reports = [];
+    
     var url = "";
 
     // internal functions
@@ -44,6 +47,17 @@ var regApp = angular.module('RegistryClient')
             angular.forEach(Object.keys(newQuery), function(value, key) {
                 reports.push(value);
             });
+            
+            return this;
+        },
+        setJoin: function(join) {
+            if(options.joins === undefined)
+                options.joins = {};
+            if(options.joins[join.resource] === undefined)
+                options.joins[join.resource] = {};
+            
+            var name = (Number(Object.keys(options.joins[join.resource]).length) + 1);
+            options.joins[join.resource][join.field] = join;
             
             return this;
         },
@@ -99,19 +113,6 @@ var regApp = angular.module('RegistryClient')
             
             return this;
         },
-        getEntryTypes: function() {
-            reports.push('entryTypes');
-            query.entryTypes = {
-                "service":"type/search",
-                "arguments": {
-                    "filter": {
-                        "registry": globalParams.get('user').registry
-                    }
-                }
-            }
-            
-            return this;
-        },
         getConnectionTypes: function() {
             reports.push('connectionType');
             query.connectionType = {
@@ -129,10 +130,9 @@ var regApp = angular.module('RegistryClient')
             if(args === undefined)
                 args = {};
             if(args.name === undefined)
-                args.name = 'propertyGroups';
+                args.name = 'properties';
             
             reports.push(args.name);
-            options = angular.merge(options, {"propertyTree":args.name});
             
             query[args.name] = {
                 "service":"propertyGroup/search",
@@ -235,35 +235,43 @@ var regApp = angular.module('RegistryClient')
                     .post(config.apiurl + url, query)
                     .then(function(response)
                     {
-                        if(options.propertyTree !== undefined)
+                        if(options.joins)
                         {
-                            if(response.data[options.propertyTree].data.foundCount > 0)
-                            {
-                                var subQuery = {}
-                                angular.forEach(response.data[options.propertyTree].data.items, function(value, key) {
-                                    subQuery[value.id] = {
-                                        "service":"property/search",
-                                        "arguments": {
-                                            "filter": {
-                                                "propertyGroup":value.id
-                                            },
-                                            "order": {
-                                                "name":"asc"
+                            var joinQuery = {};
+                            angular.forEach(reports, function(report, rkey) {
+                                if(response.data[report] && options.joins[report] !== undefined)
+                                {
+                                    angular.forEach(options.joins[report], function(joinVal, joinKey) {
+                                        if(options.joins[report][joinVal.field].results === undefined)
+                                            options.joins[report][joinVal.field].results = {};
+                                        angular.forEach(response.data[report].data.items, function(values, key) {
+                                            var instance = "join" + (Number(Object.keys(joinQuery).length) + 1);
+                                            
+                                            options.joins[report][joinVal.field].results[values[joinVal.field]] = instance;
+                                            joinQuery[instance] = {
+                                                "service":joinVal.service,
+                                                "arguments": {
+                                                    "filter": {}
+                                                }
                                             }
-                                        }
-                                    }
-                                });
-                                $http
-                                    .post(config.apiurl + url, subQuery)
-                                    .then(function(SQResponse) {
-                                        angular.forEach(SQResponse.data, function(value, key) {
-                                            response.data[options.propertyTree + key] = value.data.items;
+                                            joinQuery[instance].arguments.filter[joinVal.equals] = values[joinVal.field];
+                                            if(joinVal.order)
+                                                joinQuery[instance].order = joinVal.order;
                                         });
-                                        result.resolve(dbHandler.parseResult(response.data));
-                                    })
-                            }
+                                    });
+                                }
+                            });
+                            $http
+                                .post(config.apiurl + url, joinQuery)
+                                .then(function(joinResponse) {
+                                    result.resolve(dbHandler.parseResult(angular.merge(response.data, joinResponse.data)));
+                                })
+                                .catch(function(joinResponse) {
+                                    $log.error(joinResponse);
+                                });
+                        }else{
+                            result.resolve(dbHandler.parseResult(response.data));
                         }
-                        result.resolve(dbHandler.parseResult(response.data));
                     })
                     .catch(function(response)
                     {
@@ -277,6 +285,8 @@ var regApp = angular.module('RegistryClient')
             reports = [];
             query = {};
             options = {};
+            joins = {};
+            
             url = "";
             
             return this;
@@ -293,6 +303,7 @@ var regApp = angular.module('RegistryClient')
                     case 'read':
                         switch(service)
                         {
+                            default:
                             case 'registry':
                                 if(result[value].status == 'success')
                                 {
@@ -302,6 +313,7 @@ var regApp = angular.module('RegistryClient')
                                 }
                             break;
                             
+                            /*
                             case 'entry':
                                 if(options['fullEntry'] !== undefined)
                                 {
@@ -323,6 +335,7 @@ var regApp = angular.module('RegistryClient')
                                 }else{
                                         parsedResult.entry = false;
                                 }
+                            */
                             break;
                         }
                     break;
@@ -340,31 +353,19 @@ var regApp = angular.module('RegistryClient')
                     case 'search':
                         switch(service)
                         {
-                            case 'type':
-                            case 'connectionType':
-                            case 'propertyGroup':
-                                if(result[value].status === 'success' && result[value].data.foundCount > 0)
-                                {
-                                    parsedResult[value] = {};
-                                    angular.forEach(result[value].data.items, function(row, key2) {
-                                        parsedResult[value][row.id] = row;
-                                        if(service === 'propertyGroup' && options.propertyTree !== undefined)
-                                        {
-                                            parsedResult[value][row.id]['children'] = result[options.propertyTree + row.id];
-                                        }
-                                    });
-                                }
-                            break;
-
                             default:
                                 if(result[value].status === 'success' && result[value].data.foundCount > 0)
                                 {
                                     parsedResult[value] = {};
                                     angular.forEach(result[value].data.items, function(row, key2)
                                     {
-                                        if(row.class === 'PERSON')
-                                            row.name = row.lastName + ', ' + row.firstName;
-                                        parsedResult[value][key2] = row;
+                                        if(options.joins[value] !== undefined)
+                                        {
+                                            angular.forEach(options.joins[value], function(joinVal, joinKey) {
+                                                row[joinVal.name] = result[joinVal.results[row[joinVal.field]]].data.items;
+                                            });
+                                        }
+                                        parsedResult[value][row.id] = row;
                                     });
                                     if(parsedResult.foundCount === undefined)
                                         parsedResult.foundCount = {};

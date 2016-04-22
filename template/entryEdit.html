@@ -1,4 +1,4 @@
-<!--pre style="position:absolute; left:10px; top:10px; width:400px; z-index:10;">{{ meta | json }}</pre-->
+<pre class="debug">{{ entry | json }}</pre>
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="container-fluid">
@@ -15,36 +15,36 @@
                             <label class="control-label col-sm-4">Posttyp</label>
                             <div class="col-sm-8">
                                 <select class="form-control" ng-model="entry.type" ng-show="routeParams.id == '-1'" ng-change="switchType(this.value);">
-                                    <option ng-repeat="type in entryTypes" ng-if="type.id != '1'" ng-selected="entry.type == type.id" value="{{ type.id }}">{{ type.name }}</option>
+                                    <option ng-repeat="(key, type) in entryTypes" ng-selected="entry.type == key" value="{{ key }}">{{ type }}</option>
                                 </select>
                                 <p class="form-text" ng-show="routeParams.id !== '-1'">{{ entryTypes[entry.type].name }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON' && entry.id">
                             <label class="control-label col-sm-4">MedlemsID</label>
                             <div class="col-sm-8">
                                 <p class="form-control-static">{{ entry.id }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Förnamn</label>
                             <div class="col-sm-8">
                                 <input class="form-control" ng-model="entry.firstName" placeholder="Förnamn" type="text">
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Efternamn</label>
                             <div class="col-sm-8">
                                 <input class="form-control" ng-model="entry.lastName" placeholder="Efternamn" type="text">
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'ORGANIZATION'">
+                        <div class="form-group" ng-show="entry.type == 'ASSOCIATION'">
                             <label class="control-label col-sm-4">Namn</label>
                             <div class="col-sm-8">
                                 <input class="form-control" ng-model="entry.name" placeholder="Namn" type="text">
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Födelseår</label>
                             <div class="col-sm-8">
                                 <div class="row">
@@ -124,7 +124,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Kön</label>
                             <div class="col-sm-8">
                                 <select class="form-control" ng-model="entry.gender">
@@ -326,7 +326,7 @@
                             <hr>
                         </div>
                         <h2>Meta</h2>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'ORGANIZATION'">
+                        <div class="form-group" ng-show="entry.type == 'ASSOCIATION'">
                             <label class="control-label col-sm-4">Beskrivning</label>
                             <div class="col-sm-8">
                                 <textarea placeholder="Beskrivning" class="form-control" ng-model="entry.description"></textarea>
