@@ -17,7 +17,7 @@
                                 <select class="form-control" ng-model="entry.type" ng-show="routeParams.id == '-1'" ng-change="switchType(this.value);">
                                     <option ng-repeat="(key, type) in entryTypes" ng-selected="entry.type == key" value="{{ key }}">{{ type }}</option>
                                 </select>
-                                <p class="form-text" ng-show="routeParams.id !== '-1'">{{ entryTypes[entry.type].name }}</p>
+                                <p class="form-text" ng-show="routeParams.id !== '-1'">{{ entryTypes[entry.type] }}</p>
                             </div>
                         </div>
                         <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON' && entry.id">

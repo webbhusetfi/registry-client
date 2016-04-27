@@ -377,8 +377,6 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
-                    $scope.entryTypes = globalParams.static.types;
-                    
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
                     $scope.properties = response.properties;
@@ -430,6 +428,7 @@ var regApp = angular
     .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
+        $scope.entryTypes = globalParams.static.types;
         $scope.meta = {};
         
         $scope.setCalTime = function(format, date, target) {
@@ -509,27 +508,31 @@ var regApp = angular
             $scope.meta.addressActive = Object.keys($scope.entry.address).length - 1;
         }
         
+        dbHandler
+            .getEntries({
+                "name":"organizations",
+                "filter": {
+                    "class":"ASSOCIATION",
+                }
+            })
+            .getProperties()
+            .setJoin({
+                "resource":"properties",
+                "service":"property/search",
+                "field":"id",
+                "equals":"propertyGroup",
+                "name":"children"
+            });
+        
         $scope.init = function() {
             if($routeParams.id == '-1')
             {
                 dbHandler
-                /*
-                    .getConnectionTypes()
-                    .getEntries({
-                        "name":"organizations",
-                        "filter": {
-                            "class":"ORGANIZATION",
-                            "type":[3,1]
-                        }
-                    })
-                    .getProperties()
-                */
                     .runQuery()
                     .then(function(response) {
-                        $scope.entryTypes = globalParams.static.types;
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
-                        $scope.propertyGroups = response.propertyGroups;
+                        $scope.propertyGroups = response.properties;
                         
                         $scope.entry = {
                             "type": "MEMBER_PERSON",
@@ -545,36 +548,19 @@ var regApp = angular
                             "activeProperty": "all"
                         }
                         
-                        /*
-                        $scope.$watch('entry.type', function() {
-                            $scope.entry.class = $scope.entryTypes[$scope.entry.type].class;
-                        });
-                        */
-                        
                         $scope.addMembership();
                         $scope.addContactsheet();
                     });
             }else{
                 dbHandler
-                    .getConnectionTypes()
-                    .getProperties()
-                    .getEntries({
-                        "name":"organizations",
-                        "filter": {
-                            "class":"ORGANIZATION",
-                            "type":[3,1]
-                        }
-                    })
-                    .getProperties()
-                    .getFullEntry($routeParams.id)
+                    .getEntry({"id":$routeParams.id})
                     .runQuery()
                     .then(function(response) {
-                        $scope.entryTypes = response.entryTypes;
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
-                        $scope.propertyGroups = response.propertyGroups;
-                        $scope.entry = response.fullEntry;
-                        if($scope.entry.class == 'PERSON')
+                        $scope.propertyGroups = response.properties;
+                        $scope.entry = response.entry;
+                        if($scope.entry.type == 'MEMBER_PERSON')
                         {
                             $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
                         }
@@ -607,24 +593,37 @@ var regApp = angular
             }
             
             $scope.submit = function() {
+                dbHandler
+                    .setQuery({
+                        "entry": {
+                            "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
+                            "arguments":{
+                                "registry": globalParams.get('user').registry,
+                                "type": $scope.entry.type,
+                                "name": $scope.entry.name,
+                                "externalId": $scope.entry.externalId,
+                                "notes": $scope.entry.notes,
+                                "gender": $scope.entry.gender == '' ? undefined : $scope.entry.gender,
+                                "firstName": $scope.entry.firstName,
+                                "lastName": $scope.entry.lastName,
+                                "birthYear": $scope.entry.birthYear,
+                                "birthMonth": $scope.entry.birthMonth,
+                                "birthDay": $scope.entry.birthDate,
+                                "notes": $scope.entry.notes,
+                                "description": $scope.entry.description,
+                                "properties": $scope.entry.properties
+                            }
+                        }
+                    })
+                    .runQuery()
+                    .then(function(response) {
+                        $window.history.back();
+                    })
+                    .catch(function(response) {
+                        $log.error(response);
+                    });
+                /*
                 var entryQuery = {
-                    "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
-                    "arguments":{
-                        "registry": globalParams.get('user').registry,
-                        "type": $scope.entry.type,
-                        "externalId": $scope.entry.externalId,
-                        "notes": $scope.entry.notes,
-                        "gender": $scope.entry.gender == '' ? null : $scope.entry.gender,
-                        "name": $scope.entry.name,
-                        "firstName": $scope.entry.firstName,
-                        "lastName": $scope.entry.lastName,
-                        "birthYear": $scope.entry.birthYear,
-                        "birthMonth": $scope.entry.birthMonth,
-                        "birthDay": $scope.entry.birthDate,
-                        "notes": $scope.entry.notes,
-                        "description": (($scope.entry.description === undefined) ? null : $scope.entry.description),
-                        "properties": $scope.entry.properties
-                    }
                 }
                 
                 angular.forEach($scope.entry.connection, function(values, key) {
@@ -681,11 +680,6 @@ var regApp = angular
                 if($routeParams.id !== '-1')
                     $scope.entryQuery.entry.arguments.id = $scope.entry.id;
                 
-                dbHandler
-                    .setQuery(entryQuery)
-                    .runQuery()
-                    .then
-                
                 $http
                     .post(globalParams.static.apiurl, $scope.entryQuery)
                     .then(function(response)
@@ -723,9 +717,9 @@ var regApp = angular
                     .catch(function(response) {
                         $log.error(response)
                     });
+            */
             };
         };
-        
         $scope.init();
     })
     .controller('propertyList', function($scope, $http, $location, $log, $routeParams, dbHandler) {
@@ -740,7 +734,6 @@ var regApp = angular
             .runQuery()
             .then(function(response) {
                 $scope.propertyGroups = response.propertyGroups;
-                $log.log($scope.propertyGroups);
             });
     })
     .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, defaultParams, dbHandler) {

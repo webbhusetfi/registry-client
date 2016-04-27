@@ -39,10 +39,10 @@ var regApp = angular.module('RegistryClient')
             
             return this;
         },
-        // overwrites query buffer
+        // append to query buffer
         setQuery: function(newQuery) {
             if(newQuery !== undefined)
-                query = newQuery;
+                query = angular.merge(query, newQuery);
             
             angular.forEach(Object.keys(newQuery), function(value, key) {
                 reports.push(value);
@@ -189,7 +189,7 @@ var regApp = angular.module('RegistryClient')
                 query[args.name] = {
                     "service":"entry/read",
                     "arguments": {
-                        "id":args.id
+                        "id":args.id,
                     }
                 }
             }
@@ -235,6 +235,7 @@ var regApp = angular.module('RegistryClient')
                     .post(config.apiurl + url, query)
                     .then(function(response)
                     {
+                        $log.log(response);
                         if(options.joins)
                         {
                             var joinQuery = {};
@@ -301,42 +302,11 @@ var regApp = angular.module('RegistryClient')
                 switch(queryType)
                 {
                     case 'read':
-                        switch(service)
+                        if(result[value].status == 'success')
                         {
-                            default:
-                            case 'registry':
-                                if(result[value].status == 'success')
-                                {
-                                    parsedResult[value] = result[value].data.item;
-                                }else{
-                                        parsedResult.entry = false;
-                                }
-                            break;
-                            
-                            /*
-                            case 'entry':
-                                if(options['fullEntry'] !== undefined)
-                                {
-                                    if(result.fullEntry.status == 'success')
-                                    {
-                                        parsedResult.fullEntry = result.fullEntry.data.item;
-                                        if(result.connection.status == 'success' && result.connection.data.foundCount > 0)
-                                        {
-                                            parsedResult.fullEntry.connection = result.connection.data.items;
-                                        }
-                                        if(result.address.status == 'success' && result.address.data.foundCount > 0)
-                                        {
-                                            parsedResult.fullEntry.address = result.address.data.items;
-                                        }
-                                    }
-                                }else if(result[value].status == 'success')
-                                {
-                                    parsedResult[value] = result[value].data.item;
-                                }else{
-                                        parsedResult.entry = false;
-                                }
-                            */
-                            break;
+                            parsedResult[value] = result[value].data.item;
+                        }else{
+                                parsedResult.entry = false;
                         }
                     break;
                     
@@ -351,32 +321,30 @@ var regApp = angular.module('RegistryClient')
                     
                     default:
                     case 'search':
-                        switch(service)
+                        if(result[value].status === 'success' && result[value].data.foundCount > 0)
                         {
-                            default:
-                                if(result[value].status === 'success' && result[value].data.foundCount > 0)
+                            parsedResult[value] = {};
+                            angular.forEach(result[value].data.items, function(row, key2)
+                            {
+                                if(options.joins !== undefined)
                                 {
-                                    parsedResult[value] = {};
-                                    angular.forEach(result[value].data.items, function(row, key2)
+                                    if(options.joins[value] !== undefined)
                                     {
-                                        if(options.joins[value] !== undefined)
-                                        {
-                                            angular.forEach(options.joins[value], function(joinVal, joinKey) {
-                                                row[joinVal.name] = result[joinVal.results[row[joinVal.field]]].data.items;
-                                            });
-                                        }
-                                        parsedResult[value][row.id] = row;
-                                    });
-                                    if(parsedResult.foundCount === undefined)
-                                        parsedResult.foundCount = {};
-                                    parsedResult.foundCount[value] = result[value].data.foundCount;
-                                }else{
-                                    if(parsedResult.foundCount === undefined)
-                                        parsedResult.foundCount = {};
-
-                                    parsedResult.foundCount[value] = 0;
+                                        angular.forEach(options.joins[value], function(joinVal, joinKey) {
+                                            row[joinVal.name] = result[joinVal.results[row[joinVal.field]]].data.items;
+                                        });
+                                    }
                                 }
-                            break;
+                                parsedResult[value][row.id] = row;
+                            });
+                            if(parsedResult.foundCount === undefined)
+                                parsedResult.foundCount = {};
+                            parsedResult.foundCount[value] = result[value].data.foundCount;
+                        }else{
+                            if(parsedResult.foundCount === undefined)
+                                parsedResult.foundCount = {};
+
+                            parsedResult.foundCount[value] = 0;
                         }
                     break;
                 }
