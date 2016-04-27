@@ -7,6 +7,8 @@ var regApp = angular.module('RegistryClient')
     var reports = [];
     
     var url = "";
+    
+    var parse = true;
 
     // internal functions
     var dbInternals = {
@@ -36,6 +38,11 @@ var regApp = angular.module('RegistryClient')
                 url = urlString;
             else
                 $log.error('Not a string in setUrl(urlString)');
+            
+            return this;
+        },
+        parse: function(value) {
+            parse = !!value;
             
             return this;
         },
@@ -271,7 +278,11 @@ var regApp = angular.module('RegistryClient')
                                     $log.error(joinResponse);
                                 });
                         }else{
-                            result.resolve(dbHandler.parseResult(response.data));
+                            if (parse) {
+                                result.resolve(dbHandler.parseResult(response.data));
+                            } else {
+                                result.resolve(response.data);
+                            }
                         }
                     })
                     .catch(function(response)
@@ -289,6 +300,8 @@ var regApp = angular.module('RegistryClient')
             joins = {};
             
             url = "";
+            
+            parse = true;
             
             return this;
         },

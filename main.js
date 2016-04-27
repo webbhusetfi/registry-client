@@ -82,8 +82,8 @@ var regApp = angular
                 templateUrl: '/template/registryList.html',
                 controller: 'registryList'
             })
-            .when('/stat/', {
-                templateUrl: '/stat/statView.html',
+            .when('/stat', {
+                templateUrl: '/stat_mod/statView.html',
                 controller: 'statController'
             })
             .when('/registry/:id/delete', {
