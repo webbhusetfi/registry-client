@@ -337,8 +337,7 @@ var regApp = angular
         
         if($routeParams.id !== undefined)
         {
-            $scope.params.type = 2;
-            $scope.params.class = "PERSON";
+            $scope.params.type = "MEMBER_PERSON";
             $scope.params.parentEntry = $routeParams.id;
             $scope.params.orgId = $routeParams.id;
         }
@@ -377,6 +376,7 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
+                    $scope.types = globalParams.static.types;
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
                     $scope.properties = response.properties;
@@ -530,6 +530,7 @@ var regApp = angular
                 dbHandler
                     .runQuery()
                     .then(function(response) {
+                        $log.log(response);
                         $scope.connectionType = response.connectionType;
                         $scope.organizations = response.organizations;
                         $scope.propertyGroups = response.properties;
@@ -617,17 +618,27 @@ var regApp = angular
                     })
                     .runQuery()
                     .then(function(response) {
-                        $window.history.back();
+                        if($routeParams.id == '-1')
+                        {
+                            $log.log(response);
+                            var parentId = response;
+                        }else{
+                            var parentId = $routeParams.id;
+                        }
+                        // $window.history.back();
                     })
                     .catch(function(response) {
                         $log.error(response);
                     });
-                /*
-                var entryQuery = {
-                }
+                    
+                var connections = {};
                 
                 angular.forEach($scope.entry.connection, function(values, key) {
                     if(values.organization !== '-') {
+                        dbHandler
+                            .setQuery(
+                                
+                            )
                         connection['connection' + key] = {};
                         connection['connection' + key].arguments = {
                             "notes" : values.notes,
@@ -648,7 +659,8 @@ var regApp = angular
                         }
                     }
                 });
-
+                    
+                /*
                 var address = {}
                 angular.forEach($scope.entry.address, function(values, key) {
                     address['contactsheet' + key] = {};
