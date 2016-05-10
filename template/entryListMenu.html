@@ -47,6 +47,12 @@
                 <div ng-show="foundCount.entrylist" class="fc text-center">
                     Visar {{ params.offset+1 }}-{{ params.offset+params.limit > foundCount.entrylist ? foundCount.entrylist : params.offset+params.limit }} av {{ foundCount.entrylist }}
                 </div>
+                
+                <a class="btn btn-default"
+                    ng-csv="doExport();"
+                    filename="members.csv"
+                    lazy-load="true"
+                    >Export</a>
             </div>
             <div class="col-xs-4 text-right">
                 <div class="btn-group">

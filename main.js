@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js'])
+    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
         var get = function(key)
         {
@@ -341,6 +341,45 @@ var regApp = angular
             $scope.params.parentEntry = $routeParams.id;
             $scope.params.orgId = $routeParams.id;
         }
+        
+        $scope.doExport = function () {
+            return dbHandler
+                .parse(false)
+                .getEntries({
+                    "name":"entrylist",
+                    "include":$scope.params.includes,
+                    "filter": angular.merge({
+                        "withProperty":$scope.params.withProperty,
+                        "withoutProperty":$scope.params.withoutProperty,
+                        "class":$scope.params.class,
+                        "type":$scope.params.type,
+                        "parentEntry":$scope.params.parentEntry,
+                    }, $scope.params.filter),
+                   /*"limit":$scope.params.limit,
+                    "offset":$scope.params.offset,*/
+                    "order": {
+                        "lastName":"asc",
+                        "name":"asc"
+                    }
+                })
+                .runQuery()
+                .then(function(response) {
+                    //$scope.entrylist = response.entrylist;
+                    //console.log(JSON.stringify(response.entrylist));
+                    console.log(JSON.stringify(response.entrylist.data.items));
+                    //return response.entrylist;
+                    //return response.entrylist.data.items;
+                });
+            
+            
+            
+            
+            
+            
+            
+        }
+    
+        
         
         $scope.init = function()
         {
