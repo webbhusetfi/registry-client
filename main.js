@@ -219,6 +219,11 @@ var regApp = angular
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
         $scope.params = {};
+        $scope.headers = {
+            'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon'],
+            'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon']
+        };
+
         
         $scope.deleteConfirm = function(item) {
             dialogHandler.deleteConfirm(item, {
@@ -344,10 +349,10 @@ var regApp = angular
         
         $scope.doExport = function () {
             return dbHandler
-                .parse(false)
+                .parse(true)
                 .getEntries({
                     "name":"entrylist",
-                    "include":$scope.params.includes,
+                    "include":['address'],
                     "filter": angular.merge({
                         "withProperty":$scope.params.withProperty,
                         "withoutProperty":$scope.params.withoutProperty,
@@ -355,8 +360,6 @@ var regApp = angular
                         "type":$scope.params.type,
                         "parentEntry":$scope.params.parentEntry,
                     }, $scope.params.filter),
-                   /*"limit":$scope.params.limit,
-                    "offset":$scope.params.offset,*/
                     "order": {
                         "lastName":"asc",
                         "name":"asc"
@@ -364,23 +367,47 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
-                    //$scope.entrylist = response.entrylist;
-                    //console.log(JSON.stringify(response.entrylist));
-                    console.log(JSON.stringify(response.entrylist.data.items));
-                    //return response.entrylist;
-                    //return response.entrylist.data.items;
+                    ret = [];
+                    angular.forEach(response.entrylist, function (value, key) {
+                        if ($scope.params.type == 'MEMBER_PERSON') {
+                            row = [
+                                value.id,
+                                value.firstName,
+                                value.lastName,
+                                value.birthDay,
+                                value.birthMonth,
+                                value.birthYear,
+                                ((value.address) ? value.address.street : null),
+                                ((value.address) ? value.address.postalCode : null),
+                                ((value.address) ? value.address.town : null),
+                                ((value.address) ? value.address.country : null),
+                                ((value.address) ? value.address.email : null),
+                                ((value.address) ? value.address.mobile : null),
+                                ((value.address) ? value.address.phone : null)
+                            ];
+                        } else {
+                            row = [
+                                value.id,
+                                value.name,
+                                value.description,
+                                value.bank,
+                                value.account,
+                                value.vat,
+                                ((value.address) ? value.address.street : null),
+                                ((value.address) ? value.address.postalCode : null),
+                                ((value.address) ? value.address.town : null),
+                                ((value.address) ? value.address.country : null),
+                                ((value.address) ? value.address.email : null),
+                                ((value.address) ? value.address.mobile : null),
+                                ((value.address) ? value.address.phone : null)
+                            ];
+                        }
+                        ret.push(row);
+                    });
+                    return ret;
                 });
-            
-            
-            
-            
-            
-            
-            
         }
     
-        
-        
         $scope.init = function()
         {
             dbHandler
