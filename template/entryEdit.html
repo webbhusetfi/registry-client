@@ -1,4 +1,4 @@
-<pre class="debug">{{ entry | json }}</pre>
+<!-- pre class="debug">{{ entry | json }}</pre -->
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="container-fluid">
@@ -141,7 +141,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-xs-12 col-sm-4">Organisation</label>
                                         <div class="col-xs-8 col-sm-6">
-                                            <select class="form-control" ng-options="org.id as org.name for org in organizations" ng-model="entry.connection[key].parentEntry.id">
+                                            <select class="form-control" ng-options="org.id as org.name for org in organizations" ng-model="entry.connection[key].parentEntry">
                                                 <option value="?">-</option>
                                             </select>
                                         </div>
