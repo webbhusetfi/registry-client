@@ -150,7 +150,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-sm-4">Medlemsskap</label>
+                                        <label class="control-label col-sm-4">Medlemskap</label>
                                         <div class="col-sm-8">
                                             <div class="row">
                                                 <div class="col-sm-9">
@@ -244,21 +244,27 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-sm-4">Postnummer</label>
+                                    <label class="control-label col-sm-4">Postnummer och ort</label>
+                                    <div class="col-sm-8">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text" placeholder="Postnummer" ng-model="address.postalCode">
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Land</label>
                                     <div class="col-sm-8">
                                         <select class="form-control" ng-model="address.country">
                                             <option disabled>Land</option>
                                             <option>Finland</option>
                                             <option>Annat</option>
                                         </select><br>
-                                        <div class="row">
-                                            <div class="col-xs-4">
-                                                <input class="form-control" type="text" placeholder="Postnummer" ng-model="address.postalCode">
-                                            </div>
-                                            <div class="col-xs-8">
-                                                <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
-                                            </div>
-                                        </div>
+      
                                     </div>
                                 </div>
                                 <div class="form-group">
