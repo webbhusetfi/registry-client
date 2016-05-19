@@ -9,7 +9,7 @@
                 </a>
             </div>
         </div>
-        <div class="row">
+        <div class="row" ng-if="properties">
             <div class="col-xs-4 col-sm-2">
                 <select class="form-control" ng-model="params.propertyGroup">
                     <option ng-repeat="(key, value) in properties" value="{{ value.id }}">{{ value.name }}</option>

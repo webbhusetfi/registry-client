@@ -64,7 +64,7 @@ var regApp = angular.module('RegistryClient')
                 options.joins[join.resource] = {};
             
             var name = (Number(Object.keys(options.joins[join.resource]).length) + 1);
-            options.joins[join.resource][join.field] = join;
+            options.joins[join.resource][join.name] = join;
             
             return this;
         },
@@ -236,61 +236,69 @@ var regApp = angular.module('RegistryClient')
         },
         runQuery: function() {
             var result = $q.defer();
-            
-            dbInternals.getConfig().then(function(config) {
-                $http
-                    .post(config.apiurl + url, query)
-                    .then(function(response)
-                    {
-                        $log.log(response);
-                        if(options.joins)
+            if(Object.keys(query).length > 0)
+            {
+                dbInternals.getConfig().then(function(config) {
+                    $http
+                        .post(config.apiurl + url, query)
+                        .then(function(response)
                         {
-                            var joinQuery = {};
-                            angular.forEach(reports, function(report, rkey) {
-                                if(response.data[report] && options.joins[report] !== undefined)
-                                {
-                                    angular.forEach(options.joins[report], function(joinVal, joinKey) {
-                                        if(options.joins[report][joinVal.field].results === undefined)
-                                            options.joins[report][joinVal.field].results = {};
-                                        angular.forEach(response.data[report].data.items, function(values, key) {
-                                            var instance = "join" + (Number(Object.keys(joinQuery).length) + 1);
-                                            
-                                            options.joins[report][joinVal.field].results[values[joinVal.field]] = instance;
-                                            joinQuery[instance] = {
-                                                "service":joinVal.service,
-                                                "arguments": {
-                                                    "filter": {}
+                            if(options.joins)
+                            {
+                                var joinQuery = {};
+                                angular.forEach(reports, function(report, rkey) {
+                                    if(response.data[report] && options.joins[report] !== undefined)
+                                    {
+                                        angular.forEach(options.joins[report], function(joinVal, joinKey) {
+                                            if(options.joins[report][joinVal.name].results === undefined)
+                                                options.joins[report][joinVal.name].results = {};
+                                            if(angular.isObject(response.data[report].data.item) && !angular.isObject(response.data[report].data.items))
+                                                response.data[report].data.items = {"0":response.data[report].data.item}
+                                            angular.forEach(response.data[report].data.items, function(values, key) {
+                                                var instance = "join" + (Number(Object.keys(joinQuery).length) + 1);
+
+                                                options.joins[report][joinVal.name].results[values[joinVal.name]] = instance;
+                                                joinQuery[instance] = {
+                                                    "service":joinVal.service,
+                                                    "arguments": {
+                                                        "filter": {}
+                                                    }
                                                 }
-                                            }
-                                            joinQuery[instance].arguments.filter[joinVal.equals] = values[joinVal.field];
-                                            if(joinVal.order)
-                                                joinQuery[instance].order = joinVal.order;
+                                                joinQuery[instance].arguments.filter[joinVal.equals] = values[joinVal.field];
+                                                if(joinVal.order)
+                                                    joinQuery[instance].order = joinVal.order;
+                                            });
                                         });
-                                    });
-                                }
-                            });
-                            $http
-                                .post(config.apiurl + url, joinQuery)
-                                .then(function(joinResponse) {
-                                    result.resolve(dbHandler.parseResult(angular.merge(response.data, joinResponse.data)));
-                                })
-                                .catch(function(joinResponse) {
-                                    $log.error(joinResponse);
+                                    }
                                 });
-                        }else{
-                            if (parse) {
-                                result.resolve(dbHandler.parseResult(response.data));
-                            } else {
-                                result.resolve(response.data);
+                                $http
+                                    .post(config.apiurl + url, joinQuery)
+                                    .then(function(joinResponse) {
+                                        $log.log(joinResponse);
+                                        result.resolve(dbHandler.parseResult(angular.merge(response.data, joinResponse.data)));
+                                    })
+                                    .catch(function(joinResponse) {
+                                        $log.error(joinResponse);
+                                    });
+                            }else{
+                                if (parse) {
+                                    result.resolve(dbHandler.parseResult(response.data));
+                                } else {
+                                    result.resolve(response.data);
+                                }
                             }
-                        }
-                    })
-                    .catch(function(response)
-                    {
-                        if(response.status === 403)
-                            $location.path('/logout');
-                    })
-            });
+                        })
+                        .catch(function(response)
+                        {
+                            if(response.status === 403)
+                                $location.path('/logout');
+                        })
+                });
+            }else{
+                // query empty, blank resolve
+                $log.log('empty');
+                result.resolve();
+            }
             return result.promise;
         },
         reset: function() {
@@ -314,15 +322,6 @@ var regApp = angular.module('RegistryClient')
                 
                 switch(queryType)
                 {
-                    case 'read':
-                        if(result[value].status == 'success')
-                        {
-                            parsedResult[value] = result[value].data.item;
-                        }else{
-                                parsedResult.entry = false;
-                        }
-                    break;
-                    
                     case 'delete':
                         parsedResult[value] = result[value];
                     break;
@@ -334,7 +333,8 @@ var regApp = angular.module('RegistryClient')
                     
                     default:
                     case 'search':
-                        if(result[value].status === 'success' && result[value].data.foundCount > 0)
+                    case 'read':
+                        if(result[value].status === 'success' && result[value].data.foundCount > 0 || result[value].status === 'success' && queryType === 'read')
                         {
                             parsedResult[value] = {};
                             angular.forEach(result[value].data.items, function(row, key2)
@@ -344,11 +344,12 @@ var regApp = angular.module('RegistryClient')
                                     if(options.joins[value] !== undefined)
                                     {
                                         angular.forEach(options.joins[value], function(joinVal, joinKey) {
-                                            row[joinVal.name] = result[joinVal.results[row[joinVal.field]]].data.items;
+                                            $log.log(joinVal);
+                                            row[joinVal.name] = result[joinVal.results[row[joinVal.name]]].data.items;
                                         });
                                     }
                                 }
-                                parsedResult[value][row.id] = row;
+                                parsedResult[value][key2] = row;
                             });
                             if(parsedResult.foundCount === undefined)
                                 parsedResult.foundCount = {};
