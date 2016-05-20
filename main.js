@@ -1,6 +1,8 @@
 var regApp = angular
     .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
+        var state;
+        
         var get = function(key)
         {
             var stringValue = $window.sessionStorage.getItem('registryParams');
@@ -28,6 +30,17 @@ var regApp = angular
             
             delete jsonValue[key];
             $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));            
+        }
+        
+        var sendParams = function(object) {
+            if(angular.isObject(object))
+                state = object;
+            else
+                state = undefined;
+        }
+        
+        var getParams = function() {
+            return state;
         }
         
         var dateToObject = function(date)
@@ -66,8 +79,10 @@ var regApp = angular
             },
             get: get,
             set: set,
+            sendParams: sendParams,
+            getParams: getParams,
             unset: unset,
-            dateToObject: dateToObject,
+            dateToObject: dateToObject
         };
     })
     .run(function($window, $log, editableOptions) {
@@ -313,12 +328,18 @@ var regApp = angular
             $window.scroll(0,0);
         }
         
-        $scope.go = function(location, savestate)
+        $scope.go = function(location, params, savestate)
         {
             if(savestate)
                 globalParams.set('entryList', $scope.params);
             else
                 globalParams.unset('entryList');
+            if(angular.isObject(params)) {
+                if(Object.keys(params).length)
+                    globalParams.sendParams(params);
+            }else{
+                globalParams.sendParams(undefined);
+            }
             
             $location.path(location);
         }
@@ -499,6 +520,7 @@ var regApp = angular
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
         $scope.entryTypes = globalParams.static.types;
+        $scope.routing = globalParams.getParams();
         $scope.meta = {};
         
         $scope.setCalTime = function(format, date, target) {
@@ -660,7 +682,7 @@ var regApp = angular
                         
                         if($scope.entry.type == 'MEMBER_PERSON')
                         {
-                            $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
+                            $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : new Date();
                         }
                         $scope.meta.addressActive = 0;
                         $scope.meta.activeProperty = "all";
@@ -730,10 +752,8 @@ var regApp = angular
                                         return false;
                                     }
                                 });
-                                $log.log(selectedOrg);
                                 if(selectedOrg.type !== undefined)
                                 {
-                                    $log.log($scope.connectionType);
                                     var connectionType;
                                     angular.forEach($scope.connectionType, function(ct, ctkey) {
                                         if(ct.parentType == selectedOrg.type && ct.childType == $scope.entry.type)
@@ -801,59 +821,12 @@ var regApp = angular
                         dbHandler
                             .runQuery()
                             .then(function(response) {
-                                $log.log(response);
                                 $window.history.back();
                             });
                     })
                     .catch(function(response) {
                         $log.error(response);
                     });
-                    
-                /*
-                var subQuery = angular.merge(connection, address);
-                
-                
-                if($routeParams.id !== '-1')
-                    $scope.entryQuery.entry.arguments.id = $scope.entry.id;
-                
-                $http
-                    .post(globalParams.static.apiurl, $scope.entryQuery)
-                    .then(function(response)
-                    {
-                        var entryId = response.data.entry.data.item.id;
-
-                        var connection = {};
-                        
-                        if($scope.meta.membershipDelete !== undefined)
-                        {
-                            var membershipDeleteQuery = {}
-                            angular.forEach($scope.meta.membershipDelete, function(values, key) {
-                                if(values.id !== undefined)
-                                {
-                                    membershipDeleteQuery['deleteconnection' + key] = {
-                                        "service":"connection/delete",
-                                        "arguments": {
-                                            "id": values.id
-                                        }
-                                    }
-                                }
-                            });
-                            subQuery = angular.merge(subQuery, membershipDeleteQuery);
-                        }
-                        
-                        $http
-                            .post(globalParams.static.apiurl, subQuery)
-                            .then(function(response) {
-                                $window.history.back();
-                            })
-                            .catch(function(response) {
-                                $log.error(response)
-                            });
-                    })
-                    .catch(function(response) {
-                        $log.error(response)
-                    });
-            */
             };
         };
         $scope.init();

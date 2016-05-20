@@ -11,7 +11,7 @@
                     <div class="col-sm-12">
                         <div ng-include="'/template/header.html'"></div>
                         <div ng-include="'/template/entryListMenu.html'"></div>
-                        <table ng-show="foundCount.entrylist" class="mainList">
+                        <table class="mainList">
                             <thead>
                                 <td class="col-xs-1">
                                    <input
@@ -109,8 +109,8 @@
                                 <td class="text-right">
                                     <a ng-show="item.type == 'MEMBER_PERSON'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.firstName + ' ' + item.lastName});"><i class="fa fa-times"></i></a>
                                     <a ng-show="item.type == 'ASSOCIATION'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>                                    
-                                    <a class="btn btn-xs btn-primary" ng-click="go('/entry/' + item.id + '/edit', true);"><i class="fa fa-pencil"></i></a>
-                                    <a ng-show="item.type == 'ASSOCIATION'" class="btn btn-xs btn-default" ng-click="go('/entry/list/' + item.id);"><i class="fa fa-sign-in"></i></a>
+                                    <a class="btn btn-xs btn-primary" ng-click="go('/entry/' + item.id + '/edit',{'type':item.type}, true);"><i class="fa fa-pencil"></i></a>
+                                    <a ng-show="item.type == 'ASSOCIATION'" class="btn btn-xs btn-default" ng-click="go('/entry/list/' + item.id, {});"><i class="fa fa-sign-in"></i></a>
                                 </td>
                             </tr>
                         </table>

@@ -197,39 +197,9 @@ var regApp = angular.module('RegistryClient')
                     "service":"entry/read",
                     "arguments": {
                         "id":args.id,
+                        "registry": globalParams.get('user').registry
                     }
                 }
-            }
-            
-            return this;
-        },
-        getFullEntry: function(id) {
-            reports.push('fullEntry');
-            options = angular.merge(options, {"fullEntry":1});
-            query.fullEntry = {
-                "service":"entry/read",
-                "arguments": {
-                    "id": id,
-                    "include":["properties"]
-                }
-            }
-            query.connection = {
-                "service":"connection/search",
-                "arguments": {
-                    "filter": {
-                        "childEntry":id
-                    }
-                }
-            }
-            query.address = {
-                "service":"address/search",
-                "arguments": {
-                    "filter": {
-                        "entry":id
-                    }
-                }
-            }
-            query.properties = {
             }
             
             return this;
@@ -274,7 +244,6 @@ var regApp = angular.module('RegistryClient')
                                 $http
                                     .post(config.apiurl + url, joinQuery)
                                     .then(function(joinResponse) {
-                                        $log.log(joinResponse);
                                         result.resolve(dbHandler.parseResult(angular.merge(response.data, joinResponse.data)));
                                     })
                                     .catch(function(joinResponse) {
@@ -344,7 +313,6 @@ var regApp = angular.module('RegistryClient')
                                     if(options.joins[value] !== undefined)
                                     {
                                         angular.forEach(options.joins[value], function(joinVal, joinKey) {
-                                            $log.log(joinVal);
                                             row[joinVal.name] = result[joinVal.results[row[joinVal.name]]].data.items;
                                         });
                                     }
