@@ -220,14 +220,15 @@ var regApp = angular.module('RegistryClient')
                                     if(response.data[report] && options.joins[report] !== undefined)
                                     {
                                         angular.forEach(options.joins[report], function(joinVal, joinKey) {
+                                            // init join result array
                                             if(options.joins[report][joinVal.name].results === undefined)
                                                 options.joins[report][joinVal.name].results = {};
+                                            // push item to items.0
                                             if(angular.isObject(response.data[report].data.item) && !angular.isObject(response.data[report].data.items))
                                                 response.data[report].data.items = {"0":response.data[report].data.item}
                                             angular.forEach(response.data[report].data.items, function(values, key) {
                                                 var instance = "join" + (Number(Object.keys(joinQuery).length) + 1);
-
-                                                options.joins[report][joinVal.name].results[values[joinVal.name]] = instance;
+                                                options.joins[report][joinVal.name].results[values[joinVal.field]] = instance;
                                                 joinQuery[instance] = {
                                                     "service":joinVal.service,
                                                     "arguments": {
@@ -313,7 +314,7 @@ var regApp = angular.module('RegistryClient')
                                     if(options.joins[value] !== undefined)
                                     {
                                         angular.forEach(options.joins[value], function(joinVal, joinKey) {
-                                            row[joinVal.name] = result[joinVal.results[row[joinVal.name]]].data.items;
+                                            row[joinVal.name] = result[joinVal.results[row[joinVal.field]]].data.items;
                                         });
                                     }
                                 }
