@@ -537,8 +537,6 @@ var regApp = angular
             $scope.connectionTypes[value.childType][value.id] = value;
         });
         
-        $log.log($scope.connectionTypes);
-        
         $scope.setCalTime = function(format, date, target) {
             switch(format)
             {
