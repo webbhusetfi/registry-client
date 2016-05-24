@@ -155,10 +155,16 @@ var regApp = angular
     })
     .controller('registryList', function ($scope, $routeParams, $http, $location, $window, $log, dbHandler, dialogHandler, globalParams) {
         $scope.goto = function(id) {
-            var user = globalParams.get('user');
-            user.registry = Number(id);
-            globalParams.set('user', user);
-            $location.path('entry/list');
+            dbHandler
+                .getConnectionTypes(id)
+                .runQuery()
+                .then(function(response) {
+                    var user = globalParams.get('user');
+                    user.registry = Number(id);
+                    globalParams.set('user', user);
+                    globalParams.set('connectionTypes', response.connectionType)
+                    $location.path('entry/list');
+                });
         }
         $scope.user = globalParams.get('user');
         
@@ -520,8 +526,18 @@ var regApp = angular
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
         $scope.entryTypes = globalParams.static.types;
-        $scope.routing = globalParams.getParams();
         $scope.meta = {};
+        
+        $scope.connectionTypes = {}
+        var connectionNames = angular.merge({}, globalParams.static.types, {"UNION":"Förbund"});
+        angular.forEach(globalParams.get('connectionTypes'), function(value, key) {
+            if($scope.connectionTypes[value.childType] === undefined)
+                $scope.connectionTypes[value.childType] = {};
+            value.name = connectionNames[value.parentType];
+            $scope.connectionTypes[value.childType][value.id] = value;
+        });
+        
+        $log.log($scope.connectionTypes);
         
         $scope.setCalTime = function(format, date, target) {
             switch(format)
@@ -589,9 +605,9 @@ var regApp = angular
 
         $scope.addMembership = function() {
             $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
-                "parentEntry": {
-                    "id":"-"
-                },
+                "parentType": $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].parentType,
+                "connectionType": $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].id,
+                "parentEntry": "-",
                 "createdAt": $scope.today,
                 "fromOpen":false
             };
@@ -604,22 +620,32 @@ var regApp = angular
             $scope.meta.addressActive = Object.keys($scope.entry.address).length - 1;
         }
         
+        $scope.resetOrg = function(id) {
+            $scope.entry.connection[id].parentEntry = '-';
+            $scope.entry.connection[id].parentType = $scope.connectionTypes[$scope.entry.type][$scope.entry.connection[id].connectionType].parentType;
+        }
+        
         dbHandler
             .getEntries({
-                "name":"organizations",
+                "name":"associations",
                 "filter": {
                     "type":"ASSOCIATION",
                 }
             })
+            .getEntries({
+                "name":"unions",
+                "filter": {
+                    "type":"UNION",
+                }
+            })
             .getProperties()
-            .getConnectionTypes()
             .setJoin({
                 "resource":"properties",
                 "service":"property/search",
                 "field":"id",
                 "equals":"propertyGroup",
                 "name":"children"
-            })
+            });
         
         $scope.init = function() {
             if($routeParams.id == '-1')
@@ -628,10 +654,15 @@ var regApp = angular
                     .runQuery()
                     .then(function(response) {
                         $scope.connectionType = response.connectionType;
-                        // fix first ordering
-                        $scope.organizations = {"0":{"id":"-", "name":"-"}};
-                        angular.forEach(response.organizations, function(org, key) {
-                            $scope.organizations[Object.keys($scope.organizations).length] = org;
+                        // fix organizations
+                        $scope.organizations = {}
+                        $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
+                        $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};                        
+                        angular.forEach(response.associations, function(org, key) {
+                            $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
+                        });
+                        angular.forEach(response.unions, function(org, key) {
+                            $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
                         });
                         $scope.propertyGroups = response.properties;
                         
@@ -672,8 +703,18 @@ var regApp = angular
                     .runQuery()
                     .then(function(response) {
                         $scope.connectionType = response.connectionType;
-                        $scope.organizations = response.organizations;
                         $scope.propertyGroups = response.properties;
+                        
+                        // fix organizations
+                        $scope.organizations = {}
+                        $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
+                        $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};                        
+                        angular.forEach(response.associations, function(org, key) {
+                            $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
+                        });
+                        angular.forEach(response.unions, function(org, key) {
+                            $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
+                        });
                         
                         if(angular.isObject(response.entry) && angular.isObject(response.entry[0]))
                             $scope.entry = response.entry[0];
@@ -687,13 +728,16 @@ var regApp = angular
                         $scope.meta.addressActive = 0;
                         $scope.meta.activeProperty = "all";
                         
-                        
                         if($scope.entry.birthYear !== null)
                             $scope.meta.birthYear = new Date($scope.entry.birthYear, 1, 1);
                         if($scope.entry.birthMonth !== null)
                             $scope.meta.birthMonth = new Date($scope.entry.birthYear, $scope.entry.birthMonth-1, 1);
                         if($scope.entry.birthDay !== null)
                             $scope.meta.birthDate = new Date($scope.entry.birthYear, $scope.entry.birthMonth-1, $scope.entry.birthDay);
+                        
+                        angular.forEach($scope.entry.connection, function(value, key) {
+                            $scope.entry.connection[key].parentType = $scope.connectionTypes[$scope.entry.type][value.connectionType].parentType;
+                        });
                         
                         angular.forEach($scope.entry.address, function(value, key) {
                             if(value.country == null)
@@ -709,8 +753,7 @@ var regApp = angular
             }
             
             $scope.submit = function() {
-                dbHandler
-                    .setQuery({
+                var queryObject = {
                         "entry": {
                             "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
                             "arguments":{
@@ -730,7 +773,13 @@ var regApp = angular
                                 "properties": $scope.entry.properties
                             }
                         }
-                    })
+                    };
+                
+                if($routeParams.id !== '-1')
+                    queryObject.entry.arguments.id = $scope.entry.id;
+                    
+                dbHandler
+                    .setQuery(queryObject)
                     .runQuery()
                     .then(function(response) {
                         if($routeParams.id == '-1')
@@ -744,32 +793,14 @@ var regApp = angular
 
                         angular.forEach($scope.entry.connection, function(values, key) {
                             if(values.organization !== '-') {
-                                var selectedOrg;
-                                angular.forEach($scope.organizations, function(org, oid) {
-                                    if(Number(org.id) == Number(values.parentEntry.id))
-                                    {
-                                        selectedOrg = org;
-                                        return false;
-                                    }
-                                });
-                                if(selectedOrg.type !== undefined)
-                                {
-                                    var connectionType;
-                                    angular.forEach($scope.connectionType, function(ct, ctkey) {
-                                        if(ct.parentType == selectedOrg.type && ct.childType == $scope.entry.type)
-                                        {
-                                            connectionType = ct.id;
-                                        }
-                                    });
-                                }
                                 connections['connection' + key] = {};
                                 connections['connection' + key].arguments = {
                                         "notes" : values.notes,
-                                        "createdAt" : globalParams.dateToObject(values.createdAt),
+                                        "createdAt" : values.createdAt,
                                         "startNotes" : values.startNotes,
                                         "endNotes" : values.endNotes,
-                                        "parentEntry": values.parentEntry.id,
-                                        "connectionType": connectionType
+                                        "parentEntry": values.parentEntry,
+                                        "connectionType": values.connectionType
                                     };
 
                                 if(values.id !== undefined)
@@ -866,8 +897,16 @@ var regApp = angular
                     }else{
                         if(response.role == 'SUPER_ADMIN')
                             $location.path('/registry/list');
-                        else
-                            $location.path('/entry/list');
+                        else{
+                            dbHandler
+                                .getConnectionTypes()
+                                .runQuery()
+                                .then(function(response) {
+                                    var user = globalParams.get('user');
+                                    globalParams.set('connectionTypes', response.connectionType)
+                                    $location.path('entry/list');
+                                });
+                        }
                     }
                 });
         };

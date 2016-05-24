@@ -120,13 +120,13 @@ var regApp = angular.module('RegistryClient')
             
             return this;
         },
-        getConnectionTypes: function() {
+        getConnectionTypes: function(id) {
             reports.push('connectionType');
             query.connectionType = {
                 "service":"connectionType/search",
                 "arguments": {
                     "filter": {
-                        "registry": globalParams.get('user').registry
+                        "registry": id ? id : globalParams.get('user').registry
                     }
                 }
             }
@@ -213,6 +213,7 @@ var regApp = angular.module('RegistryClient')
                         .post(config.apiurl + url, query)
                         .then(function(response)
                         {
+                            $log.log(response);
                             if(options.joins)
                             {
                                 var joinQuery = {};
@@ -266,7 +267,7 @@ var regApp = angular.module('RegistryClient')
                 });
             }else{
                 // query empty, blank resolve
-                $log.log('empty');
+                $log.log('query empty');
                 result.resolve();
             }
             return result.promise;

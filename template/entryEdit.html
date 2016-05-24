@@ -1,4 +1,4 @@
-<pre class="debug">{{ routing | json }}</pre>
+<pre class="debug">{{ entry | json }}</pre>
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="container-fluid">
@@ -139,14 +139,27 @@
                             <div class="membership-list" ng-show="entry.connection !== undefined">
                                 <div ng-form="connection" ng-repeat="(key, connection) in entry.connection">
                                     <div class="form-group">
-                                        <label class="control-label col-xs-12 col-sm-4">Organisation</label>
+                                        <label class="control-label col-xs-12 col-sm-4">Typ</label>
                                         <div class="col-xs-8 col-sm-6">
-                                            <select class="form-control" ng-options="org.id as org.name for org in organizations" ng-model="entry.connection[key].parentEntry">
-                                                <option value="?">-</option>
+                                            <select
+                                                class="form-control" 
+                                                ng-model="entry.connection[key].connectionType"
+                                                ng-change="resetOrg(key);"
+                                                ng-options="connection.id as connection.name for connection in connectionTypes[entry.type]">
                                             </select>
                                         </div>
                                         <div class="col-xs-4 col-sm-2 text-right">
                                             <button class="btn btn-default" ng-click="removeMembership(key);"><i class="fa fa-times"></i> Radera</button>
+                                        </div>                                        
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-xs-12 col-sm-4">Organisation</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <select
+                                                class="form-control"
+                                                ng-options="org.id as org.name for org in organizations[entry.connection[key].parentType]"
+                                                ng-model="entry.connection[key].parentEntry">
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
