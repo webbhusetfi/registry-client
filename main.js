@@ -168,6 +168,10 @@ var regApp = angular
         }
         $scope.user = globalParams.get('user');
         
+        if (globalParams.get('user').role != 'SUPER_ADMIN') {
+            $scope.goto(globalParams.get('user').registry);
+        }
+        
         $scope.deleteConfirm = function(item) {
             dialogHandler.deleteConfirm(item, {
                 "entry": {
@@ -190,7 +194,7 @@ var regApp = angular
             })
             .catch(function(response) {
                 $log.error(response);
-                $location.path('/logout');
+                $location.path('/user/logout');
             });
     })
     .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
@@ -207,7 +211,7 @@ var regApp = angular
                 })
                 .catch(function(response) {
                     $log.error(response);
-                    $location.path('/logout');
+                    $location.path('/user/logout');
                 });
         }
         $scope.submit = function() {
@@ -245,6 +249,9 @@ var regApp = angular
             'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon']
         };
 
+		if (globalParams.get('user').role == 'USER') {
+            $scope.params.type = 'MEMBER_PERSON';
+        }
         
         $scope.deleteConfirm = function(item) {
             dialogHandler.deleteConfirm(item, {
@@ -356,7 +363,7 @@ var regApp = angular
             globalParams.unset('entryList');
         }else{
             $scope.params = {
-                "type":"ASSOCIATION",
+                "type": ((globalParams.get('user').role == 'USER') ? "MEMBER_PERSON":"ASSOCIATION"),
                 "limit":50,
                 "offset":0,
                 "withProperty":[],
@@ -385,7 +392,7 @@ var regApp = angular
                         "withoutProperty":$scope.params.withoutProperty,
                         "class":$scope.params.class,
                         "type":$scope.params.type,
-                        "parentEntry":$scope.params.parentEntry,
+                        "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : $scope.params.parentEntry),
                     }, $scope.params.filter),
                     "order": {
                         "lastName":"asc",
@@ -437,6 +444,32 @@ var regApp = angular
     
         $scope.init = function()
         {
+			entry_search = {
+                    "name":"entrylist",
+                    "include":$scope.params.includes,
+                    "limit":$scope.params.limit,
+                    "offset":$scope.params.offset,
+                    "order": {
+                        "lastName":"asc",
+                        "name":"asc"
+                    }};
+            entry_search.filter = $scope.params.filter;
+            console.log(JSON.stringify($scope.params.filter));
+            entry_search.filter.withProperty = $scope.params.withProperty;
+            entry_search.filter.withoutProperty = $scope.params.withoutProperty;
+            entry_search.filter.class = $scope.params.class;
+            entry_search.filter.type = $scope.params.type;
+            if (globalParams.get('user').role == 'USER') {
+                if ($scope.params.type == 'ASSOCIATION') {
+                    entry_search.filter.id = globalParams.get('user').entry;    
+                } else {
+                    entry_search.filter.parentEntry = globalParams.get('user').entry;    
+                }
+            } else {
+                entry_search.filter.parentEntry = $scope.params.parentEntry;
+            }
+            
+            console.log(JSON.stringify(entry_search));
             dbHandler
                 .getEntry({
                     "name":"organization",
@@ -450,7 +483,9 @@ var regApp = angular
                     "equals":"propertyGroup",
                     "name":"children"
                 })
-                .getEntries({
+                .getEntries( entry_search
+/*
+				{
                     "name":"entrylist",
                     "include":$scope.params.includes,
                     "filter": angular.merge({
@@ -466,7 +501,9 @@ var regApp = angular
                         "lastName":"asc",
                         "name":"asc"
                     }
-                })
+                }
+*/
+				)
                 .runQuery()
                 .then(function(response) {
                     $scope.types = globalParams.static.types;
@@ -911,7 +948,20 @@ var regApp = angular
                 });
         };
     })
-    .controller('userLogout', function($scope, $http, $location, $log, globalParams, defaultParams) {
+    .controller('userLogout', function($scope, $http, $location, $log, globalParams, defaultParams, dbHandler) {
+        
+        dbHandler
+            .setUrl('logout/')
+            .setLogout()
+            .then(function(response) {
+                globalParams.unset('user');
+                $location.path('/user/login')      
+            })
+            .catch(function(response) {
+                $log.error(response);
+            });
+        
+        /*
         $http
             .post(globalParams.static.apiurl + defaultParams.action)
             .then(function() {
@@ -921,4 +971,5 @@ var regApp = angular
             .catch(function(response) {
                 $log.error(response);
             });
+        */
     });

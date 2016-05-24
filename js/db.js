@@ -86,6 +86,24 @@ var regApp = angular.module('RegistryClient')
             
             return defer.promise;
         },
+        setLogout: function() {
+            var defer = $q.defer();
+            
+            dbInternals.getConfig().then(function(config) {
+                $http
+                    .post(config.apiurl + config.url)
+                    .then(function(response) {
+                        globalParams.unset('user');
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    }).catch(function(response) {
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    });
+            });
+            
+            return defer.promise;
+        },
         getRegistries: function(arguments) {
             if(arguments === undefined)
                 arguments = {};
@@ -262,7 +280,7 @@ var regApp = angular.module('RegistryClient')
                         .catch(function(response)
                         {
                             if(response.status === 403)
-                                $location.path('/logout');
+                                $location.path('/user/logout');
                         })
                 });
             }else{
