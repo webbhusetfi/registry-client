@@ -1,7 +1,8 @@
 regApp.controller('statController', function ($scope, $http, globalParams, dbHandler) {
     
     $scope.registry_msg = !!globalParams.get('user').registry;
-    $scope.stat_panel = !!globalParams.get('user').registry;
+    $scope.stat_panel = false;
+    
     $scope.error_exists = false;
     $scope.headorg = null;
     $scope.headorg_members_count = null;
@@ -9,7 +10,7 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
     
     $scope.selected_org = 0;
     $scope.view_org = null;
-    $scope.view_org_members_count = null;
+    $scope.view_org_members_count = 0;
     
     $scope.view_org_gender = {};
     $scope.view_org_gender.labels = null;
@@ -53,7 +54,6 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
         }
     };
     
-    
     dbHandler
         .setUrl('')
         .setQuery(query)
@@ -66,16 +66,21 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
 
             $scope.headorg = response.headorg.data.items[0];
             $scope.headorg_members_count = response.member_count.data[0].found;
-
-            $scope.view_org = $scope.headorg;
-            $scope.view_org_members_count = $scope.headorg_members_count;
-            $scope.viewOrg($scope.selected_org);
+        
+            if (!globalParams.get('user').entry && globalParams.get('user').role != 'USER') {
+                $scope.view_org = $scope.headorg;
+                $scope.view_org_members_count = $scope.headorg_members_count;
+                $scope.viewOrg($scope.selected_org);
+            } else {
+                $scope.viewOrg(globalParams.get('user').entry);
+            }
+            $scope.stat_panel = !!globalParams.get('user').registry;
         })
         .catch(function(response) {
             //console.log('err' + JSON.stringify(response));
             $scope.stat_panel = false;
             $scope.error_exists = true;
-        });
+        });        
 
     
     $scope.viewOrg = function(selected_org) {
