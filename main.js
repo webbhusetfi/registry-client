@@ -168,10 +168,6 @@ var regApp = angular
         }
         $scope.user = globalParams.get('user');
         
-        if (globalParams.get('user').role != 'SUPER_ADMIN') {
-            $scope.goto(globalParams.get('user').registry);
-        }
-        
         $scope.deleteConfirm = function(item) {
             dialogHandler.deleteConfirm(item, {
                 "entry": {
@@ -183,19 +179,23 @@ var regApp = angular
             })
         };
         
-        dbHandler
-            .getRegistries({
-                "offset":0,
-                "limit":20
-            })
-            .runQuery()
-            .then(function(response) {
-                $scope.resource = response;
-            })
-            .catch(function(response) {
-                $log.error(response);
-                $location.path('/user/logout');
-            });
+        if (globalParams.get('user').role != 'SUPER_ADMIN') {
+            $scope.goto(globalParams.get('user').registry);
+        } else {
+            dbHandler
+                .getRegistries({
+                    "offset":0,
+                    "limit":20
+                })
+                .runQuery()
+                .then(function(response) {
+                    $scope.resource = response;
+                })
+                .catch(function(response) {
+                    $log.error(response);
+                    $location.path('/user/logout');
+                });
+        }
     })
     .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
         $scope.routeParams = $routeParams;
@@ -454,7 +454,6 @@ var regApp = angular
                         "name":"asc"
                     }};
             entry_search.filter = $scope.params.filter;
-            console.log(JSON.stringify($scope.params.filter));
             entry_search.filter.withProperty = $scope.params.withProperty;
             entry_search.filter.withoutProperty = $scope.params.withoutProperty;
             entry_search.filter.class = $scope.params.class;
@@ -469,7 +468,6 @@ var regApp = angular
                 entry_search.filter.parentEntry = $scope.params.parentEntry;
             }
             
-            console.log(JSON.stringify(entry_search));
             dbHandler
                 .getEntry({
                     "name":"organization",
