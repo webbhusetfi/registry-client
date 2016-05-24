@@ -213,7 +213,6 @@ var regApp = angular.module('RegistryClient')
                         .post(config.apiurl + url, query)
                         .then(function(response)
                         {
-                            $log.log(response);
                             if(options.joins)
                             {
                                 var joinQuery = {};
