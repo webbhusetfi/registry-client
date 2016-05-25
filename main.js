@@ -162,8 +162,19 @@ var regApp = angular
                     var user = globalParams.get('user');
                     user.registry = Number(id);
                     globalParams.set('user', user);
-                    globalParams.set('connectionTypes', response.connectionType)
-                    $location.path('entry/list');
+                    globalParams.set('connectionTypes', response.connectionType);
+                
+                    dbHandler
+                        .parse(false)
+                        .getRegistry({"id": globalParams.get('user').registry})
+                        .runQuery()
+                        .then(function(response) {
+                            if (response.registry.status === 'success' && response.registry.data.item) {
+                                globalParams.set('registry', response.registry.data.item);
+                                console.log(JSON.stringify(response.registry.data.item));
+                            }
+                            $location.path('entry/list');
+                        });
                 });
         }
         $scope.user = globalParams.get('user');
@@ -180,7 +191,7 @@ var regApp = angular
         };
         
         if (globalParams.get('user').role != 'SUPER_ADMIN') {
-            $scope.goto(globalParams.get('user').registry);
+            $location.path('entry/list');
         } else {
             dbHandler
                 .getRegistries({
@@ -196,6 +207,9 @@ var regApp = angular
                     $location.path('/user/logout');
                 });
         }
+    })
+    .controller('topbar', function($scope, globalParams){
+        $scope.globalParams = globalParams;
     })
     .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
         $scope.routeParams = $routeParams;
@@ -936,8 +950,21 @@ var regApp = angular
                                 .runQuery()
                                 .then(function(response) {
                                     var user = globalParams.get('user');
-                                    globalParams.set('connectionTypes', response.connectionType)
-                                    $location.path('entry/list');
+                                    globalParams.set('connectionTypes', response.connectionType);
+                                    console.log('ok');
+                                    dbHandler
+                                        .parse(false)
+                                        .getRegistry({"id": globalParams.get('user').registry})
+                                        .runQuery()
+                                        .then(function(response) {
+                                            console.log('ok 2');
+                                        console.log(JSON.stringify(response.registry));
+                                            if (response.registry.status === 'success' && response.registry.data.item) {
+                                                globalParams.set('registry', response.registry.data.item);  
+                                                console.log(JSON.stringify(response.registry.data.item));
+                                            }
+                                            $location.path('entry/list');
+                                        });
                                 });
                         }
                     }
@@ -951,6 +978,8 @@ var regApp = angular
             .setLogout()
             .then(function(response) {
                 globalParams.unset('user');
+                globalParams.unset('connectionTypes');
+                globalParams.unset('registry');
                 $location.path('/user/login')      
             })
             .catch(function(response) {

@@ -2,6 +2,10 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
     
     $scope.registry_msg = !!globalParams.get('user').registry;
     $scope.stat_panel = false;
+    $scope.role_admin = (!globalParams.get('user').entry && globalParams.get('user').role != 'USER');
+    
+    //$scope.role = globalParams.get('user').role;
+    //$scope.entry = globalParams.get('user').entry;
     
     $scope.error_exists = false;
     $scope.headorg = null;
@@ -64,9 +68,9 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
                 $scope.suborgs.push(value);
             });
 
-            $scope.headorg = response.headorg.data.items[0];
+            $scope.headorg = response.headorg.data.items[0];    
             $scope.headorg_members_count = response.member_count.data[0].found;
-        
+
             if (!globalParams.get('user').entry && globalParams.get('user').role != 'USER') {
                 $scope.view_org = $scope.headorg;
                 $scope.view_org_members_count = $scope.headorg_members_count;
@@ -90,7 +94,11 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
         gender_lang[null] = "Odefinierade";
         
         if (selected_org == 0) {   // Headorg
-            $scope.view_org = $scope.headorg;
+            if ($scope.headorg) {
+                $scope.view_org = $scope.headorg;
+            } else {
+                $scope.view_org = globalParams.get('registry');    
+            }
             $scope.view_org_members_count = $scope.headorg_members_count;
             selected_org = null;
         } else {

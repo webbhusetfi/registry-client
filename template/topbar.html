@@ -9,9 +9,8 @@
             </div>
             <div class="col-xs-2">
             </div>
-            <div class="col-xs-6">
-                <h2>Svenska pensionärsförbundet</h2>
-                <!-- h2 ng-show="organization.name">{{ organization.name }}</h2 -->
+            <div class="col-xs-6" ng-controller="topbar">
+                <h2>{{globalParams.get('registry').name}}</h2>
             </div>
         </div>
     </div>

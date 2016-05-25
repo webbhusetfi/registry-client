@@ -322,7 +322,7 @@ var regApp = angular.module('RegistryClient')
                     default:
                     case 'search':
                     case 'read':
-                        if(result[value].status === 'success' && result[value].data.foundCount > 0 || result[value].status === 'success' && queryType === 'read')
+                        if (result[value].status === 'success' && (result[value].data.foundCount > 0 || queryType === 'read'))
                         {
                             parsedResult[value] = {};
                             angular.forEach(result[value].data.items, function(row, key2)
