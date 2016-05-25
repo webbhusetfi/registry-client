@@ -16,7 +16,7 @@
                 <div class="container-fluid" ng-show="stat_panel">
                     <div class="row">
                         <div class="col-md-12">
-                            <form class="form-inline" ng-hide="!globalParams.get('user').entry && globalParams.get('user').role != 'USER'">
+                            <form class="form-inline" ng-show="role_admin">
                                 <label for="selected_org_id">Välj filtrering:</label>
                                 <select name="selected_org" id="selected_org_id" ng-Model="selected_org" ng-change="viewOrg(selected_org);" class="form-control">
                                     <option value="0" ng-selected="selected_org==0">Hela registret</option>
