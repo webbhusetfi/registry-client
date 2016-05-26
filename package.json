@@ -7,7 +7,7 @@
         "angular-resource":">=1.4.7",
         "angular-route":">=1.4.7",
         "babel-core":">=5.8.25",
-        "chart.js":">=1.0.2",
+        "chart.js":"==1.0.2",
         "angular-chart.js":">=0.8.8",
         "ng-csv":">=0.3.6",
         "angular-sanitize":">=1.5.5"
