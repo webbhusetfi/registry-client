@@ -34,7 +34,7 @@
                                 <tr ng-repeat="subproperty in property.children">
                                     <td>
                                         <span class="spacer"></span>
-                                        <a href="#" class="editable" editable-text="subproperty.name" e-name="{{ subproperty.id }}" onbeforesave="updateProperty({'id':property.id,'name':$data});">
+                                        <a href="#" class="editable" editable-text="subproperty.name" e-name="{{ subproperty.id }}" onbeforesave="updateProperty({'id':subproperty.id,'name':$data});">
                                             <i class="fa fa-angle-right"></i> {{ subproperty.name }}
                                         </a>
                                     </td>
