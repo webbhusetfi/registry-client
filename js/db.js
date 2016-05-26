@@ -281,11 +281,7 @@ var regApp = angular.module('RegistryClient')
                                         $log.error(joinResponse);
                                     });
                             }else{
-                                if (parse) {
-                                    result.resolve(dbHandler.parseResult(response.data));
-                                } else {
-                                    result.resolve(response.data);
-                                }
+                                result.resolve(dbHandler.parseResult(response.data));
                             }
                         })
                         .catch(function(response)
@@ -315,6 +311,11 @@ var regApp = angular.module('RegistryClient')
         },
         parseResult: function(result) {
             var parsedResult = {};
+            if (!parse) {
+                tmp = result;
+                dbHandler.reset();
+                return tmp;
+            }
             angular.forEach(reports, function(value, key) {
                 var service = query[value].service.split('/')[0];
                 var queryType = query[value].service.split('/')[1];

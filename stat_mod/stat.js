@@ -1,91 +1,95 @@
 regApp.controller('statController', function ($scope, $http, globalParams, dbHandler) {
     
-    $scope.registry_msg = !!globalParams.get('user').registry;
-    $scope.stat_panel = false;
-    $scope.role_admin = (!globalParams.get('user').entry && globalParams.get('user').role != 'USER');
-    
-    //$scope.role = globalParams.get('user').role;
-    //$scope.entry = globalParams.get('user').entry;
-    
-    $scope.error_exists = false;
-    $scope.headorg = null;
-    $scope.headorg_members_count = null;
-    $scope.suborgs = [];
-    
-    $scope.selected_org = 0;
-    $scope.view_org = null;
-    $scope.view_org_members_count = 0;
-    
-    $scope.view_org_gender = {};
-    $scope.view_org_gender.labels = null;
-    $scope.view_org_gender.data = null;
-    $scope.view_org_age = {};
-    $scope.view_org_age_included_count = null;
-    $scope.view_org_age.labels = null;
-    $scope.view_org_age.data = null;
-    $scope.view_org_age_included_count = 0;
+    $scope.init = function () {
+        $scope.registry_msg = !!globalParams.get('user').registry;
+        $scope.stat_panel = false;
+        $scope.role_admin = (!globalParams.get('user').entry && globalParams.get('user').role != 'USER');
 
-    var query = {
-        "suborgs": {
-            "service": "entry/search",
-            "arguments": {
-                "select": "count",
-                "filter": {
-                    "type": "ASSOCIATION",
-                    "registry": Number(globalParams.get('user').registry)
+        //$scope.role = globalParams.get('user').role;
+        //$scope.entry = globalParams.get('user').entry;
+
+        $scope.error_exists = false;
+        $scope.headorg = null;
+        $scope.headorg_members_count = null;
+        $scope.suborgs = [];
+
+        $scope.selected_org = 0;
+        $scope.view_org = null;
+        $scope.view_org_members_count = 0;
+
+        $scope.view_org_gender = {};
+        $scope.view_org_gender.labels = null;
+        $scope.view_org_gender.data = null;
+        $scope.view_org_age = {};
+        $scope.view_org_age_included_count = null;
+        $scope.view_org_age.labels = null;
+        $scope.view_org_age.data = null;
+        $scope.view_org_age_included_count = 0;
+
+        var query = {
+            "suborgs": {
+                "service": "entry/search",
+                "arguments": {
+                    "select": "count",
+                    "filter": {
+                        "type": "ASSOCIATION",
+                        "registry": Number(globalParams.get('user').registry)
+                    }
+                }
+            },
+            "headorg": {
+                "service": "entry/search",
+                "arguments": {
+                    "select": "count",
+                    "filter": {
+                        "type": "UNION",
+                        "registry": Number(globalParams.get('user').registry)
+                    }
+                }
+            },
+            "member_count" : {
+                "service": "entry/statistics",
+                "arguments": {
+                    "select": "count",
+                    "filter": {
+                        "type": "MEMBER_PERSON",
+                        "registry": Number(globalParams.get('user').registry)
+                    }
                 }
             }
-        },
-        "headorg": {
-            "service": "entry/search",
-            "arguments": {
-                "select": "count",
-                "filter": {
-                    "type": "UNION",
-                    "registry": Number(globalParams.get('user').registry)
+        };
+
+        dbHandler
+            .setUrl('')
+            .setQuery(query)
+            .parse(false)
+            .runQuery()
+            .then(function(response) {
+                angular.forEach(response.suborgs.data.items, function (value, key) {
+                    $scope.suborgs.push(value);
+                });
+
+                $scope.headorg = response.headorg.data.items[0];    
+                $scope.headorg_members_count = response.member_count.data[0].found;
+
+                if (!globalParams.get('user').entry && globalParams.get('user').role != 'USER') {
+                    $scope.view_org = $scope.headorg;
+                    $scope.view_org_members_count = $scope.headorg_members_count;
+                    $scope.viewOrg($scope.selected_org);
+                } else {
+                    $scope.viewOrg(globalParams.get('user').entry);
                 }
-            }
-        },
-        "member_count" : {
-            "service": "entry/statistics",
-            "arguments": {
-                "select": "count",
-                "filter": {
-                    "type": "MEMBER_PERSON",
-                    "registry": Number(globalParams.get('user').registry)
-                }
-            }
-        }
-    };
-    
-    dbHandler
-        .setUrl('')
-        .setQuery(query)
-        .parse(false)
-        .runQuery()
-        .then(function(response) {
-            angular.forEach(response.suborgs.data.items, function (value, key) {
-                $scope.suborgs.push(value);
-            });
+                $scope.stat_panel = !!globalParams.get('user').registry;
+            })
+            .catch(function(response) {
+                //console.log('err' + JSON.stringify(response));
+                $scope.stat_panel = false;
+                $scope.error_exists = true;
+            });        
 
-            $scope.headorg = response.headorg.data.items[0];    
-            $scope.headorg_members_count = response.member_count.data[0].found;
+    }
 
-            if (!globalParams.get('user').entry && globalParams.get('user').role != 'USER') {
-                $scope.view_org = $scope.headorg;
-                $scope.view_org_members_count = $scope.headorg_members_count;
-                $scope.viewOrg($scope.selected_org);
-            } else {
-                $scope.viewOrg(globalParams.get('user').entry);
-            }
-            $scope.stat_panel = !!globalParams.get('user').registry;
-        })
-        .catch(function(response) {
-            //console.log('err' + JSON.stringify(response));
-            $scope.stat_panel = false;
-            $scope.error_exists = true;
-        });        
-
+    $scope.init();
     
     $scope.viewOrg = function(selected_org) {
         var gender_lang = [];
@@ -197,5 +201,6 @@ regApp.controller('statController', function ($scope, $http, globalParams, dbHan
                 $scope.view_org_age_show = false;
                 $scope.error_exists = true;
             });
+
     };
 });
