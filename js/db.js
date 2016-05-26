@@ -236,7 +236,7 @@ var regApp = angular.module('RegistryClient')
                             angular.forEach(reports, function(report, rkey) {
                                 var queryType = query[report].service.split('/')[1];
                                 // push item to items.0
-                                if(queryType === 'read')
+                                if(response.data[report].data && queryType === 'read')
                                 {
                                     response.data[report].data.items = {"0":response.data[report].data.item}
                                     // delete original
