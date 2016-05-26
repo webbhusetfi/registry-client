@@ -218,6 +218,8 @@ var regApp = angular.module('RegistryClient')
                         "registry": globalParams.get('user').registry
                     }
                 }
+                if(args.include)
+                    query[args.name].arguments.include = args.include;
             }
             
             return this;
@@ -231,6 +233,16 @@ var regApp = angular.module('RegistryClient')
                         .post(config.apiurl + url, query)
                         .then(function(response)
                         {
+                            angular.forEach(reports, function(report, rkey) {
+                                var queryType = query[report].service.split('/')[1];
+                                // push item to items.0
+                                if(queryType === 'read')
+                                {
+                                    response.data[report].data.items = {"0":response.data[report].data.item}
+                                    // delete original
+                                    delete response.data[report].data.item;
+                                }
+                            });
                             if(options.joins)
                             {
                                 var joinQuery = {};

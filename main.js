@@ -25,11 +25,16 @@ var regApp = angular
         
         var unset = function(key)
         {
-            var stringValue = $window.sessionStorage.getItem('registryParams');
-            var jsonValue = $window.JSON.parse(stringValue) || {};
-            
-            delete jsonValue[key];
-            $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));            
+            if(key === 'all')
+            {
+                $window.sessionStorage.removeItem('registryParams');
+            }else{
+                var stringValue = $window.sessionStorage.getItem('registryParams');
+                var jsonValue = $window.JSON.parse(stringValue) || {};
+
+                delete jsonValue[key];
+                $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));
+            }
         }
         
         var sendParams = function(object) {
@@ -128,24 +133,10 @@ var regApp = angular
             .when('/user/login', {
                 templateUrl: '/template/userLogin.html',
                 controller: 'userLogin',
-                resolve: {
-                    defaultParams: function() {
-                        return {
-                            action: 'login/'
-                        }
-                    }
-                }
             })
             .when('/user/logout', {
                 template: ' ',
                 controller: 'userLogout',
-                resolve: {
-                    defaultParams: function() {
-                        return {
-                            action: 'logout/'
-                        }
-                    }
-                }
             })
             .otherwise({
                 redirectTo: '/user/login'
@@ -171,7 +162,6 @@ var regApp = angular
                         .then(function(response) {
                             if (response.registry.status === 'success' && response.registry.data.item) {
                                 globalParams.set('registry', response.registry.data.item);
-                                console.log(JSON.stringify(response.registry.data.item));
                             }
                             $location.path('entry/list');
                         });
@@ -415,10 +405,10 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
-                    ret = [];
+                    var ret = [];
                     angular.forEach(response.entrylist, function (value, key) {
                         if ($scope.params.type == 'MEMBER_PERSON') {
-                            row = [
+                            var row = [
                                 value.id,
                                 value.firstName,
                                 value.lastName,
@@ -434,7 +424,7 @@ var regApp = angular
                                 ((value.address) ? value.address.phone : null)
                             ];
                         } else {
-                            row = [
+                            var row = [
                                 value.id,
                                 value.name,
                                 value.description,
@@ -458,7 +448,7 @@ var regApp = angular
     
         $scope.init = function()
         {
-			entry_search = {
+			var entry_search = {
                     "name":"entrylist",
                     "include":$scope.params.includes,
                     "limit":$scope.params.limit,
@@ -495,27 +485,7 @@ var regApp = angular
                     "equals":"propertyGroup",
                     "name":"children"
                 })
-                .getEntries( entry_search
-/*
-				{
-                    "name":"entrylist",
-                    "include":$scope.params.includes,
-                    "filter": angular.merge({
-                        "withProperty":$scope.params.withProperty,
-                        "withoutProperty":$scope.params.withoutProperty,
-                        "class":$scope.params.class,
-                        "type":$scope.params.type,
-                        "parentEntry":$scope.params.parentEntry
-                    }, $scope.params.filter),
-                    "limit":$scope.params.limit,
-                    "offset":$scope.params.offset,
-                    "order": {
-                        "lastName":"asc",
-                        "name":"asc"
-                    }
-                }
-*/
-				)
+                .getEntries(entry_search)
                 .runQuery()
                 .then(function(response) {
                     $scope.types = globalParams.static.types;
@@ -732,7 +702,7 @@ var regApp = angular
                     });
             }else{
                 dbHandler
-                    .getEntry({"id":$routeParams.id})
+                    .getEntry({"id":$routeParams.id,"include":["properties"]})
                     .setJoin({
                         "resource":"entry",
                         "service":"connection/search",
@@ -923,7 +893,7 @@ var regApp = angular
                 $scope.propertyGroups = response.propertyGroups;
             });
     })
-    .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, defaultParams, dbHandler) {
+    .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, dbHandler) {
         $scope.loginform = {};
         $scope.loginform.user = {};
         $scope.loginform.password = {};
@@ -951,17 +921,13 @@ var regApp = angular
                                 .then(function(response) {
                                     var user = globalParams.get('user');
                                     globalParams.set('connectionTypes', response.connectionType);
-                                    console.log('ok');
                                     dbHandler
                                         .parse(false)
                                         .getRegistry({"id": globalParams.get('user').registry})
                                         .runQuery()
                                         .then(function(response) {
-                                            console.log('ok 2');
-                                        console.log(JSON.stringify(response.registry));
                                             if (response.registry.status === 'success' && response.registry.data.item) {
                                                 globalParams.set('registry', response.registry.data.item);  
-                                                console.log(JSON.stringify(response.registry.data.item));
                                             }
                                             $location.path('entry/list');
                                         });
@@ -971,30 +937,15 @@ var regApp = angular
                 });
         };
     })
-    .controller('userLogout', function($scope, $http, $location, $log, globalParams, defaultParams, dbHandler) {
-        
+    .controller('userLogout', function($scope, $http, $location, $log, globalParams, dbHandler) {
         dbHandler
             .setUrl('logout/')
             .setLogout()
             .then(function(response) {
-                globalParams.unset('user');
-                globalParams.unset('connectionTypes');
-                globalParams.unset('registry');
+                globalParams.unset('all');
                 $location.path('/user/login')      
             })
             .catch(function(response) {
                 $log.error(response);
             });
-        
-        /*
-        $http
-            .post(globalParams.static.apiurl + defaultParams.action)
-            .then(function() {
-                globalParams.unset('user');
-                $location.path('/user/login')
-            })
-            .catch(function(response) {
-                $log.error(response);
-            });
-        */
     });
