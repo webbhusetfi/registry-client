@@ -888,9 +888,51 @@ var regApp = angular
             db.getProperties($routeParams.id);
         
         db
+            .getProperties()
+            .setJoin({
+                "resource":"properties",
+                "service":"property/search",
+                "field":"id",
+                "equals":"propertyGroup",
+                "name":"children"
+            })        
             .runQuery()
             .then(function(response) {
-                $scope.propertyGroups = response.propertyGroups;
+                $scope.properties = response.properties;
+                
+                $scope.updatePropertyGroup = function(data) {
+                    dbHandler
+                        .setQuery({
+                            "property":{
+                                "service":"propertyGroup/update",
+                                "arguments": {
+                                    "id":data.id,
+                                    "name":data.name
+                                }
+                            }
+                        })
+                        .runQuery()
+                        .then(function(response) {
+                            $log.log(response);
+                        })
+                }
+                
+                $scope.updateProperty = function(data) {
+                    dbHandler
+                        .setQuery({
+                            "property":{
+                                "service":"property/update",
+                                "arguments": {
+                                    "id":data.id,
+                                    "name":data.name
+                                }
+                            }
+                        })
+                        .runQuery()
+                        .then(function(response) {
+                            $log.log(response);
+                        })
+                }                
             });
     })
     .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, dbHandler) {
