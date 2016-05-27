@@ -96,7 +96,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-xs-4">
+                                    <div class="col-xs-3">
                                         <div class="input-group">
                                             <input
                                                 placeholder="Dag"
@@ -120,6 +120,11 @@
                                                 </button>
                                             </span>
                                         </div>
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <span class="label label-info" ng-show="age(meta.birthYear, meta.birthMonth, meta.birthDate)">
+                                            {{ age(meta.birthYear, meta.birthMonth, meta.birthDate) }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

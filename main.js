@@ -556,6 +556,28 @@ var regApp = angular
             $scope.connectionTypes[value.childType][value.id] = value;
         });
         
+        $scope.age = function(year, month, day) {
+            if (year !== null && year !== undefined) {
+                y = year.getFullYear();
+                if (month !== null && month !== undefined) {
+                    m = month.getMonth();
+                } else {
+                    m = 0;
+                }
+                if (day !== null && day !== undefined) {
+                    d = day.getDate();
+                } else {
+                    d = 1;
+                }
+                birthday = new Date(y, m, d);
+                var ageDifMs = Date.now() - birthday.getTime();
+                var ageDate = new Date(ageDifMs);
+                return Math.abs(ageDate.getUTCFullYear() - 1970);
+            } else {
+                return false;
+            }
+        };
+        
         $scope.setCalTime = function(format, date, target) {
             switch(format)
             {
