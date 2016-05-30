@@ -148,23 +148,15 @@ var regApp = angular
         $scope.goto = function(id) {
             dbHandler
                 .getConnectionTypes(id)
+                .getRegistry({"id": id})
                 .runQuery()
                 .then(function(response) {
                     var user = globalParams.get('user');
                     user.registry = Number(id);
                     globalParams.set('user', user);
                     globalParams.set('connectionTypes', response.connectionType);
-                
-                    dbHandler
-                        .parse(false)
-                        .getRegistry({"id": globalParams.get('user').registry})
-                        .runQuery()
-                        .then(function(response) {
-                            if (response.registry.status === 'success' && response.registry.data.item) {
-                                globalParams.set('registry', response.registry.data.item);
-                            }
-                            $location.path('entry/list');
-                        });
+                    globalParams.set('registry', response.registry[0]);
+                    $location.path('entry/list');
                 });
         }
         $scope.user = globalParams.get('user');
@@ -1023,20 +1015,13 @@ var regApp = angular
                         else{
                             dbHandler
                                 .getConnectionTypes()
+                                .getRegistry({"id": globalParams.get('user').registry})
                                 .runQuery()
                                 .then(function(response) {
                                     var user = globalParams.get('user');
                                     globalParams.set('connectionTypes', response.connectionType);
-                                    dbHandler
-                                        .parse(false)
-                                        .getRegistry({"id": globalParams.get('user').registry})
-                                        .runQuery()
-                                        .then(function(response) {
-                                            if (response.registry.status === 'success' && response.registry.data.item) {
-                                                globalParams.set('registry', response.registry.data.item);  
-                                            }
-                                            $location.path('entry/list');
-                                        });
+                                    globalParams.set('registry', response.registry[0]);  
+                                    $location.path('entry/list');
                                 });
                         }
                     }
