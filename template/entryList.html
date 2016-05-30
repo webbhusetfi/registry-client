@@ -107,8 +107,8 @@
                                 </td>
                                 <td ng-show="params.additionals == 'contact'">{{ item.address.mobile }}</td>                        
                                 <td class="text-right">
-                                    <a ng-show="item.type == 'MEMBER_PERSON'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.firstName + ' ' + item.lastName});"><i class="fa fa-times"></i></a>
-                                    <a ng-show="item.type == 'ASSOCIATION'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>                                    
+                                    <a ng-show="item.type == 'MEMBER_PERSON' && globalParams.get('user').role != 'USER'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.firstName + ' ' + item.lastName});"><i class="fa fa-times"></i></a>
+                                    <a ng-show="item.type == 'ASSOCIATION' && globalParams.get('user').role != 'USER'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>                                    
                                     <a class="btn btn-xs btn-primary" ng-click="go('/entry/' + item.id + '/edit',{'type':item.type}, true);"><i class="fa fa-pencil"></i></a>
                                     <a ng-show="item.type == 'ASSOCIATION'" class="btn btn-xs btn-default" ng-click="go('/entry/list/' + item.id, {});"><i class="fa fa-sign-in"></i></a>
                                 </td>
