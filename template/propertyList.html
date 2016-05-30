@@ -14,7 +14,7 @@
                                 <!-- h3 ng-show="organization.name !== undefined">{{ organization.name }}</h3 -->
                             </div>
                             <div class="col-xs-4 text-right" style="padding-top:2rem;">
-                                <a class="btn btn-default" ng-click="propertyGroupCreate();">Skapa</a>
+                                <a class="btn btn-default" ng-click="createProperty({'service':'propertyGroup'});">Skapa</a>
                             </div>
                         </div>
                         <table class="mainList">
@@ -29,7 +29,10 @@
                                             <i class="fa fa-angle-right"></i> {{ property.name }}
                                         </a>
                                     </td>
-                                    <td></td>
+                                    <td>
+                                        <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'service':'propertyGroup','id':property.id,'name':property.name});"><i class="fa fa-times"></i></a>
+                                        <a class="btn btn-xs btn-default" ng-click="createProperty({'service':'property','propertyGroup':property.id});"><i class="fa fa-plus"></i></a>
+                                    </td>
                                 </tr>
                                 <tr ng-repeat="subproperty in property.children">
                                     <td>
@@ -38,7 +41,9 @@
                                             <i class="fa fa-angle-right"></i> {{ subproperty.name }}
                                         </a>
                                     </td>
-                                    <td></td>
+                                    <td>
+                                        <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'service':'property','id':subproperty.id,'name':subproperty.name});"><i class="fa fa-times"></i></a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

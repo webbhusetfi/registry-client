@@ -696,7 +696,7 @@ var regApp = angular
                         // fix organizations
                         $scope.organizations = {}
                         $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
-                        $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};                        
+                        $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};
                         angular.forEach(response.associations, function(org, key) {
                             $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
                         });
@@ -901,7 +901,10 @@ var regApp = angular
         };
         $scope.init();
     })
-    .controller('propertyList', function($scope, $http, $location, $log, $routeParams, dbHandler) {
+    .controller('propertyList', function($scope, $http, $location, $log, $routeParams, $route, globalParams, dbHandler, dialogHandler) {
+        if(globalParams.get('user').role === 'USER')
+            $location.path('/entry/list/' + globalParams.get('user').entry);
+        
         var db = dbHandler;
         
         if(!isNaN(Number($routeParams.id)))
@@ -917,10 +920,51 @@ var regApp = angular
                 "field":"id",
                 "equals":"propertyGroup",
                 "name":"children"
-            })        
+            })
             .runQuery()
             .then(function(response) {
                 $scope.properties = response.properties;
+        
+                $scope.createProperty = function(item) {
+                    if(item.service === 'propertyGroup') {
+                        var action = function(item) {
+                            return {
+                                "property": {
+                                    "service":item.service + '/create',
+                                    "arguments":{
+                                        "name":item.name,
+                                        "registry":globalParams.get('user').registry
+                                    }
+                                }
+                            }
+                        }
+                    }else if(item.service === 'property') {
+                        var action = function(item) {
+                            return {
+                                "property": {
+                                    "service":item.service + '/create',
+                                    "arguments":{
+                                        "name":item.name,
+                                        "propertyGroup":item.propertyGroup
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    dialogHandler.create('template/propertyCreate.html', item, action);
+                }
+               
+                $scope.deleteConfirm = function(item) {
+                    dialogHandler.deleteConfirm(item, {
+                        "property": {
+                            "service": item.service + "/delete",
+                            "arguments": {
+                                "id": item.id
+                            }
+                        }
+                    })
+                };
                 
                 $scope.updatePropertyGroup = function(data) {
                     dbHandler
@@ -935,7 +979,6 @@ var regApp = angular
                         })
                         .runQuery()
                         .then(function(response) {
-                            $log.log(response);
                         })
                 }
                 
@@ -952,9 +995,8 @@ var regApp = angular
                         })
                         .runQuery()
                         .then(function(response) {
-                            $log.log(response);
                         })
-                }                
+                }
             });
     })
     .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, dbHandler) {

@@ -12,8 +12,8 @@ var regApp = angular.module('RegistryClient')
                             $uibModalInstance.dismiss();
                         }
 
-                        $scope.go = function(id) {
-                            $uibModalInstance.close(id);
+                        $scope.go = function($scope) {
+                            $uibModalInstance.close(item);
                         }
                     },
                     size: 'sm',
@@ -21,6 +21,18 @@ var regApp = angular.module('RegistryClient')
                         item: item
                     }
                 });
+                
+                modalInstance.result.then(function (item) {
+                    dbHandler
+                        .setQuery(action(item))
+                        .runQuery()
+                        .then(function(response) {
+                            $route.reload();
+                        })
+                        .catch(function(response) {
+                            $log.error(response);
+                        });
+                });                
             }else{
                 $log.error('no dialog template')
             }

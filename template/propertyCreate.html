@@ -1,0 +1,16 @@
+<div class="modal-header">
+    <h3>Skapa egenskap</h3>
+</div>
+<div class="modal-body form-horizontal">
+    <pre>{{ item | json }}</pre>
+    <div class="form-group">
+        <label class="col-xs-4 control-label">Namn</label>
+        <div class="col-xs-8">
+            <input ng-model="item.name" placeholder="Namn" type="text" class="form-control">
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="dismiss();"><i class="fa fa-times"></i> Avbryt</button>
+    <button class="btn btn-primary" ng-click="go(item.id);"><i class="fa fa-check"></i> Skapa</button>
+</div>
