@@ -51,7 +51,7 @@ var regApp = angular
         var dateToObject = function(date)
         {
             if(date)
-            {
+            {e
                 return {
                     "date": {
                         "year": date.getFullYear(),
@@ -454,13 +454,13 @@ var regApp = angular
             entry_search.filter.withoutProperty = $scope.params.withoutProperty;
             entry_search.filter.class = $scope.params.class;
             entry_search.filter.type = $scope.params.type;
-            if (globalParams.get('user').role == 'USER') {
-                if ($scope.params.type == 'ASSOCIATION') {
+            if(globalParams.get('user').role == 'USER') {
+                if($scope.params.type == 'ASSOCIATION') {
                     entry_search.filter.id = globalParams.get('user').entry;    
-                } else {
+                }else{
                     entry_search.filter.parentEntry = globalParams.get('user').entry;    
                 }
-            } else {
+            }else{
                 entry_search.filter.parentEntry = $scope.params.parentEntry;
             }
             
@@ -635,10 +635,34 @@ var regApp = angular
         }
 
         $scope.addMembership = function() {
+            if(!isNaN(globalParams.get('user').entry))
+            {
+                var orgType = undefined;
+                var orgParentTypeId = undefined;
+                var orgParentId = undefined;
+                
+                angular.forEach($scope.organizations, function(value, key) {
+                    angular.forEach($scope.organizations[key], function(org, orgkey) {
+                        if(org.id === globalParams.get('user').entry)
+                        {
+                            orgType = org.type;
+                            orgParentId = org.id;
+                            return false;
+                        }
+                    });
+                    return false;
+                });
+                
+                angular.forEach($scope.connectionTypes[$scope.entry.type], function(type, typekey) {
+                    if(orgType === type.parentType)
+                        orgParentTypeId = type.id;
+                });
+            }
+            
             $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
-                "parentType": $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].parentType,
-                "connectionType": $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].id,
-                "parentEntry": "-",
+                "parentType": orgType ? orgType : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].parentType,
+                "connectionType": orgParentTypeId ? orgParentTypeId : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].id,
+                "parentEntry": orgParentId ? orgParentId : "-",
                 "createdAt": $scope.today,
                 "fromOpen":false
             };
@@ -1018,10 +1042,15 @@ var regApp = angular
                                 .getRegistry({"id": globalParams.get('user').registry})
                                 .runQuery()
                                 .then(function(response) {
-                                    var user = globalParams.get('user');
-                                    globalParams.set('connectionTypes', response.connectionType);
-                                    globalParams.set('registry', response.registry[0]);  
-                                    $location.path('entry/list');
+                                    if(response.registry)
+                                    {
+                                        var user = globalParams.get('user');
+                                        globalParams.set('connectionTypes', response.connectionType);
+                                        globalParams.set('registry', response.registry[0]);  
+                                        $location.path('entry/list');
+                                    }else{
+                                        $scope.message = 'Fatal error.';
+                                    }
                                 });
                         }
                     }
