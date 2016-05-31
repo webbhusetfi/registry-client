@@ -1,4 +1,5 @@
 regApp.controller('statController', function ($scope, $http, globalParams, dbHandler) {
+    $scope.globalParams = globalParams;
     
     $scope.init = function () {
         $scope.registry_msg = !!globalParams.get('user').registry;
