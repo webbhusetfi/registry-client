@@ -254,7 +254,8 @@ var regApp = angular
                 "entry": {
                     "service":"entry/delete",
                     "arguments": {
-                        "id": item.id
+                        "id": item.id,
+                        "type": item.type
                     }
                 }
             })
