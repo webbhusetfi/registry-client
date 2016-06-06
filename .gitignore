@@ -40,3 +40,7 @@ config.local.json
 
 # .htaccess
 .htaccess
+
+# dist files
+dist.js
+dist.min.js
