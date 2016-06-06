@@ -8,29 +8,41 @@
             <div class="col-xs-8 col-sm-9 col-md-10 mainList-ct">
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="row">
-                            <div class="col-xs-12">
+                        <div class="row" style="margin-bottom:2rem;">
+                            <div class="col-xs-8">
                                 <h2>Egenskaper</h2>
+                                <!-- h3 ng-show="organization.name !== undefined">{{ organization.name }}</h3 -->
+                            </div>
+                            <div class="col-xs-4 text-right" style="padding-top:2rem;">
+                                <a class="btn btn-default" ng-click="createProperty({'service':'propertyGroup'});">Skapa</a>
                             </div>
                         </div>
                         <table class="mainList">
                             <thead>
                                 <td><strong>Namn</strong></td>
+                                <td></td>
                             </thead>
-                            <tbody ng-repeat="propertyGroup in propertyGroups">
+                            <tbody ng-repeat="property in properties">
                                 <tr>
                                     <td>
-                                        <a href="#" class="editable" editable-text="propertyGroup.name" e-name="{{ propertyGroup.id }}">
-                                            <i class="fa fa-angle-right"></i> {{ propertyGroup.name }}
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr ng-repeat="property in propertyGroup.children">
-                                    <td>
-                                        <span class="spacer"></span>
-                                        <a href="#" class="editable" editable-text="property.name" e-name="{{ property.id }}">
+                                        <a href="#" class="editable" editable-text="property.name" e-name="{{ property.id }}" onbeforesave="updatePropertyGroup({'id':property.id,'name':$data});">
                                             <i class="fa fa-angle-right"></i> {{ property.name }}
                                         </a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'service':'propertyGroup','id':property.id,'name':property.name});"><i class="fa fa-times"></i></a>
+                                        <a class="btn btn-xs btn-default" ng-click="createProperty({'service':'property','propertyGroup':property.id});"><i class="fa fa-plus"></i></a>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="subproperty in property.children">
+                                    <td>
+                                        <span class="spacer"></span>
+                                        <a href="#" class="editable" editable-text="subproperty.name" e-name="{{ subproperty.id }}" onbeforesave="updateProperty({'id':subproperty.id,'name':$data});">
+                                            <i class="fa fa-angle-right"></i> {{ subproperty.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'service':'property','id':subproperty.id,'name':subproperty.name});"><i class="fa fa-times"></i></a>
                                     </td>
                                 </tr>
                             </tbody>

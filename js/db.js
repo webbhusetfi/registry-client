@@ -1,37 +1,150 @@
 var regApp = angular.module('RegistryClient')
-.factory('dbHandler', ['$http', '$log', '$location', 'globalParams', function($http, $log, $location, globalParams) {
-    var config = function() {
-        return {
-            apiurl: "https://api.registry.huset.fi/",
-            registry: Number(globalParams.get('user').registry)
+.factory('dbHandler', ['$http', '$q', '$log', '$location', 'globalParams', function($http, $q, $log, $location, globalParams) {
+    var query = {};
+    var options = {};
+    var joins = {};
+    
+    var reports = [];
+    
+    var url = "";
+    
+    var parse = true;
+
+    // internal functions
+    var dbInternals = {
+        getConfig: function() {
+            var defer = $q.defer();
+            var defaults = {
+                apiurl: "https://api.registry.huset.fi/",
+                url: url,
+                registry: Number(globalParams.get('user').registry)
+            }
+            $http
+                .get('/config.local.json')
+                .then(function(response) {
+                    if(angular.isObject(response))
+                        defer.resolve(angular.merge(defaults, response.data));
+                    else
+                        defer.resolve(defaults);
+                });
+            return defer.promise;
         }
     }
     
-    var reports = []
-    var query = {};
-    var options = {};
-        
     var dbHandler = {
-        getEntryTypes: function() {
-            reports.push('entryTypes');
-            query.entryTypes = {
-                "service":"type/search",
-                "arguments": {
-                    "filter": {
-                        "registry": config().registry
-                    }
-                }
+        // external functions
+        setUrl: function(urlString) {
+            if(angular.isString(urlString))
+                url = urlString;
+            else
+                $log.error('Not a string in setUrl(urlString)');
+            
+            return this;
+        },
+        parse: function(value) {
+            parse = !!value;
+            
+            return this;
+        },
+        // append to query buffer
+        setQuery: function(newQuery) {
+            if(newQuery !== undefined)
+                query = angular.merge(query, newQuery);
+            
+            angular.forEach(Object.keys(newQuery), function(value, key) {
+                reports.push(value);
+            });
+            
+            return this;
+        },
+        setJoin: function(join) {
+            if(options.joins === undefined)
+                options.joins = {};
+            if(options.joins[join.resource] === undefined)
+                options.joins[join.resource] = {};
+            
+            var name = (Number(Object.keys(options.joins[join.resource]).length) + 1);
+            options.joins[join.resource][join.name] = join;
+            
+            return this;
+        },
+        setLogin: function(queryData) {
+            var defer = $q.defer();
+            
+            dbInternals.getConfig().then(function(config) {
+                $http
+                    .post(config.apiurl + config.url, queryData)
+                    .then(function(response) {
+                        globalParams.set('user', response.data);
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    }).catch(function(response) {
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    });
+            });
+            
+            return defer.promise;
+        },
+        setLogout: function() {
+            var defer = $q.defer();
+            
+            dbInternals.getConfig().then(function(config) {
+                $http
+                    .post(config.apiurl + config.url)
+                    .then(function(response) {
+                        globalParams.unset('user');
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    }).catch(function(response) {
+                        dbHandler.reset();
+                        defer.resolve(response.data);
+                    });
+            });
+            
+            return defer.promise;
+        },
+        getRegistries: function(arguments) {
+            if(arguments === undefined)
+                arguments = {};
+            
+            reports.push('registries');
+            query.registries = {
+                "service":"registry/search",
+                "arguments": angular.merge({
+                    "offset":0,
+                    "limit":20
+                }, arguments)
             }
             
             return this;
         },
-        getConnectionTypes: function() {
+        getRegistry: function(arguments) {
+            if(arguments.id !== undefined)
+            {
+                if(arguments === undefined)
+                    arguments = {};
+
+                reports.push('registry');
+                query.registry = {
+                    "service":"registry/read",
+                    "arguments": angular.merge({
+                        "id":null
+                    }, arguments)
+                }
+            }else{
+                $log.error('read must have id');
+            }
+            
+            return this;
+        },
+        getConnectionTypes: function(id) {
             reports.push('connectionType');
             query.connectionType = {
                 "service":"connectionType/search",
                 "arguments": {
                     "filter": {
-                        "registry": config().registry
+                        "registry": id ? id : globalParams.get('user').registry
                     }
                 }
             }
@@ -42,16 +155,15 @@ var regApp = angular.module('RegistryClient')
             if(args === undefined)
                 args = {};
             if(args.name === undefined)
-                args.name = 'propertyGroups';
+                args.name = 'properties';
             
             reports.push(args.name);
-            options = angular.merge(options, {"propertyTree":args.name});
             
             query[args.name] = {
                 "service":"propertyGroup/search",
                 "arguments": {
                     "filter": {
-                        "registry": config().registry
+                        "registry": globalParams.get('user').registry
                     }
                 },
                 "order": {
@@ -69,7 +181,7 @@ var regApp = angular.module('RegistryClient')
                 "service":"entry/search",
                 "arguments":{
                     "filter": {
-                        "registry": config().registry
+                        "registry": globalParams.get('user').registry
                     },
                     "order": {
                         "name":"asc"
@@ -102,93 +214,108 @@ var regApp = angular.module('RegistryClient')
                 query[args.name] = {
                     "service":"entry/read",
                     "arguments": {
-                        "id":args.id
+                        "id":args.id,
+                        "registry": globalParams.get('user').registry
                     }
                 }
+                if(args.include)
+                    query[args.name].arguments.include = args.include;
             }
-            
-            return this;
-        },
-        getFullEntry: function(id) {
-            reports.push('fullEntry');
-            options = angular.merge(options, {"fullEntry":1});
-            query.fullEntry = {
-                "service":"entry/read",
-                "arguments": {
-                    "id": id,
-                    "include":["properties"]
-                }
-            }
-            query.connection = {
-                "service":"connection/search",
-                "arguments": {
-                    "filter": {
-                        "childEntry":id
-                    }
-                }
-            }
-            query.address = {
-                "service":"address/search",
-                "arguments": {
-                    "filter": {
-                        "entry":id
-                    }
-                }
-            }
-            query.properties = {
-            }
-            
-            return this;
-        },
-        reset: function() {
-            query = {};
             
             return this;
         },
         runQuery: function() {
-            var promise = $http
-                .post(config().apiurl, query)
-                .then(function(response)
-                {
-                    if(options.propertyTree !== undefined)
-                    {
-                        if(response.data[options.propertyTree].data.foundCount > 0)
+            var result = $q.defer();
+            if(Object.keys(query).length > 0)
+            {
+                dbInternals.getConfig().then(function(config) {
+                    $http
+                        .post(config.apiurl + url, query)
+                        .then(function(response)
                         {
-                            var subQuery = {}
-                            angular.forEach(response.data[options.propertyTree].data.items, function(value, key) {
-                                subQuery[value.id] = {
-                                    "service":"property/search",
-                                    "arguments": {
-                                        "filter": {
-                                            "propertyGroup":value.id
-                                        },
-                                        "order": {
-                                            "name":"asc"
-                                        }
-                                    }
+                            angular.forEach(reports, function(report, rkey) {
+                                var queryType = query[report].service.split('/')[1];
+                                // push item to items.0
+                                if(response.data[report].data && queryType === 'read')
+                                {
+                                    response.data[report].data.items = {"0":response.data[report].data.item}
+                                    // delete original
+                                    delete response.data[report].data.item;
                                 }
                             });
-                            $http
-                                .post(config().apiurl, subQuery)
-                                .then(function(SQResponse) {
-                                    angular.forEach(SQResponse.data, function(value, key) {
-                                        response.data[options.propertyTree + key] = value.data.items;
+                            if(options.joins)
+                            {
+                                var joinQuery = {};
+                                angular.forEach(reports, function(report, rkey) {
+                                    if(response.data[report] && options.joins[report] !== undefined)
+                                    {
+                                        angular.forEach(options.joins[report], function(joinVal, joinKey) {
+                                            // init join result array
+                                            if(options.joins[report][joinVal.name].results === undefined)
+                                                options.joins[report][joinVal.name].results = {};
+                                            // push item to items.0
+                                            if(angular.isObject(response.data[report].data.item) && !angular.isObject(response.data[report].data.items))
+                                                response.data[report].data.items = {"0":response.data[report].data.item}
+                                            angular.forEach(response.data[report].data.items, function(values, key) {
+                                                var instance = "join" + (Number(Object.keys(joinQuery).length) + 1);
+                                                options.joins[report][joinVal.name].results[values[joinVal.field]] = instance;
+                                                joinQuery[instance] = {
+                                                    "service":joinVal.service,
+                                                    "arguments": {
+                                                        "filter": {}
+                                                    }
+                                                }
+                                                joinQuery[instance].arguments.filter[joinVal.equals] = values[joinVal.field];
+                                                if(joinVal.order)
+                                                    joinQuery[instance].order = joinVal.order;
+                                            });
+                                        });
+                                    }
+                                });
+                                $http
+                                    .post(config.apiurl + url, joinQuery)
+                                    .then(function(joinResponse) {
+                                        result.resolve(dbHandler.parseResult(angular.merge(response.data, joinResponse.data)));
+                                    })
+                                    .catch(function(joinResponse) {
+                                        $log.error(joinResponse);
                                     });
-                                    return dbHandler.parseResult(response.data);
-                                })
-                        }
-                    }
-                    return dbHandler.parseResult(response.data);
-                })
-                .catch(function(response)
-                {
-                    if(response.status === 403)
-                        $location.path('/logout');
-                })
-            return promise;
+                            }else{
+                                result.resolve(dbHandler.parseResult(response.data));
+                            }
+                        })
+                        .catch(function(response)
+                        {
+                            if(response.status === 403)
+                                $location.path('/user/logout');
+                        })
+                });
+            }else{
+                // query empty, blank resolve
+                $log.log('query empty');
+                result.resolve();
+            }
+            return result.promise;
+        },
+        reset: function() {
+            reports = [];
+            query = {};
+            options = {};
+            joins = {};
+            
+            url = "";
+            
+            parse = true;
+            
+            return this;
         },
         parseResult: function(result) {
             var parsedResult = {};
+            if (!parse) {
+                tmp = result;
+                dbHandler.reset();
+                return tmp;
+            }
             angular.forEach(reports, function(value, key) {
                 var service = query[value].service.split('/')[0];
                 var queryType = query[value].service.split('/')[1];
@@ -196,78 +323,48 @@ var regApp = angular.module('RegistryClient')
                 
                 switch(queryType)
                 {
-                    case 'read':
-                        switch(service)
-                        {
-                            case 'entry':
-                                if(options['fullEntry'] !== undefined)
-                                {
-                                    if(result.fullEntry.status == 'success')
-                                    {
-                                        parsedResult.fullEntry = result.fullEntry.data.item;
-                                        if(result.connection.status == 'success' && result.connection.data.foundCount > 0)
-                                        {
-                                            parsedResult.fullEntry.connection = result.connection.data.items;
-                                        }
-                                        if(result.address.status == 'success' && result.address.data.foundCount > 0)
-                                        {
-                                            parsedResult.fullEntry.address = result.address.data.items;
-                                        }
-                                    }
-                                }else if(result[value].status == 'success')
-                                {
-                                    parsedResult[value] = result[value].data.item;
-                                }else{
-                                        parsedResult.entry = false;
-                                }
-                            break;
-                        }
+                    case 'delete':
+                        parsedResult[value] = result[value];
                     break;
-
+                    
+                    case 'create':
+                    case 'update':
+                        parsedResult[value] = result[value];
+                    break;
+                    
                     default:
                     case 'search':
-                        switch(service)
+                    case 'read':
+                        if (result[value].status === 'success' && (result[value].data.foundCount > 0 || queryType === 'read'))
                         {
-                            case 'type':
-                            case 'connectionType':
-                            case 'propertyGroup':
-                                if(result[value].status === 'success' && result[value].data.foundCount > 0)
+                            parsedResult[value] = {};
+                            angular.forEach(result[value].data.items, function(row, key2)
+                            {
+                                if(options.joins !== undefined)
                                 {
-                                    parsedResult[value] = {};
-                                    angular.forEach(result[value].data.items, function(row, key2) {
-                                        parsedResult[value][row.id] = row;
-                                        if(service === 'propertyGroup' && options.propertyTree !== undefined)
-                                        {
-                                            parsedResult[value][row.id]['children'] = result[options.propertyTree + row.id];
-                                        }
-                                    });
-                                }
-                            break;
-
-                            default:
-                                if(result[value].status === 'success' && result[value].data.foundCount > 0)
-                                {
-                                    parsedResult[value] = {};
-                                    angular.forEach(result[value].data.items, function(row, key2)
+                                    if(options.joins[value] !== undefined)
                                     {
-                                        if(row.class === 'PERSON')
-                                            row.name = row.lastName + ', ' + row.firstName;
-                                        parsedResult[value][key2] = row;
-                                    });
-                                    if(parsedResult.foundCount === undefined)
-                                        parsedResult.foundCount = {};
-                                    parsedResult.foundCount[value] = result[value].data.foundCount;
-                                }else{
-                                    if(parsedResult.foundCount === undefined)
-                                        parsedResult.foundCount = {};
-
-                                    parsedResult.foundCount[value] = 0;
+                                        angular.forEach(options.joins[value], function(joinVal, joinKey) {
+                                            row[joinVal.name] = result[joinVal.results[row[joinVal.field]]].data.items;
+                                        });
+                                    }
                                 }
-                            break;
+                                parsedResult[value][key2] = row;
+                            });
+                            if(parsedResult.foundCount === undefined)
+                                parsedResult.foundCount = {};
+                            parsedResult.foundCount[value] = result[value].data.foundCount;
+                        }else{
+                            if(parsedResult.foundCount === undefined)
+                                parsedResult.foundCount = {};
+
+                            parsedResult.foundCount[value] = 0;
                         }
                     break;
                 }
             });
+            
+            dbHandler.reset();
             return parsedResult;
         }
     }

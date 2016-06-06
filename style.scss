@@ -8,18 +8,37 @@
 @import 'scss/_offcanvas';
 @import 'scss/_toolbars';
 
-html { min-height:100%; }
+html { height:100%; background:#333; }
 body {
     min-height:100%;
-    overflow-x:hidden;
-    > .outer {
-        margin:0 -1.5rem;
+    > .main {
+        position:absolute;
+        width:100%;
         min-height:100%;
-        background:$background;
-        > .main {
-            padding:1.5rem;
+        .outer-section {
+            > .inner-section {
+                position:absolute;
+                width:100%;
+                min-height:calc(100% - 50px);
+                > .row {
+                    position:absolute;
+                    min-height:100%;
+                    width:100%;
+                    > * {
+                        position:absolute;
+                        min-height:100%;
+                        &:first-child {
+                            background:#333;
+                        }
+                    }
+                }
+            }
+            width:100%;
+            position:absolute;
+            min-height:100%;
         }
     }
+    overflow-x:hidden;
 }
 
 h1, h2, h3 { font-family:Lato, Arial, Tahoma, Sans-serif; font-weight:300; }
@@ -92,6 +111,13 @@ h3 { font-size:2rem; }
     }
 }
 
+.list-functions {
+    margin-top:4rem;
+    h2 {
+        margin-top:0; margin-bottom:0;
+    }
+}
+
 img.webbhuset { max-width:14rem; vertical-align:baseline; }
 
 .main > div { padding-left:0; padding-right:0; }
@@ -105,10 +131,10 @@ img.webbhuset { max-width:14rem; vertical-align:baseline; }
 .outer-section { background:#333333; }
 .mainList-ct { min-height:80rem; padding-bottom:2rem; background:#f9f9f9; box-shadow:0 0 2px rgba(0,0,0,0.05) inset }
 .mainList { border:0.1rem solid #ccc; width:100%; margin-bottom:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }
-.inner-form { border:0.1rem solid #ccc; padding:2rem; background:#fff; width:100%; margin-bottom:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }
+.inner-form { border:0.1rem solid #ccc; padding:2rem; background:#fff; width:100%; margin-top:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }
 .mainList td { border:0.1rem solid #ccc; padding:0.5rem 1rem; }
 .mainList tr:nth-child(2n) td { background:#f5f5f5; }
-.mainList tr td:last-child { width:10rem; }
+.mainList tr td:last-child { width:10rem; text-align:right; }
 .mainList thead td, .mainList tr:nth-child(2n-1) td { background:#fff; }
 
 .membership-list > div:last-child hr { display:none; }
@@ -126,6 +152,11 @@ span.spacer {
     display:inline-block;
     width:2rem;
 }
+
+pre.debug {
+    position:absolute; left:10px; top:10px; width:400px; z-index:10;
+}
+
 .editable-click, a.editable-click { border-bottom:none; }
 a.editable-click { padding-top:0.4rem; padding-bottom:0.4rem; display:inline-block; }
 .editable-controls input.form-control, .editable-controls button { padding-top:0.3rem!important; padding-bottom:0.3rem!important; height:28px; }

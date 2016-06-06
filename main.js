@@ -1,6 +1,8 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ui.bootstrap', 'xeditable', 'chart.js'])
+    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv'])
     .factory('globalParams', function($window, $location, $log, $routeParams) {
+        var state;
+        
         var get = function(key)
         {
             var stringValue = $window.sessionStorage.getItem('registryParams');
@@ -23,17 +25,33 @@ var regApp = angular
         
         var unset = function(key)
         {
-            var stringValue = $window.sessionStorage.getItem('registryParams');
-            var jsonValue = $window.JSON.parse(stringValue) || {};
-            
-            delete jsonValue[key];
-            $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));            
+            if(key === 'all')
+            {
+                $window.sessionStorage.removeItem('registryParams');
+            }else{
+                var stringValue = $window.sessionStorage.getItem('registryParams');
+                var jsonValue = $window.JSON.parse(stringValue) || {};
+
+                delete jsonValue[key];
+                $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));
+            }
+        }
+        
+        var sendParams = function(object) {
+            if(angular.isObject(object))
+                state = object;
+            else
+                state = undefined;
+        }
+        
+        var getParams = function() {
+            return state;
         }
         
         var dateToObject = function(date)
         {
             if(date)
-            {
+            {e
                 return {
                     "date": {
                         "year": date.getFullYear(),
@@ -52,7 +70,10 @@ var regApp = angular
         
         return {
             static: {
-                "apiurl":"https://api.registry.huset.fi/",
+                "types":{
+                    "ASSOCIATION":"Förening",
+                    "MEMBER_PERSON":"Medlem"
+                },
                 "datepickerPopupConfig":{
                     "uib-datepicker-popup":"dd.MM.yyyy",
                     "current-text":"Idag",
@@ -63,11 +84,13 @@ var regApp = angular
             },
             get: get,
             set: set,
+            sendParams: sendParams,
+            getParams: getParams,
             unset: unset,
-            dateToObject: dateToObject,
+            dateToObject: dateToObject
         };
     })
-    .run(function(editableOptions) {
+    .run(function($window, $log, editableOptions) {
         editableOptions.theme = 'bs3';
     })
     .config(function($httpProvider, $routeProvider, $locationProvider) {
@@ -77,22 +100,10 @@ var regApp = angular
         $routeProvider
             .when('/registry/list', {
                 templateUrl: '/template/registryList.html',
-                controller: 'registryList',
-                resolve: {
-                   defaultParams: function()
-                    {
-                        return {
-                            service: 'registry/search',
-                            arguments: {
-                                offset: 0,
-                                limit:  20
-                            }
-                        };
-                    }
-                }
+                controller: 'registryList'
             })
-            .when('/stat/', {
-                templateUrl: '/stat/statView.html',
+            .when('/stat', {
+                templateUrl: '/stat_mod/statView.html',
                 controller: 'statController'
             })
             .when('/registry/:id/delete', {
@@ -122,24 +133,10 @@ var regApp = angular
             .when('/user/login', {
                 templateUrl: '/template/userLogin.html',
                 controller: 'userLogin',
-                resolve: {
-                    defaultParams: function() {
-                        return {
-                            action: 'login/'
-                        }
-                    }
-                }
             })
             .when('/user/logout', {
                 template: ' ',
                 controller: 'userLogout',
-                resolve: {
-                    defaultParams: function() {
-                        return {
-                            action: 'logout/'
-                        }
-                    }
-                }
             })
             .otherwise({
                 redirectTo: '/user/login'
@@ -147,169 +144,121 @@ var regApp = angular
             
         $locationProvider.html5Mode(true);
     })
-    .controller('registryList', function ($scope, $routeParams, $http, $location, $log, globalParams, defaultParams) {
-        $scope.request = request;
+    .controller('registryList', function ($scope, $routeParams, $http, $location, $window, $log, dbHandler, dialogHandler, globalParams) {
+        $scope.goto = function(id) {
+            dbHandler
+                .getConnectionTypes(id)
+                .getRegistry({"id": id})
+                .runQuery()
+                .then(function(response) {
+                    var user = globalParams.get('user');
+                    user.registry = Number(id);
+                    globalParams.set('user', user);
+                    globalParams.set('connectionTypes', response.connectionType);
+                    globalParams.set('registry', response.registry[0]);
+                    $location.path('entry/list');
+                });
+        }
         $scope.user = globalParams.get('user');
         
-        $scope.goto = function(id) {
-            var user = globalParams.get('user');
-            user.registry = Number(id);
-            globalParams.set('user', user);
+        $scope.deleteConfirm = function(item) {
+            dialogHandler.deleteConfirm(item, {
+                "entry": {
+                    "service":"registry/delete",
+                    "arguments": {
+                        "id": item.id
+                    }
+                }
+            })
+        };
+        
+        if (globalParams.get('user').role != 'SUPER_ADMIN') {
             $location.path('entry/list');
-        }
-        
-        var request = {};
-        request = angular.merge(defaultParams, $routeParams);
-        
-        $http.post(
-                globalParams.static.apiurl,
-                {"request1":request}
-            ).then(function(response) {
-                // internal handling on successful load
-                $scope.request = request;
-                $scope.resource = response.data.request1.data.items;
-
-                if(response.data.count !== undefined)
-                {
-                    var pagination = [];
-                    for(i = 0; i < Math.ceil(response.data.count/20); i++)
-                    {
-                        var page = {}
-                        page.name = i;
-                        if(i == request.offset/request.limit)
-                            page.class = 'active';
-                        pagination.push(page);
-                    }
-                }
-                $scope.resource.pagination = pagination;
-            // http failure
-            }).catch(function(response) {
-                $location.path('/user/logout');
-            });
-    })
-    .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, globalParams) {
-        $scope.routeParams = $routeParams;
-        $scope.post = {};
-        if(Number($routeParams.id) !== -1)
-        {
-            var request = {
-                "request1": {
-                    "service":"registry/read",
-                    "arguments":{
-                        "id": $routeParams.id
-                    }
-                }
-            }
-            $http
-                .post(globalParams.static.apiurl, request)
+        } else {
+            dbHandler
+                .getRegistries({
+                    "offset":0,
+                    "limit":20
+                })
+                .runQuery()
                 .then(function(response) {
-                    $scope.post = response.data.request1.data.item;
+                    $scope.resource = response;
                 })
                 .catch(function(response) {
                     $log.error(response);
+                    $location.path('/user/logout');
+                });
+        }
+    })
+    .controller('topbar', function($scope, globalParams){
+        $scope.globalParams = globalParams;
+    })
+    .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
+        $scope.routeParams = $routeParams;
+        $scope.registry = {};
+        
+        if(Number($routeParams.id) !== -1)
+        {
+            dbHandler
+                .getRegistry({"id":$routeParams.id})
+                .runQuery()
+                .then(function(response) {
+                    $scope.registry = response.registry;
+                })
+                .catch(function(response) {
+                    $log.error(response);
+                    $location.path('/user/logout');
                 });
         }
         $scope.submit = function() {
-            if(Number($routeParams.id) === -1)
-            {
-                var request = {
-                    "request1": {
-                        "service":"registry/create",
-                        "arguments": {
-                            "name":$scope.post.name.value
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var request = {
-                    "request1": {
-                        "service":"registry/update",
-                        "arguments": {
-                            "id":Number($routeParams.id),
-                            "name":$scope.post.name.value
-                        }
+            var request = {
+                "registry": {
+                    "service":"registry/update",
+                    "arguments":{
+                        "name":$scope.registry.name
                     }
                 }
             }
             
-            $http
-                .post(globalParams.static.apiurl, request)
+            if(Number($routeParams.id) !== -1)
+                request.registry.arguments.id = $scope.registry.id;
+            else
+                request.registry.service = 'registry/create';
+            
+            dbHandler
+                .setQuery(request)
+                .runQuery()
                 .then(function(response) {
-                    $location.path('/registry/list')
+                    $location.path('/registry/list');
                 })
                 .catch(function(response) {
-                    $log.error(response);
+                    $location.path('/logout');
                 });
         };
     })
-    .controller('registryDelete', function($routeParams, $http, $location, $log, globalParams) {
-        var request = {
-            "request1":{
-                "service":"registry/delete",
-                "arguments":{
-                    "id":Number($routeParams.id)
-                }
-            }
-        }
-        
-        $http
-            .post(globalParams.static.apiurl, request)
-            .then(function(response) {
-                $location.path('registry/list');
-            }).catch(function(response) {
-                $log.error(response);
-            });
-    })
-    .controller('entryListDelete', function($scope, $uibModalInstance, $log, item) {
-        $scope.item = item;
-        $scope.dismiss = function() {
-            $uibModalInstance.dismiss();
-        }
-        
-        $scope.go = function(id) {
-            $uibModalInstance.close(id);
-        };
-    })
-    .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dbHandler) {
+    .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dialogHandler, dbHandler) {
         $scope.globalParams = globalParams;
         $scope.routeParams = $routeParams;
         $scope.params = {};
-        
-        $scope.deleteConfirm = function(item)
-        {
-            if(item.id !== undefined)
-            {
-                var modalInstance = $uibModal.open({
-                    templateUrl: 'template/entryListDelete.html',
-                    controller: 'entryListDelete',
-                    size: 'sm',
-                    resolve: {
-                        item: item
-                    }
-                });
-                
-                modalInstance.result.then(function (id) {
-                    var deleteQuery = {
-                        "entry": {
-                            "service":"entry/delete",
-                            "arguments": {
-                                "id": id
-                            }
-                        }
-                    }
-                    $http
-                        .post(globalParams.static.apiurl, deleteQuery)
-                        .then(function(response) {
-                            $route.reload();
-                        })
-                        .catch(function(response) {
-                            $log.error(response);
-                        });
-                });
-            }
+        $scope.headers = {
+            'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon'],
+            'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon']
+        };
+
+		if (globalParams.get('user').role == 'USER') {
+            $scope.params.type = 'MEMBER_PERSON';
         }
+        
+        $scope.deleteConfirm = function(item) {
+            dialogHandler.deleteConfirm(item, {
+                "entry": {
+                    "service":"entry/delete",
+                    "arguments": {
+                        "id": item.id
+                    }
+                }
+            })
+        };
         
         $scope.checkProperty = function(id)
         {
@@ -369,8 +318,7 @@ var regApp = angular
         
         $scope.setType = function(type)
         {
-            $scope.params.type = type.id;
-            $scope.params.class = type.class;
+            $scope.params.type = type;
             $scope.params.filter = {};
             $scope.params.offset = 0;
             $scope.init();
@@ -389,12 +337,18 @@ var regApp = angular
             $window.scroll(0,0);
         }
         
-        $scope.go = function(location, savestate)
+        $scope.go = function(location, params, savestate)
         {
             if(savestate)
                 globalParams.set('entryList', $scope.params);
             else
                 globalParams.unset('entryList');
+            if(angular.isObject(params)) {
+                if(Object.keys(params).length)
+                    globalParams.sendParams(params);
+            }else{
+                globalParams.sendParams(undefined);
+            }
             
             $location.path(location);
         }
@@ -405,8 +359,7 @@ var regApp = angular
             globalParams.unset('entryList');
         }else{
             $scope.params = {
-                "type":3,
-                "class":"ORGANIZATION",
+                "type": ((globalParams.get('user').role == 'USER') ? "MEMBER_PERSON":"ASSOCIATION"),
                 "limit":50,
                 "offset":0,
                 "withProperty":[],
@@ -419,33 +372,24 @@ var regApp = angular
         
         if($routeParams.id !== undefined)
         {
-            $scope.params.type = 2;
-            $scope.params.class = "PERSON";
+            $scope.params.type = "MEMBER_PERSON";
             $scope.params.parentEntry = $routeParams.id;
             $scope.params.orgId = $routeParams.id;
         }
         
-        $scope.init = function()
-        {
-            dbHandler
-                .getEntry({
-                    "name":"organization",
-                    "id": $scope.params.orgId
-                })
-                .getEntryTypes()
-                .getProperties()
+        $scope.doExport = function () {
+            return dbHandler
+                .parse(true)
                 .getEntries({
                     "name":"entrylist",
-                    "include":$scope.params.includes,
+                    "include":['address'],
                     "filter": angular.merge({
                         "withProperty":$scope.params.withProperty,
                         "withoutProperty":$scope.params.withoutProperty,
                         "class":$scope.params.class,
                         "type":$scope.params.type,
-                        "parentEntry":$scope.params.parentEntry,
+                        "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : $scope.params.parentEntry),
                     }, $scope.params.filter),
-                    "limit":$scope.params.limit,
-                    "offset":$scope.params.offset,
                     "order": {
                         "lastName":"asc",
                         "name":"asc"
@@ -453,14 +397,100 @@ var regApp = angular
                 })
                 .runQuery()
                 .then(function(response) {
+                    var ret = [];
+                    angular.forEach(response.entrylist, function (value, key) {
+                        if ($scope.params.type == 'MEMBER_PERSON') {
+                            var row = [
+                                value.id,
+                                value.firstName,
+                                value.lastName,
+                                value.birthDay,
+                                value.birthMonth,
+                                value.birthYear,
+                                ((value.address) ? value.address.street : null),
+                                ((value.address) ? value.address.postalCode : null),
+                                ((value.address) ? value.address.town : null),
+                                ((value.address) ? value.address.country : null),
+                                ((value.address) ? value.address.email : null),
+                                ((value.address) ? value.address.mobile : null),
+                                ((value.address) ? value.address.phone : null)
+                            ];
+                        } else {
+                            var row = [
+                                value.id,
+                                value.name,
+                                value.description,
+                                value.bank,
+                                value.account,
+                                value.vat,
+                                ((value.address) ? value.address.street : null),
+                                ((value.address) ? value.address.postalCode : null),
+                                ((value.address) ? value.address.town : null),
+                                ((value.address) ? value.address.country : null),
+                                ((value.address) ? value.address.email : null),
+                                ((value.address) ? value.address.mobile : null),
+                                ((value.address) ? value.address.phone : null)
+                            ];
+                        }
+                        ret.push(row);
+                    });
+                    return ret;
+                });
+        }
+    
+        $scope.init = function()
+        {
+			var entry_search = {
+                    "name":"entrylist",
+                    "include":$scope.params.includes,
+                    "limit":$scope.params.limit,
+                    "offset":$scope.params.offset,
+                    "order": {
+                        "lastName":"asc",
+                        "name":"asc"
+                    }};
+            entry_search.filter = $scope.params.filter;
+            entry_search.filter.withProperty = $scope.params.withProperty;
+            entry_search.filter.withoutProperty = $scope.params.withoutProperty;
+            entry_search.filter.class = $scope.params.class;
+            entry_search.filter.type = $scope.params.type;
+            if(globalParams.get('user').role == 'USER') {
+                if($scope.params.type == 'ASSOCIATION') {
+                    entry_search.filter.id = globalParams.get('user').entry;    
+                }else{
+                    entry_search.filter.parentEntry = globalParams.get('user').entry;    
+                }
+            }else{
+                entry_search.filter.parentEntry = $scope.params.parentEntry;
+            }
+            
+            dbHandler
+                .getEntry({
+                    "name":"organization",
+                    "id": $scope.params.orgId
+                })
+                .getProperties()
+                .setJoin({
+                    "resource":"properties",
+                    "service":"property/search",
+                    "field":"id",
+                    "equals":"propertyGroup",
+                    "name":"children"
+                })
+                .getEntries(entry_search)
+                .runQuery()
+                .then(function(response) {
+                    $scope.types = globalParams.static.types;
                     $scope.entrylist = response.entrylist;
                     $scope.organization = response.organization;
-                    $scope.properties = response.propertyGroups;
-                    $scope.entryTypes = response.entryTypes;
+                    $scope.properties = response.properties;
                     $scope.foundCount = response.foundCount;
                     
-                    if($scope.params.propertyGroup === undefined)
-                        $scope.params.propertyGroup = Object.keys($scope.properties)[0];
+                    if(angular.isObject($scope.properties) && $scope.params.propertyGroup === undefined)
+                    {
+                        angular.isObject($scope.properties[0])
+                            $scope.params.propertyGroup = String($scope.properties[0].id);
+                    }
                     
                     if($scope.foundCount.entrylist > 0)
                     {
@@ -490,7 +520,7 @@ var regApp = angular
                         var pagination = [];
                         for(i = lower; i < upper; i++)
                         {
-                            var page = {}
+                            var page = {};
                             page.name = i;
                             if(i == active)
                                 page.class = 'active';
@@ -499,14 +529,46 @@ var regApp = angular
                     }
                     $scope.pagination = pagination;
                 });
-        }
+        };
         
         $scope.init();
     })
     .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
         $scope.today = new Date();
         $scope.routeParams = $routeParams;
+        $scope.entryTypes = globalParams.static.types;
         $scope.meta = {};
+        
+        $scope.connectionTypes = {}
+        var connectionNames = angular.merge({}, globalParams.static.types, {"UNION":"Förbund"});
+        angular.forEach(globalParams.get('connectionTypes'), function(value, key) {
+            if($scope.connectionTypes[value.childType] === undefined)
+                $scope.connectionTypes[value.childType] = {};
+            value.name = connectionNames[value.parentType];
+            $scope.connectionTypes[value.childType][value.id] = value;
+        });
+        
+        $scope.age = function(year, month, day) {
+            if (year !== null && year !== undefined) {
+                y = year.getFullYear();
+                if (month !== null && month !== undefined) {
+                    m = month.getMonth();
+                } else {
+                    m = 0;
+                }
+                if (day !== null && day !== undefined) {
+                    d = day.getDate();
+                } else {
+                    d = 1;
+                }
+                birthday = new Date(y, m, d);
+                var ageDifMs = Date.now() - birthday.getTime();
+                var ageDate = new Date(ageDifMs);
+                return Math.abs(ageDate.getUTCFullYear() - 1970);
+            } else {
+                return false;
+            }
+        };
         
         $scope.setCalTime = function(format, date, target) {
             switch(format)
@@ -542,7 +604,7 @@ var regApp = angular
                         $scope.entry.birthDate = null;
                 break;
             }
-        }
+        };
         
         $scope.checkProperty = function(id)
         {
@@ -553,7 +615,7 @@ var regApp = angular
                 $scope.entry.properties.push(id);
             else
                 $scope.entry.properties.splice(index,1);                
-        }
+        };
         
         $scope.removeMembership = function(key) {
             if($scope.meta.membershipDelete === undefined)
@@ -563,7 +625,7 @@ var regApp = angular
             
             delete $scope.entry.connection[key];
             var index = 0;
-            var newObject = {}
+            var newObject = {};
             angular.forEach($scope.entry.connection, function(value, key)
             {
                 newObject[index] = $scope.entry.connection[key];
@@ -573,42 +635,94 @@ var regApp = angular
         }
 
         $scope.addMembership = function() {
-            $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
-                "organization": "-",
-                "from": $scope.today,
-                "fromOpen":false,
+            if(!isNaN(globalParams.get('user').entry))
+            {
+                var orgType = undefined;
+                var orgParentTypeId = undefined;
+                var orgParentId = undefined;
+                
+                angular.forEach($scope.organizations, function(value, key) {
+                    angular.forEach($scope.organizations[key], function(org, orgkey) {
+                        if(org.id === globalParams.get('user').entry)
+                        {
+                            orgType = org.type;
+                            orgParentId = org.id;
+                            return false;
+                        }
+                    });
+                    return false;
+                });
+                
+                angular.forEach($scope.connectionTypes[$scope.entry.type], function(type, typekey) {
+                    if(orgType === type.parentType)
+                        orgParentTypeId = type.id;
+                });
             }
-        }
+            
+            $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
+                "parentType": orgType ? orgType : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].parentType,
+                "connectionType": orgParentTypeId ? orgParentTypeId : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].id,
+                "parentEntry": orgParentId ? orgParentId : "-",
+                "createdAt": $scope.today,
+                "fromOpen":false
+            };
+        };
         
         $scope.addContactsheet = function() {
+            if($scope.entry.address === undefined)
+                $scope.entry.address = {};
             $scope.entry.address[Object.keys($scope.entry.address).length] = {"country":"Finland"}
             $scope.meta.addressActive = Object.keys($scope.entry.address).length - 1;
         }
+        
+        $scope.resetOrg = function(id) {
+            $scope.entry.connection[id].parentEntry = '-';
+            $scope.entry.connection[id].parentType = $scope.connectionTypes[$scope.entry.type][$scope.entry.connection[id].connectionType].parentType;
+        }
+        
+        dbHandler
+            .getEntries({
+                "name":"associations",
+                "filter": {
+                    "type":"ASSOCIATION",
+                }
+            })
+            .getEntries({
+                "name":"unions",
+                "filter": {
+                    "type":"UNION",
+                }
+            })
+            .getProperties()
+            .setJoin({
+                "resource":"properties",
+                "service":"property/search",
+                "field":"id",
+                "equals":"propertyGroup",
+                "name":"children"
+            });
         
         $scope.init = function() {
             if($routeParams.id == '-1')
             {
                 dbHandler
-                    .getEntryTypes()
-                    .getConnectionTypes()
-                    .getEntries({
-                        "name":"organizations",
-                        "filter": {
-                            "class":"ORGANIZATION",
-                            "type":[3,1]
-                        }
-                    })
-                    .getProperties()
                     .runQuery()
                     .then(function(response) {
-                        $scope.entryTypes = response.entryTypes;
                         $scope.connectionType = response.connectionType;
-                        $scope.organizations = response.organizations;
-                        $scope.propertyGroups = response.propertyGroups;
+                        // fix organizations
+                        $scope.organizations = {}
+                        $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
+                        $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};
+                        angular.forEach(response.associations, function(org, key) {
+                            $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
+                        });
+                        angular.forEach(response.unions, function(org, key) {
+                            $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
+                        });
+                        $scope.propertyGroups = response.properties;
                         
                         $scope.entry = {
-                            "type": "3",
-                            "class": "ORGANIZATION",
+                            "type": "MEMBER_PERSON",
                             "gender": "",
                             "connection": {},
                             "address": {}
@@ -621,41 +735,53 @@ var regApp = angular
                             "activeProperty": "all"
                         }
                         
-                        $scope.$watch('entry.type', function() {
-                            $scope.entry.class = $scope.entryTypes[$scope.entry.type].class;
-                        });
-                        
                         $scope.addMembership();
                         $scope.addContactsheet();
                     });
             }else{
                 dbHandler
-                    .getEntryTypes()
-                    .getConnectionTypes()
-                    .getProperties()
-                    .getEntries({
-                        "name":"organizations",
-                        "filter": {
-                            "class":"ORGANIZATION",
-                            "type":[3,1]
-                        }
+                    .getEntry({"id":$routeParams.id,"include":["properties"]})
+                    .setJoin({
+                        "resource":"entry",
+                        "service":"connection/search",
+                        "field":"id",
+                        "equals":"childEntry",
+                        "name":"connection"
                     })
-                    .getProperties()
-                    .getFullEntry($routeParams.id)
+                    .setJoin({
+                        "resource":"entry",
+                        "service":"address/search",
+                        "field":"id",
+                        "equals":"entry",
+                        "name":"address"
+                    })
                     .runQuery()
                     .then(function(response) {
-                        $scope.entryTypes = response.entryTypes;
                         $scope.connectionType = response.connectionType;
-                        $scope.organizations = response.organizations;
-                        $scope.propertyGroups = response.propertyGroups;
-                        $scope.entry = response.fullEntry;
-                        if($scope.entry.class == 'PERSON')
+                        $scope.propertyGroups = response.properties;
+                        
+                        // fix organizations
+                        $scope.organizations = {}
+                        $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
+                        $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};                        
+                        angular.forEach(response.associations, function(org, key) {
+                            $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
+                        });
+                        angular.forEach(response.unions, function(org, key) {
+                            $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
+                        });
+                        
+                        if(angular.isObject(response.entry) && angular.isObject(response.entry[0]))
+                            $scope.entry = response.entry[0];
+                        else
+                            $scope.entry = {};
+                        
+                        if($scope.entry.type == 'MEMBER_PERSON')
                         {
-                            $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : null;
+                            $scope.meta.birthYear = $scope.entry.birthYear ? new Date('1-1-' + $scope.entry.birthYear) : new Date();
                         }
                         $scope.meta.addressActive = 0;
                         $scope.meta.activeProperty = "all";
-                        
                         
                         if($scope.entry.birthYear !== null)
                             $scope.meta.birthYear = new Date($scope.entry.birthYear, 1, 1);
@@ -663,6 +789,10 @@ var regApp = angular
                             $scope.meta.birthMonth = new Date($scope.entry.birthYear, $scope.entry.birthMonth-1, 1);
                         if($scope.entry.birthDay !== null)
                             $scope.meta.birthDate = new Date($scope.entry.birthYear, $scope.entry.birthMonth-1, $scope.entry.birthDay);
+                        
+                        angular.forEach($scope.entry.connection, function(value, key) {
+                            $scope.entry.connection[key].parentType = $scope.connectionTypes[$scope.entry.type][value.connectionType].parentType;
+                        });
                         
                         angular.forEach($scope.entry.address, function(value, key) {
                             if(value.country == null)
@@ -672,72 +802,78 @@ var regApp = angular
                         });
                         
                         angular.forEach($scope.entry.connection, function(value, key) {
-                            $scope.entry.connection[key] = {
-                                "id" : value.id,
-                                "organization" : String(value.parentEntry.id),
-                                "from" : value.start ? new Date(value.start) : null,
-                            }
+                            $scope.entry.connection[key].createdAt = value.createdAt ? new Date(value.createdAt) : null;
                         })
                 });
             }
             
             $scope.submit = function() {
-                $scope.entryQuery = $scope.entry;
-                $scope.entryQuery.entry = {
-                    "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
-                    "arguments":{
-                        "registry": globalParams.get('user').registry,
-                        "type": $scope.entry.type,
-                        "class": $scope.entryTypes[$scope.entry.type].class,
-                        "externalId": $scope.entry.externalId,
-                        "notes": $scope.entry.notes,
-                        "gender": $scope.entry.gender == '' ? null : $scope.entry.gender,
-                        "name": $scope.entry.name,
-                        "firstName": $scope.entry.firstName,
-                        "lastName": $scope.entry.lastName,
-                        "birthYear": $scope.entry.birthYear,
-                        "birthMonth": $scope.entry.birthMonth,
-                        "birthDay": $scope.entry.birthDate,
-                        "notes": $scope.entry.notes,
-                        "description": (($scope.entry.description === undefined) ? null : $scope.entry.description),
-                        "properties": $scope.entry.properties
-                    }
-                }
+                var queryObject = {
+                        "entry": {
+                            "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
+                            "arguments":{
+                                "registry": globalParams.get('user').registry,
+                                "type": $scope.entry.type,
+                                "name": $scope.entry.name,
+                                "externalId": $scope.entry.externalId,
+                                "notes": $scope.entry.notes,
+                                "gender": $scope.entry.gender == '' ? undefined : $scope.entry.gender,
+                                "firstName": $scope.entry.firstName,
+                                "lastName": $scope.entry.lastName,
+                                "birthYear": $scope.entry.birthYear,
+                                "birthMonth": $scope.entry.birthMonth,
+                                "birthDay": $scope.entry.birthDate,
+                                "notes": $scope.entry.notes,
+                                "description": $scope.entry.description,
+                                "properties": $scope.entry.properties
+                            }
+                        }
+                    };
                 
                 if($routeParams.id !== '-1')
-                    $scope.entryQuery.entry.arguments.id = $scope.entry.id;
-                
-                $http
-                    .post(globalParams.static.apiurl, $scope.entryQuery)
-                    .then(function(response)
-                    {
-                        var entryId = response.data.entry.data.item.id;
+                    queryObject.entry.arguments.id = $scope.entry.id;
+                    
+                dbHandler
+                    .setQuery(queryObject)
+                    .runQuery()
+                    .then(function(response) {
+                        if($routeParams.id == '-1')
+                        {
+                            var parentId = response.entry.data.item.id;
+                        }else{
+                            var parentId = $routeParams.id;
+                        }
+                        
+                        var connections = {};
 
-                        var connection = {};
                         angular.forEach($scope.entry.connection, function(values, key) {
                             if(values.organization !== '-') {
-                                connection['connection' + key] = {};
-                                connection['connection' + key].arguments = {
-                                    "notes" : values.notes,
-                                    "start" : globalParams.dateToObject(values.from),
-                                    "startNotes" : values.startNotes,
-                                    "endNotes" : values.endNotes,
-                                    "parentEntry": values.organization,
-                                    "connectionType": $scope.connectionType[$scope.entry.type].id
-                                }
-                                
+                                connections['connection' + key] = {};
+                                connections['connection' + key].arguments = {
+                                        "notes" : values.notes,
+                                        "createdAt" : values.createdAt,
+                                        "startNotes" : values.startNotes,
+                                        "endNotes" : values.endNotes,
+                                        "parentEntry": values.parentEntry,
+                                        "connectionType": values.connectionType
+                                    };
+
                                 if(values.id !== undefined)
                                 {
-                                    connection['connection' + key].service = 'connection/update';
-                                    connection['connection' + key].arguments.id = values.id;
+                                    connections['connection' + key].service = 'connection/update';
+                                    connections['connection' + key].arguments.id = values.id;
                                 }else{
-                                    connection['connection' + key].service = 'connection/create';
-                                    connection['connection' + key].arguments.childEntry = entryId;
+                                    connections['connection' + key].service = 'connection/create';
+                                    connections['connection' + key].arguments.childEntry = parentId;
                                 }
                             }
-
                         });
-
+                        if(Object.keys(connections).length > 0)
+                        {
+                            dbHandler
+                                .setQuery(connections);
+                        }
+                        
                         var address = {}
                         angular.forEach($scope.entry.address, function(values, key) {
                             address['contactsheet' + key] = {};
@@ -759,47 +895,32 @@ var regApp = angular
                                 address['contactsheet' + key].arguments.id = values.id;
                             }else{
                                 address['contactsheet' + key].service = 'address/create';
-                                address['contactsheet' + key].arguments.entry = entryId;
+                                address['contactsheet' + key].arguments.entry = parentId;
                             }
                         });
-
-                        var subQuery = angular.merge(connection, address);
-                        
-                        if($scope.meta.membershipDelete !== undefined)
+                        if(Object.keys(address).length > 0)
                         {
-                            var membershipDeleteQuery = {}
-                            angular.forEach($scope.meta.membershipDelete, function(values, key) {
-                                if(values.id !== undefined)
-                                {
-                                    membershipDeleteQuery['deleteconnection' + key] = {
-                                        "service":"connection/delete",
-                                        "arguments": {
-                                            "id": values.id
-                                        }
-                                    }
-                                }
-                            });
-                            subQuery = angular.merge(subQuery, membershipDeleteQuery);
+                            dbHandler
+                                .setQuery(address);
                         }
                         
-                        $http
-                            .post(globalParams.static.apiurl, subQuery)
+                        dbHandler
+                            .runQuery()
                             .then(function(response) {
                                 $window.history.back();
-                            })
-                            .catch(function(response) {
-                                $log.error(response)
                             });
                     })
                     .catch(function(response) {
-                        $log.error(response)
+                        $log.error(response);
                     });
             };
         };
-        
         $scope.init();
     })
-    .controller('propertyList', function($scope, $http, $location, $log, $routeParams, dbHandler) {
+    .controller('propertyList', function($scope, $http, $location, $log, $routeParams, $route, globalParams, dbHandler, dialogHandler) {
+        if(globalParams.get('user').role === 'USER')
+            $location.path('/entry/list/' + globalParams.get('user').entry);
+        
         var db = dbHandler;
         
         if(!isNaN(Number($routeParams.id)))
@@ -808,45 +929,141 @@ var regApp = angular
             db.getProperties($routeParams.id);
         
         db
+            .getProperties()
+            .setJoin({
+                "resource":"properties",
+                "service":"property/search",
+                "field":"id",
+                "equals":"propertyGroup",
+                "name":"children"
+            })
             .runQuery()
             .then(function(response) {
-                $scope.propertyGroups = response.propertyGroups;
-                $log.log($scope.propertyGroups);
+                $scope.properties = response.properties;
+        
+                $scope.createProperty = function(item) {
+                    if(item.service === 'propertyGroup') {
+                        var action = function(item) {
+                            return {
+                                "property": {
+                                    "service":item.service + '/create',
+                                    "arguments":{
+                                        "name":item.name,
+                                        "registry":globalParams.get('user').registry
+                                    }
+                                }
+                            }
+                        }
+                    }else if(item.service === 'property') {
+                        var action = function(item) {
+                            return {
+                                "property": {
+                                    "service":item.service + '/create',
+                                    "arguments":{
+                                        "name":item.name,
+                                        "propertyGroup":item.propertyGroup
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    dialogHandler.create('template/propertyCreate.html', item, action);
+                }
+               
+                $scope.deleteConfirm = function(item) {
+                    dialogHandler.deleteConfirm(item, {
+                        "property": {
+                            "service": item.service + "/delete",
+                            "arguments": {
+                                "id": item.id
+                            }
+                        }
+                    })
+                };
+                
+                $scope.updatePropertyGroup = function(data) {
+                    dbHandler
+                        .setQuery({
+                            "property":{
+                                "service":"propertyGroup/update",
+                                "arguments": {
+                                    "id":data.id,
+                                    "name":data.name
+                                }
+                            }
+                        })
+                        .runQuery()
+                        .then(function(response) {
+                        })
+                }
+                
+                $scope.updateProperty = function(data) {
+                    dbHandler
+                        .setQuery({
+                            "property":{
+                                "service":"property/update",
+                                "arguments": {
+                                    "id":data.id,
+                                    "name":data.name
+                                }
+                            }
+                        })
+                        .runQuery()
+                        .then(function(response) {
+                        })
+                }
             });
     })
-    .controller('userLogin', function($scope, $http, $location, $log, globalParams, defaultParams) {
+    .controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, dbHandler) {
         $scope.loginform = {};
         $scope.loginform.user = {};
         $scope.loginform.password = {};
         
         $scope.submit = function() {
             $scope.message = null;
-            var request = {
-                "username":$scope.user,
-                "password":$scope.password
-            }
-            $http.post(
-                globalParams.static.apiurl + defaultParams.action,
-                request)
+            
+            dbHandler
+                .setUrl('login/')
+                .setLogin({
+                    "username":$scope.user,
+                    "password":$scope.password
+                })
                 .then(function(response) {
-                    $scope.response = response;
-                    
-                    if(response.data.registry == null)
-                        response.data.sa = true;
-                    
-                    globalParams.set('user', response.data);
-                    $location.path('/registry/list');
-                }).catch(function(response) {
-                    $scope.message = response.data.message;
+                    if(response.message !== undefined)
+                    {
+                        $scope.message = response.message;
+                    }else{
+                        if(response.role == 'SUPER_ADMIN')
+                            $location.path('/registry/list');
+                        else{
+                            dbHandler
+                                .getConnectionTypes()
+                                .getRegistry({"id": globalParams.get('user').registry})
+                                .runQuery()
+                                .then(function(response) {
+                                    if(response.registry)
+                                    {
+                                        var user = globalParams.get('user');
+                                        globalParams.set('connectionTypes', response.connectionType);
+                                        globalParams.set('registry', response.registry[0]);  
+                                        $location.path('entry/list');
+                                    }else{
+                                        $scope.message = 'Fatal error.';
+                                    }
+                                });
+                        }
+                    }
                 });
         };
     })
-    .controller('userLogout', function($scope, $http, $location, $log, globalParams, defaultParams) {
-        $http
-            .post(globalParams.static.apiurl + defaultParams.action)
-            .then(function() {
-                globalParams.unset('user');
-                $location.path('/user/login')
+    .controller('userLogout', function($scope, $http, $location, $log, globalParams, dbHandler) {
+        dbHandler
+            .setUrl('logout/')
+            .setLogout()
+            .then(function(response) {
+                globalParams.unset('all');
+                $location.path('/user/login')      
             })
             .catch(function(response) {
                 $log.error(response);

@@ -1,0 +1,62 @@
+<div class="outer-section">
+    <div ng-include="'/template/topbar.html'"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-2">
+                <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
+            </div>
+            <div class="col-xs-10 mainList-ct">
+                
+                <h2>Statistik</h2>
+                
+                <div ng-show="error_exists" class="alert alert-danger">
+                    Ett fel har inträffat!</div>
+                <div ng-hide="registry_msg" class="alert alert-warning">
+                    Inget register finns valt!</div>
+                <div class="container-fluid" ng-show="stat_panel">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form class="form-inline" ng-show="role_admin">
+                                <label for="selected_org_id">Välj filtrering:</label>
+                                <select name="selected_org" id="selected_org_id" ng-Model="selected_org" ng-change="viewOrg(selected_org);" class="form-control">
+                                    <option value="0" ng-selected="selected_org==0">Hela registret</option>
+                                    <optgroup label="Underföreningar">
+                                        <option ng-repeat="org in suborgs" value="{{ org.id }}">{{ org.name }}</option>
+                                    </optgroup>
+                                </select>
+                            </form>
+                            <div ng-show="selected_org!=null">
+                                <h3>{{ view_org.name }} har {{ view_org_members_count }} st. medlemmar.</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>Åldersfördelning</strong><br />
+                            <small><em>{{ (view_org_age_included_count/view_org_members_count)*100 | number:0 }}% är inkluderade i statistiken.</em></small>
+                            <canvas id="line" class="chart chart-line" ng-show="view_org_age_show" chart-data="view_org_age.data" 
+                                chart-labels="view_org_age.labels">
+                            </canvas> 
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>Könsfördelning</strong><br />
+                            <small><em>
+                                <span ng-repeat="g in view_org_gender.data track by $index">
+                                    {{ view_org_gender.labels[$index] }}: {{ (view_org_gender.data[$index]/view_org_members_count)*100 |number:0 }}%
+                                    <span ng-show="$index+1 != view_org_gender.data.length">, </span>
+                                </span>
+                            </em></small>
+                            <canvas id="pie" class="chart chart-pie" chart-legend="true" ng-show="view_org_gender_show"
+                                chart-data="view_org_gender.data" chart-labels="view_org_gender.labels">
+                            </canvas> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

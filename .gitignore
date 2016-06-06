@@ -34,3 +34,9 @@ node_modules
 
 # Netbeans
 nbproject
+
+# config.local.json
+config.local.json
+
+# .htaccess
+.htaccess

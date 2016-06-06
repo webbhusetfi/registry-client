@@ -1,4 +1,4 @@
-<!--pre style="position:absolute; left:10px; top:10px; width:400px; z-index:10;">{{ meta | json }}</pre-->
+<!-- pre class="debug">{{ entry | json }}</pre -->
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="container-fluid">
@@ -15,36 +15,36 @@
                             <label class="control-label col-sm-4">Posttyp</label>
                             <div class="col-sm-8">
                                 <select class="form-control" ng-model="entry.type" ng-show="routeParams.id == '-1'" ng-change="switchType(this.value);">
-                                    <option ng-repeat="type in entryTypes" ng-if="type.id != '1'" ng-selected="entry.type == type.id" value="{{ type.id }}">{{ type.name }}</option>
+                                    <option ng-repeat="(key, type) in entryTypes" ng-selected="entry.type == key" value="{{ key }}">{{ type }}</option>
                                 </select>
-                                <p class="form-text" ng-show="routeParams.id !== '-1'">{{ entryTypes[entry.type].name }}</p>
+                                <p class="form-text" ng-show="routeParams.id !== '-1'">{{ entryTypes[entry.type] }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON' && entry.id">
                             <label class="control-label col-sm-4">MedlemsID</label>
                             <div class="col-sm-8">
                                 <p class="form-control-static">{{ entry.id }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Förnamn</label>
                             <div class="col-sm-8">
                                 <input class="form-control" ng-model="entry.firstName" placeholder="Förnamn" type="text">
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Efternamn</label>
                             <div class="col-sm-8">
                                 <input class="form-control" ng-model="entry.lastName" placeholder="Efternamn" type="text">
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'ORGANIZATION'">
+                        <div class="form-group" ng-show="entry.type == 'ASSOCIATION'">
                             <label class="control-label col-sm-4">Namn</label>
                             <div class="col-sm-8">
                                 <input class="form-control" ng-model="entry.name" placeholder="Namn" type="text">
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Födelseår</label>
                             <div class="col-sm-8">
                                 <div class="row">
@@ -96,7 +96,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-xs-4">
+                                    <div class="col-xs-3">
                                         <div class="input-group">
                                             <input
                                                 placeholder="Dag"
@@ -121,10 +121,15 @@
                                             </span>
                                         </div>
                                     </div>
+                                    <div class="col-xs-1">
+                                        <span class="label label-info" ng-show="age(meta.birthYear, meta.birthMonth, meta.birthDate)">
+                                            {{ age(meta.birthYear, meta.birthMonth, meta.birthDate) }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'PERSON'">
+                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
                             <label class="control-label col-sm-4">Kön</label>
                             <div class="col-sm-8">
                                 <select class="form-control" ng-model="entry.gender">
@@ -134,24 +139,36 @@
                                 </select>
                             </div>
                         </div>
-                        <div ng-show="entry.connection !== undefined">
+                        <div>
                             <h2>Medlemskap</h2>
-                            <div class="membership-list">
+                            <div class="membership-list" ng-show="entry.connection !== undefined">
                                 <div ng-form="connection" ng-repeat="(key, connection) in entry.connection">
                                     <div class="form-group">
-                                        <label class="control-label col-xs-12 col-sm-4">Organisation</label>
+                                        <label class="control-label col-xs-12 col-sm-4">Typ</label>
                                         <div class="col-xs-8 col-sm-6">
-                                            <select class="form-control" ng-model="entry.connection[key].organization">
-                                                <option value="-">-</option>
-                                                <option ng-repeat="org in organizations" value="{{ org.id }}">{{ org.name }}</option>
+                                            <select
+                                                class="form-control" 
+                                                ng-model="entry.connection[key].connectionType"
+                                                ng-change="resetOrg(key);"
+                                                ng-options="connection.id as connection.name for connection in connectionTypes[entry.type]">
                                             </select>
                                         </div>
                                         <div class="col-xs-4 col-sm-2 text-right">
                                             <button class="btn btn-default" ng-click="removeMembership(key);"><i class="fa fa-times"></i> Radera</button>
+                                        </div>                                        
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-xs-12 col-sm-4">Organisation</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <select
+                                                class="form-control"
+                                                ng-options="org.id as org.name for org in organizations[entry.connection[key].parentType]"
+                                                ng-model="entry.connection[key].parentEntry">
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-sm-4">Medlemsskap</label>
+                                        <label class="control-label col-sm-4">Medlemskap</label>
                                         <div class="col-sm-8">
                                             <div class="row">
                                                 <div class="col-sm-9">
@@ -162,7 +179,7 @@
                                                             placeholder="Från"
                                                             uib-datepicker-popup="dd.MM.yyyy" 
                                                             init-date="today" 
-                                                            ng-model="entry.connection[key].from"
+                                                            ng-model="entry.connection[key].createdAt"
                                                             is-open="entry.connection[key].fromOpen"
                                                             ng-required="true"
                                                             close-text="Stäng" />
@@ -176,60 +193,37 @@
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <!-- div class="col-sm-6">
-                                                    <div class="input-group">
-                                                        <input
-                                                            type="text"
-                                                            class="form-control"
-                                                            placeholder="Till"
-                                                            uib-datepicker-popup="dd.MM.yyyy" 
-                                                            init-date="today" 
-                                                            min-date="entry.connection[key].from"
-                                                            ng-model="entry.connection[key].to"
-                                                            is-open="entry.connection[key].toOpen"
-                                                            ng-required="true"
-                                                            close-text="Stäng" />
-                                                        <span class="input-group-btn">
-                                                            <button
-                                                                class="btn btn-default"
-                                                                ng-click="entry.connection[key].toOpen = true"
-                                                            >
-                                                                <i class="fa fa-calendar"></i>
-                                                            </button>
-                                                        </span>
-                                                    </div>
-                                                </div-->
                                             </div>
                                         </div>
                                     </div>
                                     <hr>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-4 col-sm-8">
-                                        <a class="btn btn-default" ng-click="addMembership()"><i class="fa fa-plus"></i> Lägg till medlemskap</a>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-4 col-sm-8">
+                                    <a class="btn btn-default" ng-click="addMembership()"><i class="fa fa-plus"></i> Lägg till medlemskap</a>
                                 </div>
                             </div>
                         </div>
-                        <div ng-show="entry.address !== undefined">
-                            <h2>Kontaktuppgifter</h2>
-                            <div class="contact-toolbar row">
-                                <div class="col-lg-8 col-lg-offset-4 col-xs-12">
-                                    <a
-                                        class="btn btn-default contact-sheet-btn"
-                                        ng-class="{ 'active btn-primary' : meta.addressActive == key }"
-                                        ng-repeat="(key, address) in entry.address"
-                                        ng-click="meta.addressActive = key">
-                                        {{ key }}
-                                    </a>
-                                    <a
-                                        class="btn btn-default"
-                                        ng-click="addContactsheet()"
-                                        >
-                                        <i class="fa fa-plus"></i> Lägg till
-                                    </a>
-                                </div>
+                        <h2>Kontaktuppgifter</h2>
+                        <div class="contact-toolbar row">
+                            <div class="col-md-8 col-md-offset-4 col-xs-12">
+                                <a
+                                    class="btn btn-default contact-sheet-btn"
+                                    ng-class="{ 'active btn-primary' : meta.addressActive == key }"
+                                    ng-repeat="(key, address) in entry.address"
+                                    ng-click="meta.addressActive = key">
+                                    {{ key }}
+                                </a>
+                                <a
+                                    class="btn btn-default"
+                                    ng-click="addContactsheet()"
+                                    >
+                                    <i class="fa fa-plus"></i> Lägg till
+                                </a>
                             </div>
+                        </div>
+                        <div ng-show="entry.address !== undefined">
                             <hr>
                             <div
                                 class="contact-sheet"
@@ -268,21 +262,27 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-sm-4">Postnummer</label>
+                                    <label class="control-label col-sm-4">Postnummer och ort</label>
+                                    <div class="col-sm-8">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text" placeholder="Postnummer" ng-model="address.postalCode">
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Land</label>
                                     <div class="col-sm-8">
                                         <select class="form-control" ng-model="address.country">
                                             <option disabled>Land</option>
                                             <option>Finland</option>
                                             <option>Annat</option>
                                         </select><br>
-                                        <div class="row">
-                                            <div class="col-xs-4">
-                                                <input class="form-control" type="text" placeholder="Postnummer" ng-model="address.postalCode">
-                                            </div>
-                                            <div class="col-xs-8">
-                                                <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
-                                            </div>
-                                        </div>
+      
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -326,7 +326,7 @@
                             <hr>
                         </div>
                         <h2>Meta</h2>
-                        <div class="form-group" ng-show="entryTypes[entry.type].class == 'ORGANIZATION'">
+                        <div class="form-group" ng-show="entry.type == 'ASSOCIATION'">
                             <label class="control-label col-sm-4">Beskrivning</label>
                             <div class="col-sm-8">
                                 <textarea placeholder="Beskrivning" class="form-control" ng-model="entry.description"></textarea>

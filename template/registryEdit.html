@@ -1,16 +1,15 @@
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="mainList-ct">
-        <div ng-include="'/template/header.html'"></div>
         <div class="row">
             <div class="col-lg-6 col-lg-offset-3 col-sm-12 col-xs-12">
-                <div class="functions"><a class="btn btn-default" onclick="history.back();"><i class="fa fa-chevron-left"></i> Tillbaka</a></div>
+                <div class="functions" style="margin-top:2rem;"><a class="btn btn-default" onclick="history.back();"><i class="fa fa-chevron-left"></i> Tillbaka</a></div>
                 <div class="form-horizontal" ng-form="post">
                     <h2>{{ routeParams.id === '-1' ? 'Skapa' : 'Ändra' }} register</h2>
                     <div class="form-group"
                         ng-class="{
-                            'has-error' : post.name.$invalid && post.name.$dirty,
-                            'has-success' : post.name.$valid && post.name.$dirty,
+                            'has-error' : regform.$invalid && regform.$dirty,
+                            'has-success' : regform.$valid && regform.$dirty,
                         }" 
                         ng-form="name"
                     >
@@ -20,7 +19,8 @@
                                 class="form-control" 
                                 type="text" 
                                 ng-minlength="4" 
-                                ng-model="post.name" 
+                                ng-model="registry.name" 
+                                ng-model-options="{ debounce:100 }" 
                                 required 
                                 placeholder="Namn"
                             >
@@ -30,7 +30,7 @@
                         <div class="col-sm-12 text-right">
                             <a
                                 class="btn btn-default"
-                                ng-disabled="post.$invalid || post.$pristine"
+                                ng-disabled="regform.$invalid || regform.$pristine"
                                 ng-click="submit()"
                             ><i class="fa fa-save"></i> Spara</a>
                         </div>
