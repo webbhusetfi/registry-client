@@ -2,21 +2,18 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         concat: {
-            options: {
-                separator: ';'
-            },
             dist: {
                 src: [
-                    'node_modules/angular/angular.js',
-                    'node_modules/angular-route/angular-route.js',
-                    'node_modules/angular-resource/angular-resource.js',
-                    'node_modules/angular-sanitize/angular-sanitize.js',
-                    'node_modules/angular-chart.js/node_modules/chart.js/Chart.js',
-                    'node_modules/angular-chart.js/angular-chart.js',
-                    'node_modules/ng-csv/build/ng-csv.js',
-                    'node_modules/angular-ui-bootstrap/ui-bootstrap.js',
-                    'node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.js',
-                    'node_modules/angular-xeditable/dist/js/xeditable.js',
+                    'node_modules/angular/angular.min.js',
+                    'node_modules/angular-route/angular-route.min.js',
+                    'node_modules/angular-resource/angular-resource.min.js',
+                    'node_modules/angular-sanitize/angular-sanitize.min.js',
+                    'node_modules/angular-chart.js/node_modules/chart.js/Chart.min.js',
+                    'node_modules/angular-chart.js/dist/angular-chart.min.js',
+                    'node_modules/ng-csv/build/ng-csv.min.js',
+                    'node_modules/angular-ui-bootstrap/ui-bootstrap.min.js',
+                    'node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js',
+                    'node_modules/angular-xeditable/dist/js/xeditable.min.js',
                     'dist.min.js'
                 ],
                 dest: 'dist.js'
