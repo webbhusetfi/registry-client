@@ -26,10 +26,19 @@ module.exports = function(grunt) {
             dist: {
                 src: [
                     'main.js',
-                    'js/db.js',
-                    'js/dialog.js',
-                    'js/directives.js',
-                    'stat_mod/stat.js'                    
+                    'js/factory/db.js',
+                    'js/factory/dialog.js',
+                    'js/factory/globalParams.js',
+                    'js/directive/directives.js',
+                    'js/controller/topbar.js',
+                    'js/controller/statView.js',
+                    'js/controller/registryList.js',
+                    'js/controller/registryEdit.js',
+                    'js/controller/entryList.js',
+                    'js/controller/entryEdit.js',
+                    'js/controller/propertyList.js',
+                    'js/controller/userLogin.js',
+                    'js/controller/userLogout.js'
                 ],
                 dest:'dist.min.js'
             }

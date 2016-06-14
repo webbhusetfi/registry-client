@@ -1,13 +1,13 @@
-var regApp = angular.module('RegistryClient')
+angular.module('RegistryClient')
 .factory('dbHandler', ['$http', '$q', '$log', '$location', 'globalParams', function($http, $q, $log, $location, globalParams) {
     var query = {};
     var options = {};
     var joins = {};
-    
+
     var reports = [];
-    
+
     var url = "";
-    
+
     var parse = true;
 
     // internal functions
@@ -30,7 +30,7 @@ var regApp = angular.module('RegistryClient')
             return defer.promise;
         }
     }
-    
+
     var dbHandler = {
         // external functions
         setUrl: function(urlString) {
@@ -38,23 +38,23 @@ var regApp = angular.module('RegistryClient')
                 url = urlString;
             else
                 $log.error('Not a string in setUrl(urlString)');
-            
+
             return this;
         },
         parse: function(value) {
             parse = !!value;
-            
+
             return this;
         },
         // append to query buffer
         setQuery: function(newQuery) {
             if(newQuery !== undefined)
                 query = angular.merge(query, newQuery);
-            
+
             angular.forEach(Object.keys(newQuery), function(value, key) {
                 reports.push(value);
             });
-            
+
             return this;
         },
         setJoin: function(join) {
@@ -62,15 +62,15 @@ var regApp = angular.module('RegistryClient')
                 options.joins = {};
             if(options.joins[join.resource] === undefined)
                 options.joins[join.resource] = {};
-            
+
             var name = (Number(Object.keys(options.joins[join.resource]).length) + 1);
             options.joins[join.resource][join.name] = join;
-            
+
             return this;
         },
         setLogin: function(queryData) {
             var defer = $q.defer();
-            
+
             dbInternals.getConfig().then(function(config) {
                 $http
                     .post(config.apiurl + config.url, queryData)
@@ -83,12 +83,12 @@ var regApp = angular.module('RegistryClient')
                         defer.resolve(response.data);
                     });
             });
-            
+
             return defer.promise;
         },
         setLogout: function() {
             var defer = $q.defer();
-            
+
             dbInternals.getConfig().then(function(config) {
                 $http
                     .post(config.apiurl + config.url)
@@ -101,13 +101,13 @@ var regApp = angular.module('RegistryClient')
                         defer.resolve(response.data);
                     });
             });
-            
+
             return defer.promise;
         },
         getRegistries: function(arguments) {
             if(arguments === undefined)
                 arguments = {};
-            
+
             reports.push('registries');
             query.registries = {
                 "service":"registry/search",
@@ -116,7 +116,7 @@ var regApp = angular.module('RegistryClient')
                     "limit":20
                 }, arguments)
             }
-            
+
             return this;
         },
         getRegistry: function(arguments) {
@@ -135,7 +135,7 @@ var regApp = angular.module('RegistryClient')
             }else{
                 $log.error('read must have id');
             }
-            
+
             return this;
         },
         getConnectionTypes: function(id) {
@@ -148,7 +148,7 @@ var regApp = angular.module('RegistryClient')
                     }
                 }
             }
-            
+
             return this;
         },
         getProperties: function(args) {
@@ -156,9 +156,9 @@ var regApp = angular.module('RegistryClient')
                 args = {};
             if(args.name === undefined)
                 args.name = 'properties';
-            
+
             reports.push(args.name);
-            
+
             query[args.name] = {
                 "service":"propertyGroup/search",
                 "arguments": {
@@ -170,7 +170,7 @@ var regApp = angular.module('RegistryClient')
                     "name":"asc"
                 }
             }
-            
+
             return this;
         },
         getEntries: function(args) {
@@ -188,7 +188,7 @@ var regApp = angular.module('RegistryClient')
                     }
                 }
             }
-            
+
             if(args.include !== undefined)
                 query[args.name].arguments.include = args.include;
             if(args.filter !== undefined)
@@ -201,7 +201,7 @@ var regApp = angular.module('RegistryClient')
                 query[args.name].arguments.offset = args.offset;
             if(args.append !== undefined)
                 query[args.name] = angular.merge(query[args.name], args.append);
-            
+
             return this;
         },
         // expects id
@@ -221,7 +221,7 @@ var regApp = angular.module('RegistryClient')
                 if(args.include)
                     query[args.name].arguments.include = args.include;
             }
-            
+
             return this;
         },
         runQuery: function() {
@@ -302,11 +302,11 @@ var regApp = angular.module('RegistryClient')
             query = {};
             options = {};
             joins = {};
-            
+
             url = "";
-            
+
             parse = true;
-            
+
             return this;
         },
         parseResult: function(result) {
@@ -320,18 +320,18 @@ var regApp = angular.module('RegistryClient')
                 var service = query[value].service.split('/')[0];
                 var queryType = query[value].service.split('/')[1];
                 var option = query[value].option;
-                
+
                 switch(queryType)
                 {
                     case 'delete':
                         parsedResult[value] = result[value];
                     break;
-                    
+
                     case 'create':
                     case 'update':
                         parsedResult[value] = result[value];
                     break;
-                    
+
                     default:
                     case 'search':
                     case 'read':
@@ -363,7 +363,7 @@ var regApp = angular.module('RegistryClient')
                     break;
                 }
             });
-            
+
             dbHandler.reset();
             return parsedResult;
         }
