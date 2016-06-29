@@ -364,6 +364,21 @@ angular.module('RegistryClient')
                             address['contactsheet' + key].arguments.entry = parentId;
                         }
                     });
+                    
+                    if($scope.meta.membershipDelete) {
+                        var membershipDelete = {};
+                        angular.forEach($scope.meta.membershipDelete, function(value, key) {
+                            membershipDelete['membership' + key] = {
+                                "service":"connection/delete",
+                                "arguments":{
+                                    "id":value.id
+                                }
+                            }
+                        });
+                        dbHandler
+                            .setQuery(membershipDelete); 
+                    }
+                    
                     if(Object.keys(address).length > 0)
                     {
                         dbHandler
