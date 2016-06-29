@@ -44,3 +44,4 @@ config.local.json
 # dist files
 dist.js
 dist.min.js
+index.html

@@ -42,9 +42,31 @@ module.exports = function(grunt) {
                 ],
                 dest:'dist.min.js'
             }
+        },
+        processhtml: {
+            dist: {
+                options: {
+                    "process":true,
+                    "strip":true
+                },
+                files: {
+                    'index.html':['index.tpl.html']
+                }
+            },
+            dev: {
+                options: {
+                    "process":true,
+                    "strip":true
+                },
+                files: {
+                    'index.html':['index.tpl.html']
+                }
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['uglify','concat']);
+    grunt.loadNpmTasks('grunt-processhtml');
+    grunt.registerTask('dev', ['uglify','concat','processhtml:dev']);
+    grunt.registerTask('default', ['uglify','concat','processhtml:dist']);
 };
