@@ -17,6 +17,7 @@
         "grunt-contrib-concat":"==1.0.1",
         "grunt-contrib-uglify":"==1.0.0",
         "grunt-contrib-jshint":"==1.0.0",
-        "grunt-processhtml":">=0.4.0"
+        "grunt-processhtml":">=0.4.0",
+        "grunt-cache-breaker":">=2.0.1"
     }
 }

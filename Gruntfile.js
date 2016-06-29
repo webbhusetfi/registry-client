@@ -62,11 +62,26 @@ module.exports = function(grunt) {
                     'index.html':['index.tpl.html']
                 }
             }
+        },
+        cachebreaker: {
+            dist: {
+                options: {
+                    match:[{
+                        'dist.js':'dist.js',
+                        'style.css':'css/style.css'
+                    }],
+                    replacement: 'md5'
+                },
+                files: {
+                    src:['index.html']
+                }
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-processhtml');
+    grunt.loadNpmTasks('grunt-cache-breaker');
     grunt.registerTask('dev', ['uglify','concat','processhtml:dev']);
-    grunt.registerTask('default', ['uglify','concat','processhtml:dist']);
+    grunt.registerTask('default', ['uglify','concat','processhtml:dist','cachebreaker']);
 };
