@@ -40,9 +40,13 @@ var regApp = angular
                 templateUrl: '/template/propertyList.html',
                 controller: 'propertyList'
             })
+            .when('/user/:id?/edit', {
+                templateUrl: '/template/userEdit.html',
+                controller: 'userEdit'
+            })
             .when('/user/login', {
                 templateUrl: '/template/userLogin.html',
-                controller: 'userLogin',
+                controller: 'userLogin'
             })
             .when('/user/logout', {
                 template: ' ',

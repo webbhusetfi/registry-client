@@ -37,6 +37,7 @@ module.exports = function(grunt) {
                     'js/controller/entryList.js',
                     'js/controller/entryEdit.js',
                     'js/controller/propertyList.js',
+                    'js/controller/userEdit.js',
                     'js/controller/userLogin.js',
                     'js/controller/userLogout.js'
                 ],
