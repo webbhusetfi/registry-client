@@ -30,7 +30,7 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'service':'propertyGroup','id':property.id,'name':property.name});"><i class="fa fa-times"></i></a>
+                                        <a class="btn btn-xs btn-danger" ng-disabled="property.children.length > 0" ng-click="property.children.length == 0 ? deleteConfirm({'service':'propertyGroup','id':property.id,'name':property.name}) : null;"><i class="fa fa-times"></i></a>
                                         <a class="btn btn-xs btn-default" ng-click="createProperty({'service':'property','propertyGroup':property.id});"><i class="fa fa-plus"></i></a>
                                     </td>
                                 </tr>
