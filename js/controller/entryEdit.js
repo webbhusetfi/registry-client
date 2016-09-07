@@ -2,6 +2,7 @@ angular.module('RegistryClient')
 .controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
     $scope.today = new Date();
     $scope.routeParams = $routeParams;
+    $scope.globalParams = globalParams;
     $scope.entryTypes = globalParams.static.types;
     $scope.meta = {};
 
