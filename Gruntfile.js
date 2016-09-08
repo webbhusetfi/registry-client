@@ -68,7 +68,7 @@ module.exports = function(grunt) {
                 options: {
                     match:[{
                         'dist.js':'dist.js',
-                        'style.css':'css/style.css'
+                        'style.css':'style.css'
                     }],
                     replacement: 'md5'
                 },

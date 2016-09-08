@@ -81,24 +81,17 @@ angular.module('RegistryClient')
         if(index == -1)
             $scope.entry.properties.push(id);
         else
-            $scope.entry.properties.splice(index,1);                
+            $scope.entry.properties.splice(index,1);
     };
 
     $scope.removeMembership = function(key) {
         if($scope.meta.membershipDelete === undefined)
-            $scope.meta.membershipDelete = new Array();
+            $scope.meta.membershipDelete = [];
+        
+        if($scope.entry.connection[key].id !== undefined)
+            $scope.meta.membershipDelete.push($scope.entry.connection[key]);
 
-        $scope.meta.membershipDelete.push($scope.entry.connection[key]);
-
-        delete $scope.entry.connection[key];
-        var index = 0;
-        var newObject = {};
-        angular.forEach($scope.entry.connection, function(value, key)
-        {
-            newObject[index] = $scope.entry.connection[key];
-            index++;
-        });
-        $scope.entry.connection = newObject;
+        $scope.entry.connection.splice(key, 1);
     }
 
     $scope.addMembership = function() {
@@ -126,21 +119,49 @@ angular.module('RegistryClient')
             });
         }
 
-        $scope.entry.connection[Object.keys($scope.entry.connection).length] = {
+        $scope.entry.connection.push({
             "parentType": orgType ? orgType : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].parentType,
             "connectionType": orgParentTypeId ? orgParentTypeId : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].id,
             "parentEntry": orgParentId ? orgParentId : "-",
             "createdAt": $scope.today,
             "fromOpen":false
-        };
+        });
     };
 
-    $scope.addContactsheet = function() {
+    $scope.addAddress = function() {
         if($scope.entry.address === undefined)
-            $scope.entry.address = {};
-        $scope.entry.address[Object.keys($scope.entry.address).length] = {"country":"Finland"}
-        $scope.meta.addressActive = Object.keys($scope.entry.address).length - 1;
+            $scope.entry.address = [];
+        if($scope.entry.address.length == 0) {
+            var newClass = 'PRIMARY';
+        }else{
+            var newClass = null;
+        }
+        
+        $scope.entry.address.push({"class":newClass,"country":"Finland"});
+        $scope.meta.addressActive = $scope.entry.address.length - 1;
     }
+    
+    $scope.removeAddress = function(key) {
+        if($scope.entry.address.length > 1)
+        {
+            if($scope.meta.addressDelete === undefined)
+                $scope.meta.addressDelete = [];
+            if($scope.entry.address[key].id !== undefined)
+                $scope.meta.addressDelete.push($scope.entry.address[key]);
+            $scope.entry.address.splice(key, 1);
+            $scope.meta.addressActive = 0;
+        }
+    }
+    
+    $scope.setAddressType = function(id, type) {
+        if(typeof(type) === 'string') {
+            angular.forEach($scope.entry.address, function(value, key) {
+                if($scope.entry.address[key].class == type)
+                    $scope.entry.address[key].class = null;
+            });
+        };
+        $scope.entry.address[id].class = type;
+    };
 
     $scope.resetOrg = function(id) {
         $scope.entry.connection[id].parentEntry = '-';
@@ -191,8 +212,8 @@ angular.module('RegistryClient')
                     $scope.entry = {
                         "type": "MEMBER_PERSON",
                         "gender": "",
-                        "connection": {},
-                        "address": {}
+                        "connection": [],
+                        "address": []
                     };
 
                     $scope.meta = {
@@ -203,7 +224,7 @@ angular.module('RegistryClient')
                     }
 
                     $scope.addMembership();
-                    $scope.addContactsheet();
+                    $scope.addAddress();
                 });
         }else{
             dbHandler
@@ -340,6 +361,20 @@ angular.module('RegistryClient')
                         dbHandler
                             .setQuery(connections);
                     }
+                    
+                    if($scope.meta.membershipDelete) {
+                        var membershipDelete = {};
+                        angular.forEach($scope.meta.membershipDelete, function(value, key) {
+                            membershipDelete['membership' + key] = {
+                                "service":"connection/delete",
+                                "arguments":{
+                                    "id":value.id
+                                }
+                            }
+                        });
+                        dbHandler
+                            .setQuery(membershipDelete); 
+                    }                    
 
                     var address = {}
                     angular.forEach($scope.entry.address, function(values, key) {
@@ -366,25 +401,25 @@ angular.module('RegistryClient')
                         }
                     });
                     
-                    if($scope.meta.membershipDelete) {
-                        var membershipDelete = {};
-                        angular.forEach($scope.meta.membershipDelete, function(value, key) {
-                            membershipDelete['membership' + key] = {
-                                "service":"connection/delete",
+                    if(Object.keys(address).length > 0)
+                    {
+                        dbHandler
+                            .setQuery(address);
+                    }
+                    
+                    if($scope.meta.addressDelete) {
+                        var addressDelete = {};
+                        angular.forEach($scope.meta.addressDelete, function(value, key) {
+                            addressDelete['membership' + key] = {
+                                "service":"address/delete",
                                 "arguments":{
                                     "id":value.id
                                 }
                             }
                         });
                         dbHandler
-                            .setQuery(membershipDelete); 
-                    }
-                    
-                    if(Object.keys(address).length > 0)
-                    {
-                        dbHandler
-                            .setQuery(address);
-                    }
+                            .setQuery(addressDelete); 
+                    }                    
 
                     dbHandler
                         .runQuery()

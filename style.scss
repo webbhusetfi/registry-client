@@ -1,4 +1,4 @@
-@import url("//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css");
+@import url("//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
 @import url("//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
 @import url("/node_modules/angular-chart.js/dist/angular-chart.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/angular-xeditable/0.1.11/css/xeditable.min.css");
@@ -119,6 +119,37 @@ h3 { font-size:2rem; }
     }
 }
 
+.mainList-ct {
+    .contact-toolbar + hr { margin-top:1.6rem; }
+    .dropdown-menu {
+        a {
+            cursor:pointer;
+        }
+    }
+    .contact-toolbar {
+        .btn { margin-bottom:0.4rem; margin-right:0.4rem; }
+        .contact-btn {
+            display:inline-block;
+            .class-marker {
+                cursor:pointer;
+                display:block;
+                height:1rem;
+                margin-right:0.4rem;
+                margin-bottom:0.4rem;
+                background:#ccc;
+                border-radius:0.2rem;
+                box-shadow:0 0 2px rgba(0,0,0,0.25);
+                &.class-primary {
+                    background:#5cb85c;
+                }
+                &.class-invoice {
+                    background:#337ab7;
+                }
+            }
+        }
+    }
+}
+
 img.webbhuset { max-width:14rem; vertical-align:top; height:auto; margin-top:0.8rem; max-height:21px; }
 
 .main > div { padding-left:0; padding-right:0; }
@@ -140,8 +171,6 @@ img.webbhuset { max-width:14rem; vertical-align:top; height:auto; margin-top:0.8
 
 .membership-list > div:last-child hr { display:none; }
 .form-text { margin-top:0.7rem; }
-.contact-toolbar + hr { margin-top:1.6rem; }
-.contact-toolbar .btn { margin-bottom:0.4rem; margin-right:0.4rem; }
 
 .functions { margin-bottom:2rem; }
 
