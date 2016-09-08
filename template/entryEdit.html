@@ -210,28 +210,39 @@
                         <div class="contact-toolbar row">
                             <div class="col-md-8 col-md-offset-4 col-xs-12">
                                 <div class="contact-btn" ng-repeat="(key, address) in entry.address">
-                                    <div uib-dropdown>
+                                    <div ng-show="entry.address.length == 1" class="contact-btn">
+                                        <a class="class-marker class-primary"></a>
                                         <a
-                                            uib-dropdown-toggle
-                                            class="class-marker"
-                                            ng-class="{
-                                                'class-primary' : entry.address[key].class == 'PRIMARY',
-                                                'class-invoice' : entry.address[key].class == 'INVOICE'
-                                            }"
-                                            >
+                                            class="btn btn-default contact-sheet-btn"
+                                            ng-class="{ 'active btn-primary' : meta.addressActive == key }"
+                                            ng-click="meta.addressActive = key">
+                                            {{ key }}
                                         </a>
-                                        <ul uib-drowdown-menu class="dropdown-menu text-left">
-                                            <li><a ng-click="setAddressType(key, 'PRIMARY');"><span class="label label-success">Primäradress</span></a></li>
-                                            <li><a ng-click="setAddressType(key, 'INVOICE');"><span class="label label-primary">Faktureringsadress</span></a></li>
-                                            <li><a ng-click="setAddressType(key, null);"><span class="label label-default">Annan adress</span></a></li>
-                                        </ul>
                                     </div>
-                                    <a
-                                        class="btn btn-default contact-sheet-btn"
-                                        ng-class="{ 'active btn-primary' : meta.addressActive == key }"
-                                        ng-click="meta.addressActive = key">
-                                        {{ key }}
-                                    </a>
+                                    <div ng-show="entry.address.length > 1">
+                                        <div uib-dropdown>
+                                            <a
+                                                uib-dropdown-toggle
+                                                class="class-marker"
+                                                ng-class="{
+                                                    'class-primary' : entry.address[key].class == 'PRIMARY',
+                                                    'class-invoice' : entry.address[key].class == 'INVOICE'
+                                                }"
+                                                >
+                                            </a>
+                                            <ul uib-drowdown-menu class="dropdown-menu text-left">
+                                                <li><a ng-click="setAddressType(key, 'PRIMARY');"><span class="label label-success">Primäradress</span></a></li>
+                                                <li><a ng-click="setAddressType(key, 'INVOICE');"><span class="label label-primary">Faktureringsadress</span></a></li>
+                                                <li><a ng-click="setAddressType(key, null);"><span class="label label-default">Annan adress</span></a></li>
+                                            </ul>
+                                        </div>
+                                        <a
+                                            class="btn btn-default contact-sheet-btn"
+                                            ng-class="{ 'active btn-primary' : meta.addressActive == key }"
+                                            ng-click="meta.addressActive = key">
+                                            {{ key }}
+                                        </a>                                        
+                                    </div>
                                 </div>
                                 <a
                                     class="btn btn-default"

@@ -150,6 +150,9 @@ angular.module('RegistryClient')
                 $scope.meta.addressDelete.push($scope.entry.address[key]);
             $scope.entry.address.splice(key, 1);
             $scope.meta.addressActive = 0;
+            if($scope.entry.address.length == 1) {
+                $scope.entry.address[0].class = 'PRIMARY';
+            }
         }
     }
     
@@ -291,7 +294,11 @@ angular.module('RegistryClient')
 
                     angular.forEach($scope.entry.connection, function(value, key) {
                         $scope.entry.connection[key].createdAt = value.createdAt ? new Date(value.createdAt) : null;
-                    })
+                    });
+                    
+                    if($scope.entry.address.length == 0) {
+                        $scope.addAddress();
+                    }
             });
         }
 
