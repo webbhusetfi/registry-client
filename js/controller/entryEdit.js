@@ -144,13 +144,15 @@ angular.module('RegistryClient')
     $scope.removeAddress = function(key) {
         if($scope.entry.address.length > 1)
         {
+            var type = $scope.entry.address[key].class;
+            
             if($scope.meta.addressDelete === undefined)
                 $scope.meta.addressDelete = [];
             if($scope.entry.address[key].id !== undefined)
                 $scope.meta.addressDelete.push($scope.entry.address[key]);
             $scope.entry.address.splice(key, 1);
             $scope.meta.addressActive = 0;
-            if($scope.entry.address.length == 1) {
+            if($scope.entry.address.length == 1 || type == 'PRIMARY') {
                 $scope.entry.address[0].class = 'PRIMARY';
             }
         }
