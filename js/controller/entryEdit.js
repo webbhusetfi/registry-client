@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler) {
+.controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler, dialogHandler) {
     $scope.today = new Date();
     $scope.routeParams = $routeParams;
     $scope.globalParams = globalParams;
@@ -172,6 +172,18 @@ angular.module('RegistryClient')
         $scope.entry.connection[id].parentEntry = '-';
         $scope.entry.connection[id].parentType = $scope.connectionTypes[$scope.entry.type][$scope.entry.connection[id].connectionType].parentType;
     }
+    
+    $scope.deleteEntry = function(item) {
+        dialogHandler.deleteConfirm(item, {
+            "entry": {
+                "service":"entry/delete",
+                "arguments": {
+                    "id": item.id,
+                    "type": item.type,
+                }
+            }
+        });
+    };
 
     dbHandler
         .getEntries({
