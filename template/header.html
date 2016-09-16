@@ -4,7 +4,8 @@
         <h3 ng-show="organization.name !== undefined">{{ organization.name }}</h3>
     </div>
     <div class="col-xs-4 text-right" style="padding-top:2rem;">
-        <a ng-show="routeParams.id !== undefined" class="btn btn-default" href="/entry/list"><i class="fa fa-reply"></i> Tillbaka</a>
-        <a ng-show="globalParams.get('user').role == 'SUPER_ADMIN' && routeParams.id == undefined" class="btn btn-default" href="/registry/list"><i class="fa fa-reply"></i> Tillbaka</a>
+        <div ng-show="globalParams.get('user').role == 'SUPER_ADMIN' || routeParams.id !== undefined">
+            <xg-back/>
+        </div>
     </div>
 </div>

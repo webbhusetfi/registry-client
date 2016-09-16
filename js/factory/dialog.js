@@ -1,5 +1,5 @@
 var regApp = angular.module('RegistryClient')
-.factory('dialogHandler', ['$http', '$q', '$log', '$route', '$location', '$uibModal', 'dbHandler', function($http, $q, $log, $route, $location, $uibModal, dbHandler) {
+.factory('dialogHandler', ['$http', '$q', '$log', '$route', '$window', '$location', '$uibModal', 'dbHandler', function($http, $q, $log, $route, $window, $location, $uibModal, dbHandler) {
     var dialogHandler = {
         create: function(dialogTemplate, item, action) {
             if(dialogTemplate)
@@ -64,7 +64,21 @@ var regApp = angular.module('RegistryClient')
                         .setQuery(action)
                         .runQuery()
                         .then(function(response) {
-                            $route.reload();
+                            // program flow
+                            if(typeof(item.post) === 'object')
+                            {
+                                switch(item.post.action) {
+                                    case 'back':
+                                        $window.history.back();
+                                    break;
+                                    case 'redirect':
+                                        $location.path(item.post.redirect);
+                                    break;
+                                }
+                            }
+                            // default
+                            else
+                                $route.reload();                            
                         })
                         .catch(function(response) {
                             $log.error(response);

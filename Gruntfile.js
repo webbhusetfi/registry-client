@@ -30,7 +30,7 @@ module.exports = function(grunt) {
                     'js/factory/dialog.js',
                     'js/factory/globalParams.js',
                     'js/directive/directives.js',
-                    'js/controller/topbar.js',
+                    'js/controller/navigation.js',
                     'js/controller/statView.js',
                     'js/controller/registryList.js',
                     'js/controller/registryEdit.js',
@@ -38,6 +38,7 @@ module.exports = function(grunt) {
                     'js/controller/entryEdit.js',
                     'js/controller/propertyList.js',
                     'js/controller/userEdit.js',
+                    'js/controller/userList.js',
                     'js/controller/userLogin.js',
                     'js/controller/userLogout.js'
                 ],
@@ -69,7 +70,7 @@ module.exports = function(grunt) {
                 options: {
                     match:[{
                         'dist.js':'dist.js',
-                        'style.css':'css/style.css'
+                        'style.css':'style.css'
                     }],
                     replacement: 'md5'
                 },

@@ -1,14 +1,78 @@
+<pre class="debug">{{ user | json }}</pre>
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
-    <div class="container-fluid">
+    <div class="inner-section container-fluid">
         <div class="row">
-            <div class="col-xs-4 col-sm-3 col-md-2">
+            <div class="col-xs-2">
                 <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
             </div>
-            <div class="col-xs-8 col-sm-9 col-md-10 mainList-ct">
+            <div class="col-xs-offset-2 col-xs-10 mainList-ct">
+                <div class="controls list-functions" ng-controller="navigation">
+                    <div class="row functions">
+                        <div class="col-sm-6"><h2>Medlemsregister</h2></div>
+                        <div class="col-sm-6 text-right">
+                            <xg-back/>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
-                    <div class="col-sm-12">
-                        <div ng-include="'/template/header.html'"></div>
+                    <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12 form-horizontal">
+                        <div class="inner-form">
+                            <h2>Skapa användare</h2>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Användartyp</label>
+                                <div class="col-sm-6">
+                                    <select ng-options="key as value for (key, value) in roles" ng-model="user.role" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="registry">
+                                <label class="control-label col-sm-4">Register</label>
+                                <div class="col-sm-6">
+                                    <select 
+                                        ng-options="value.id as value.name for (key, value) in registry"
+                                        ng-model="user.registry"
+                                        class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="user.role === 'USER'">
+                                <label class="control-label col-sm-4">Tillhörande</label>
+                                <div class="col-sm-6">
+                                    <select ng-options="value.id as value.name for (key, value) in organizations[user.registry]" ng-model="user.entry" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Användarnamn</label>
+                                <div class="col-sm-6">
+                                    <input 
+                                        class="form-control"
+                                        type="text"
+                                        ng-model="user.username"
+                                    />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Lösenord</label>
+                                <div class="col-sm-6">
+                                    <input 
+                                        class="form-control"
+                                        type="text"
+                                        ng-model="user.password"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 text-right">
+                                    <xg-cancel></xg-cancel>
+                                    <a
+                                        class="btn btn-default"
+                                        ng-click="submit();"
+                                    ><i class="fa fa-save"></i> Spara</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
