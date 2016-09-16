@@ -18,4 +18,16 @@ angular.module('RegistryClient')
                 }
             }
         }
-    });    
+    })
+    .directive('xgHref', function($location, $log) {
+        return {
+            restrict: 'A',
+            link: function(scope, elem, attr) {
+                elem.addClass('link');
+                elem.bind('click', function() {
+                    $location.path(attr.xgHref);
+                    scope.$apply();
+                });
+            }
+        }
+    });

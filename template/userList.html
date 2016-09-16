@@ -11,7 +11,7 @@
                     <div class="row functions">
                         <div class="col-sm-6"><h2>Medlemsregister</h2></div>
                         <div class="col-sm-6 text-right">
-                            <a class="btn btn-default" href="/user/edit">
+                            <a class="btn btn-default" xg-href="/user/edit">
                                 <i class="fa fa-pencil"></i> Skapa
                             </a>
                         </div>
@@ -26,7 +26,7 @@
                                 <td style="text-align:left;">Funktioner</td>
                             </thead>
                             <tr ng-repeat="item in resource.users">
-                                <td><a href="/user/edit/{{ item.id }}">{{item.username}}</a></td>
+                                <td><a xg-href="/user/edit/{{ item.id }}">{{item.username}}</a></td>
                                 <td>{{ roles[item.role] }}</td>
                                 <td>
                                     <!-- a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a -->
