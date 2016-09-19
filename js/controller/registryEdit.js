@@ -3,7 +3,7 @@ angular.module('RegistryClient')
     $scope.routeParams = $routeParams;
     $scope.registry = {};
 
-    if(Number($routeParams.id) !== -1)
+    if($routeParams.id !== undefined)
     {
         dbHandler
             .getRegistry({"id":$routeParams.id})

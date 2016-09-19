@@ -1,0 +1,106 @@
+<div class="outer-section">
+    <div ng-include="'/template/topbar.html'"></div>
+    <div class="inner-section container-fluid">
+        <div class="row">
+            <div class="col-xs-2">
+                <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
+            </div>
+            <div class="col-xs-offset-2 col-xs-10 mainList-ct">
+                <div class="controls list-functions" ng-controller="navigation">
+                    <div class="row functions">
+                        <div class="col-sm-6"><h2>Medlemsregister</h2></div>
+                        <div class="col-sm-6 text-right">
+                            <xg-back/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12 form-horizontal">
+                        <div class="inner-form" ng-form="validation">
+                            <h2>{{ routeParams.id ? 'Ändra' : 'Skapa' }} användare</h2>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Användartyp</label>
+                                <div class="col-sm-6">
+                                    <select ng-options="key as value for (key, value) in roles" ng-model="user.role" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="registry && user.role !== 'SUPER_ADMIN'">
+                                <label class="control-label col-sm-4">Register</label>
+                                <div class="col-sm-6">
+                                    <select 
+                                        ng-options="value.id as value.name for (key, value) in registry"
+                                        ng-model="user.registry"
+                                        class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="user.role === 'USER'">
+                                <label class="control-label col-sm-4">Tillhörande</label>
+                                <div class="col-sm-6">
+                                    <select ng-options="value.id as value.name for (key, value) in organizations[user.registry]" ng-model="user.entry" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div
+                                class="form-group"
+                                ng-form="validation.username"
+                                ng-class="{
+                                    'has-error':validation.username.$invalid && validation.username.$dirty
+                                }"
+                            >
+                                <label class="control-label col-sm-4">Användarnamn</label>
+                                <div class="col-sm-6">
+                                    <input 
+                                        placeholder="Minst 4 tecken"
+                                        class="form-control"
+                                        type="text"
+                                        ng-model="user.username"
+                                        ng-model-options="{ debounce:500 }"
+                                        required
+                                        ng-minlength="4"
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                class="form-group"
+                                ng-form="validation.password"
+                                ng-class="{
+                                    'has-error':validation.password.$invalid && validation.password.$dirty
+                                }"
+                            >
+                                <label class="control-label col-sm-4">Lösenord</label>
+                                <div class="col-sm-6">
+                                    <input 
+                                        placeholder="Minst 8 tecken"
+                                        class="form-control"
+                                        type="text"
+                                        ng-model="user.password"
+                                        ng-model-options="{ debounce:500 }"
+                                        required
+                                        ng-minlength="8"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 text-right">
+                                    <xg-cancel></xg-cancel>
+                                    <a
+                                        class="btn btn-default"
+                                        ng-disabled="validation.$pristine || validation.$invalid"
+                                        ng-click="submit();"
+                                    ><i class="fa fa-save"></i> Spara</a>
+                                </div>
+                            </div>
+                            <div class="row" ng-show="message">
+                                <div class="col-xs-12">
+                                    <div class="alert alert-warning">{{ message }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -30,6 +30,8 @@ angular.module('RegistryClient')
     if (globalParams.get('user').role != 'SUPER_ADMIN') {
         $location.path('entry/list');
     } else {
+        if(globalParams.get('user').registry !== null)
+            globalParams.set('user', angular.merge(globalParams.get('user'), {"registry":null}));
         dbHandler
             .getRegistries({
                 "offset":0,

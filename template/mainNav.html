@@ -1,12 +1,34 @@
-<div class="mainNav">
+<div class="mainNav" ng-controller="navigation">
     <ul>
-        <li><a href="/registry/list"><i class="fa fa-cubes"></i> Register</a></li>
         <li>
-            <ul>
-                <li><a href="/stat"><i class="fa fa-bar-chart"></i> Statistik</a></li>
-                <!-- <li><a><i class="fa fa-cog"></i> Inställningar</a></li> //-->
-                <li ng-show="globalParams.get('user').role !== 'USER'"><a href="/property/list"><i class="fa fa-edit"></i> Egenskaper</a></li>
-            </ul>
+            <a xg-href="/registry/list">
+                <i class="fa fa-cubes"></i>
+                <span class="hidden-xs hidden-sm"> Register</span>
+            </a>
+        </li>
+        <li ng-show="user.registry !== null">
+            <a xg-href="/stat">
+                <i class="fa fa-bar-chart"></i>
+                <span class="hidden-xs hidden-sm"> Statistik</span>
+            </a>
+        </li>
+        <!-- <li><a><i class="fa fa-cog"></i> Inställningar</a></li> //-->
+        <li ng-show="user.role !== 'USER' && user.registry !== null">
+            <a xg-href="/property/list"><i class="fa fa-edit"></i>
+                <span class="hidden-xs hidden-sm"> Egenskaper</span>
+            </a>
+        </li>
+        <li ng-show="user.entry !== undefined && user.role !== 'USER'">
+            <a xg-href="/user/list/{{ user.entry }}">
+                <i class="fa fa-user"></i>
+                <span class="hidden-xs hidden-sm"> Användare</span>
+            </a>
+        </li>
+        <li ng-show="user.entry === undefined">
+            <a xg-href="/user/list">
+                <i class="fa fa-user"></i>
+                <span class="hidden-xs hidden-sm"> Användare</span>
+            </a>
         </li>
     </ul>
 </div>

@@ -16,11 +16,7 @@ var regApp = angular
                 templateUrl: '/template/statView.html',
                 controller: 'statController'
             })
-            .when('/registry/:id/delete', {
-                template: ' ',
-                controller: 'registryDelete'
-            })
-            .when('/registry/:id/edit', {
+            .when('/registry/edit/:id?', {
                 templateUrl: '/template/registryEdit.html',
                 controller: 'registryEdit'
             })
@@ -39,6 +35,14 @@ var regApp = angular
             .when('/property/list/:id?', {
                 templateUrl: '/template/propertyList.html',
                 controller: 'propertyList'
+            })
+            .when('/user/list/:id?', {
+                templateUrl: '/template/userList.html',
+                controller: 'userList'
+            })
+            .when('/user/edit/:id?', {
+                templateUrl: '/template/userEdit.html',
+                controller: 'userEdit'
             })
             .when('/user/login', {
                 templateUrl: '/template/userLogin.html',

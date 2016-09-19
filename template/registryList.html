@@ -11,7 +11,7 @@
                     <div class="col-sm-12">
                         <table class="mainList">
                             <tr ng-repeat="item in resource.registries">
-                                <td><a href="/registry/{{item.id}}/edit">{{item.name}}</a></td>
+                                <td><a xg-href="/registry/edit/{{item.id}}">{{item.name}}</a></td>
                                 <td>
                                     <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name});"><i class="fa fa-times"></i></a>
                                     <a ng-click="goto(item.id)" class="btn btn-xs btn-primary"><i class="fa fa-sign-in"></i></a>

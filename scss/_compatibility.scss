@@ -6,6 +6,7 @@ textarea { resize:vertical; }
 
 .modal-header h3 { margin:0; }
 .alert:last-child { margin-bottom:0; }
+.link { cursor:pointer; }
 
 /* general mixins */
 @mixin transition($value) {

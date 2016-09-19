@@ -17,7 +17,7 @@
                         required
                         ng-minlength="5"
                         ng-model="user"
-                        ng-model-options="{ debounce:0 }"
+                        ng-model-options="{ debounce:500 }"
                         type="text"
                         placeholder="Användarnamn"
                     >
@@ -36,7 +36,7 @@
                         class="form-control"
                         required
                         ng-model="password"
-                        ng-model-options="{ debounce:0 }"
+                        ng-model-options="{ debounce:500 }"
                         ng-minlength="4"
                         type="password"
                         placeholder="Lösenord"
