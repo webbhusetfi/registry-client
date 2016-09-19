@@ -30,6 +30,7 @@ module.exports = function(grunt) {
                     'js/factory/dialog.js',
                     'js/factory/globalParams.js',
                     'js/directive/directives.js',
+                    'js/directive/list.js',
                     'js/controller/navigation.js',
                     'js/controller/statView.js',
                     'js/controller/registryList.js',

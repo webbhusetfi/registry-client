@@ -9,7 +9,8 @@
                 <div ng-include="'/template/registryListMenu.html'"></div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <table class="mainList">
+                        <xg-list resource="resource"></xg-list>
+                        <!-- table class="mainList">
                             <tr ng-repeat="item in resource.registries">
                                 <td><a xg-href="/registry/edit/{{item.id}}">{{item.name}}</a></td>
                                 <td>
@@ -17,7 +18,7 @@
                                     <a ng-click="goto(item.id)" class="btn btn-xs btn-primary"><i class="fa fa-sign-in"></i></a>
                                 </td>
                             </tr>
-                        </table>
+                        </table -->
                     </div>
                 </div>
                 <div class="alert alert-info" ng-show="resource.foundCount.registries == 0">
