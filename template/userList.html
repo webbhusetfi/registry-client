@@ -29,7 +29,12 @@
                                 <td><a xg-href="/user/edit/{{ item.id }}">{{item.username}}</a></td>
                                 <td>{{ roles[item.role] }}</td>
                                 <td>
-                                    <a class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.username});"><i class="fa fa-times"></i></a>
+                                    <a
+                                        ng-disabled="globalParams.get('user').id == item.id"
+                                        class="btn btn-xs btn-danger"
+                                        ng-click="globalParams.get('user').id == item.id ? null : deleteConfirm({'id':item.id,'name':item.username});">
+                                        <i class="fa fa-times"></i>
+                                    </a>
                                     <a xg-href="/user/edit/{{ item.id }}" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></a>
                                 </td>
                             </tr>
