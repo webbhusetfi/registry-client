@@ -18,7 +18,7 @@
                 <span class="hidden-xs hidden-sm"> Egenskaper</span>
             </a>
         </li>
-        <li ng-show="user.entry !== undefined">
+        <li ng-show="user.entry !== undefined && user.role !== 'USER'">
             <a xg-href="/user/list/{{ user.entry }}">
                 <i class="fa fa-user"></i>
                 <span class="hidden-xs hidden-sm"> Användare</span>

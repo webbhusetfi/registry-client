@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('userEdit', function($scope, $log, $routeParams, $location, globalParams, dbHandler) {
+.controller('userEdit', function($scope, $log, $routeParams, $location, $window, globalParams, dbHandler) {
     // default roles
     $scope.roles = {
         "USER":"Användare",
@@ -54,6 +54,10 @@ angular.module('RegistryClient')
             "role":"USER",
             "entry":"0"
         }
+        if(globalParams.get('user').role !== 'SUPER_ADMIN')
+            $scope.user.registry = globalParams.get('user').registry;
+        if(globalParams.get('user').role === 'USER')
+            $scope.user.entry = globalParams.get('user').entry;
     }
     
     if(globalParams.get('user').role === 'SUPER_ADMIN') {
@@ -75,12 +79,8 @@ angular.module('RegistryClient')
             angular.forEach(response.organizations, function(value, key) {
                 if(orgs[value.registry] === undefined) {
                     orgs[value.registry] = {};
-                    orgs[value.registry][0] = {
-                        "id":null,
-                        "name":"-"
-                    }
                 }
-                orgs[value.registry][Object.keys(orgs[value.registry]).length + 1] = value;
+                orgs[value.registry][Object.keys(orgs[value.registry]).length] = value;
             });
 
             $scope.organizations = orgs;
@@ -95,7 +95,34 @@ angular.module('RegistryClient')
                     $scope.user = response.user[0];
                 else
                     $location.path('/user/list');
+            }else{
+                if(globalParams.get('user').role === 'SUPER_ADMIN') {
+                    $scope.user.registry = $scope.registry[0].id;
+                    $scope.user.entry = $scope.organizations[$scope.registry[0].id][0].id;
+                }
             }
+            
+            // watch entry & role to prevent null
+            $scope.$watch('user.entry', function(nV, oV, scope) {
+                if(scope.user.role === 'USER' && nV === null)
+                    scope.user.entry = scope.organizations[scope.user.registry][0].id;
+            });
+            $scope.$watch('user.role', function(nV, oV, scope) {
+                if(nV === 'USER')
+                    scope.user.entry = scope.organizations[scope.user.registry][0].id;
+                if(nV === 'ADMIN') {
+                    scope.user.entry = null;
+                    if(globalParams.get('user').registry === null) {
+                        scope.user.registry = scope.registry[0].id;
+                    }else{
+                        scope.user.registry = globalParams.get('user').registry;
+                    }
+                }
+                if(nV === 'SUPER_ADMIN') {
+                    scope.user.registry = null;
+                    scope.user.entry = null;
+                }
+            });
         });
         
     $scope.submit = function() {
@@ -106,10 +133,21 @@ angular.module('RegistryClient')
                     "role":$scope.user.role,
                     "username":$scope.user.username,
                     "password":$scope.user.password,
+                    "entry":$scope.user.entry,
+                    "registry": globalParams.get('user').role === 'SUPER_ADMIN' ? $scope.user.registry : globalParams.get('user').registry
                 }
             }
         }
         
-        $log.log(userQuery);
+        dbHandler
+            .setQuery(userQuery)
+            .runQuery()
+            .then(function(response) {
+                if(response.user.status === 'success')
+                    $window.history.back();
+                else {
+                    $scope.message = 'Det uppstod ett problem.'
+                }
+            });
     }
 });

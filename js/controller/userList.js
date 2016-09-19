@@ -8,6 +8,17 @@ angular.module('RegistryClient')
     $scope.globalParams = globalParams;
     $scope.routeParams = $routeParams;
     
+    $scope.deleteConfirm = function(item) {
+        dialogHandler.deleteConfirm(item, {
+            "user": {
+                "service":"user/delete",
+                "arguments": {
+                    "id": item.id
+                }
+            }
+        })
+    };
+    
     if(globalParams.get('user').registry !== null) {
         var arguments = {
             "filter": {
@@ -17,6 +28,9 @@ angular.module('RegistryClient')
     }else{
         var arguments = {};
     }
+    
+    if(globalParams.get('user').role === 'USER')
+        arguments.filter.entry = globalParams.get('user').entry;
     
     dbHandler
         .setQuery({

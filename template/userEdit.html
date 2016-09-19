@@ -1,4 +1,3 @@
-<pre class="debug">{{ user | json }}</pre>
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="inner-section container-fluid">
@@ -17,8 +16,8 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12 form-horizontal">
-                        <div class="inner-form">
-                            <h2>Skapa användare</h2>
+                        <div class="inner-form" ng-form="validation">
+                            <h2>{{ routeParams.id ? 'Ändra' : 'Skapa' }} användare</h2>
                             <div class="form-group">
                                 <label class="control-label col-sm-4">Användartyp</label>
                                 <div class="col-sm-6">
@@ -26,7 +25,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group" ng-show="registry">
+                            <div class="form-group" ng-show="registry && user.role !== 'SUPER_ADMIN'">
                                 <label class="control-label col-sm-4">Register</label>
                                 <div class="col-sm-6">
                                     <select 
@@ -43,23 +42,41 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div
+                                class="form-group"
+                                ng-form="validation.username"
+                                ng-class="{
+                                    'has-error':validation.username.$invalid && validation.username.$dirty
+                                }"
+                            >
                                 <label class="control-label col-sm-4">Användarnamn</label>
                                 <div class="col-sm-6">
                                     <input 
                                         class="form-control"
                                         type="text"
                                         ng-model="user.username"
+                                        ng-model-options="{ debounce:500 }"
+                                        required
+                                        ng-minlength="4"
                                     />
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div
+                                class="form-group"
+                                ng-form="validation.password"
+                                ng-class="{
+                                    'has-error':validation.password.$invalid && validation.password.$dirty
+                                }"
+                            >
                                 <label class="control-label col-sm-4">Lösenord</label>
                                 <div class="col-sm-6">
                                     <input 
                                         class="form-control"
                                         type="text"
                                         ng-model="user.password"
+                                        ng-model-options="{ debounce:500 }"
+                                        required
+                                        ng-minlength="8"
                                     />
                                 </div>
                             </div>
@@ -68,8 +85,14 @@
                                     <xg-cancel></xg-cancel>
                                     <a
                                         class="btn btn-default"
+                                        ng-disabled="validation.$pristine || validation.$invalid"
                                         ng-click="submit();"
                                     ><i class="fa fa-save"></i> Spara</a>
+                                </div>
+                            </div>
+                            <div class="row" ng-show="message">
+                                <div class="col-xs-12">
+                                    <div class="alert alert-warning">{{ message }}</div>
                                 </div>
                             </div>
                         </div>
