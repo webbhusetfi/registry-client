@@ -1,34 +1,36 @@
 <div class="controls list-functions">
     <div class="functions">
         <div class="row functions">
-            <div class="col-xs-12 text-right">
+            <div class="col-sm-10">
+                <div class="row" ng-if="properties">
+                    <div class="col-xs-6 col-md-4">
+                        <select class="form-control" ng-model="params.propertyGroup">
+                            <option ng-repeat="(key, value) in properties" value="{{ value.id }}">{{ value.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom:1rem;">
+                    <div class="col-xs-12" style="margin-top:1rem;">
+                        <div ng-repeat="(key, value) in properties" ng-show="params.propertyGroup == value.id">
+                            <div class="btn-group">
+                                <button
+                                    class="btn btn-xs btn-default"
+                                    ng-class="{ 'btn-success' : params.withProperty.indexOf(value2.id) > -1, 'btn-danger' : params.withoutProperty.indexOf(value2.id) > -1 }"
+                                    ng-click="checkProperty(value2.id);"
+                                    ng-repeat="(key2, value2) in value.children">
+                                    {{ value2.name }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2 text-right">
                 <a
                     ng-show="!user.registry && (globalParams.get('user').role != 'USER' || (globalParams.get('user').role == 'USER' && params.type == 'MEMBER_PERSON'))"
                     class="btn btn-default"
                     xg-href="/entry/-1/edit"><i class="fa fa-pencil"></i> Skapa
                 </a>
-            </div>
-        </div>
-        <div class="row" ng-if="properties">
-            <div class="col-xs-4 col-sm-2">
-                <select class="form-control" ng-model="params.propertyGroup">
-                    <option ng-repeat="(key, value) in properties" value="{{ value.id }}">{{ value.name }}</option>
-                </select>
-            </div>
-        </div>
-        <div class="row" style="margin-bottom:1rem;">
-            <div class="col-xs-12" style="margin-top:1rem;">
-                <div ng-repeat="(key, value) in properties" ng-show="params.propertyGroup == value.id">
-                    <div class="btn-group">
-                        <button
-                            class="btn btn-xs btn-default"
-                            ng-class="{ 'btn-success' : params.withProperty.indexOf(value2.id) > -1, 'btn-danger' : params.withoutProperty.indexOf(value2.id) > -1 }"
-                            ng-click="checkProperty(value2.id);"
-                            ng-repeat="(key2, value2) in value.children">
-                            {{ value2.name }}
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="row">
