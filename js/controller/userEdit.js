@@ -139,6 +139,9 @@ angular.module('RegistryClient')
             }
         }
         
+        if($routeParams.id)
+            userQuery.user.arguments.id = $scope.user.id;
+        
         dbHandler
             .setQuery(userQuery)
             .runQuery()
