@@ -108,7 +108,7 @@ angular.module('RegistryClient')
                     scope.user.entry = scope.organizations[scope.user.registry][0].id;
             });
             $scope.$watch('user.role', function(nV, oV, scope) {
-                if(nV === 'USER')
+                if(nV === 'USER' && !angular.isNumber(scope.user.entry))
                     scope.user.entry = scope.organizations[scope.user.registry][0].id;
                 if(nV === 'ADMIN') {
                     scope.user.entry = null;
