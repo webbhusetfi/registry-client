@@ -1,0 +1,25 @@
+<div class="xg-pagination">
+    <div class="btn-group">
+        <a
+            class="btn btn-default"
+            ng-disabled="active == 0"
+            ng-click="active == 0 ? null : pagination(active-1)"
+            >&laquo;
+        </a>
+        <a
+            class="btn btn-default"
+            ng-class="{
+                'btn-primary':active == key
+            }"
+            ng-repeat="(key, page) in pages"
+            ng-click="pagination(key);"
+            >{{ page }}
+        </a>
+        <a
+            class="btn btn-default"
+            ng-disabled="active == last"
+            ng-click="active == last ? null : pagination(Number(active)+1)"
+            >&raquo;
+        </a>
+    </div>
+</div>
