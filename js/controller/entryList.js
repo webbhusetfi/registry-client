@@ -11,6 +11,15 @@ angular.module('RegistryClient')
     if (globalParams.get('user').role == 'USER') {
         $scope.params.type = 'MEMBER_PERSON';
     }
+    
+    $scope.toggleParent = function() {
+        if($scope.params.parentEntry === null) {
+            delete $scope.params.parentEntry;
+        }else{
+            $scope.params.parentEntry = null;
+        }
+        $scope.init();
+    }
 
     $scope.deleteConfirm = function(item) {
         dialogHandler.deleteConfirm(item, {
