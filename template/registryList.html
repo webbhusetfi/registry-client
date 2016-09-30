@@ -1,3 +1,4 @@
+<pre class="debug">{{ config.query | json }}</pre>
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="inner-section container-fluid">
@@ -9,7 +10,7 @@
                 <div ng-include="'/template/registryListMenu.html'"></div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <xg-list resource="resource"></xg-list>
+                        <xg-list resource="resource" config="config"></xg-list>
                         <!-- table class="mainList">
                             <tr ng-repeat="item in resource.registries">
                                 <td><a xg-href="/registry/edit/{{item.id}}">{{item.name}}</a></td>
@@ -21,10 +22,6 @@
                         </table -->
                     </div>
                 </div>
-                <div class="alert alert-info" ng-show="resource.foundCount.registries == 0">
-                    Inga poster.
-                </div>
-                <div ng-include="'/template/pagination.html'"></div>
             </div>
         </div>
     </div>

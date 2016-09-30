@@ -30,4 +30,17 @@ angular.module('RegistryClient')
                 });
             }
         }
+    })
+    .directive('xgOpenRegistry', function() {
+        return {
+            restrict: 'AEC',
+            compile: function() {
+                $log.log('wtf1')
+            },
+            scope: {
+            },
+            controller: function($scope) {
+                $log.log('wtf2');
+            }
+        }
     });

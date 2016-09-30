@@ -3,23 +3,30 @@ angular.module('RegistryClient')
     $scope.routeParams = $routeParams;
     $scope.registry = {};
 
-    if($routeParams.id !== undefined)
+    if($routeParams.id)
     {
         dbHandler
-            .getRegistry({"id":$routeParams.id})
+            .setQuery({
+                "registry": {
+                    "service":"registry/read",
+                    "arguments": {
+                        "id":$routeParams.id
+                    }
+                }
+            })
             .runQuery()
             .then(function(response) {
-                $scope.registry = response.registry;
+                $log.log(response);
+                $scope.registry = response.registry[0];
             })
             .catch(function(response) {
-                $log.error(response);
                 $location.path('/user/logout');
             });
     }
     $scope.submit = function() {
         var request = {
             "registry": {
-                "service":"registry/update",
+                "service":"registry/" + ($routeParams.id ? 'update' : 'create'),
                 "arguments":{
                     "name":$scope.registry.name
                 }

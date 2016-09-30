@@ -1,5 +1,47 @@
-<table class="xg-list">
-    <tr ng-repeat="item in resource">
-        <td><pre>{{ item }}</pre></td>
+<table class="xg-list" ng-show="resource.foundCount > 0">
+    <thead>
+        <td ng-repeat="col in config.cols">
+            <span class="col-label" ng-show="!col.filter">{{ col.label }}</span>
+        </td>
+        <td class="functions" ng-show="config.params.functions">
+            <span class="col-label">Funktioner</span>
+        </td>
+    </thead>
+    <tr ng-repeat="item in resource.items">
+        <td ng-repeat="col in config.cols">
+            <a xg-href="{{ link(col.link, item) }}" ng-show="col.link">{{ item[col.name] }}</a>
+            <span ng-show="!col.link">{{ item[col.name] }}</span>
+        </td>
+        <td class="functions" ng-show="config.params.functions">
+            <a
+                ng-show="config.params.functions.deleteDialog"
+                ng-click="deleteDialog(item);"
+                class="btn btn-xs btn-danger">
+                <i class="fa fa-times"></i>
+            </a>
+            <a
+                ng-show="config.params.functions.edit"
+                xg-href="{{ link(config.params.functions.edit, item); }}"
+                class="btn btn-xs btn-primary">
+                <i class="fa fa-pencil"></i>
+            </a>
+            <span ng-if="config.params.functions.custom">
+                <a
+                    {{ value.directive }}
+                    ng-repeat="(key, value) in config.params.functions.custom"
+                    >asdf
+                </a>
+            </span>
+        </td>
     </tr>
 </table>
+<xg-pagination
+    ng-if="resource && config && config.params.pagination"
+    limit="config.query.base.arguments.limit"
+    offset="config.query.base.arguments.offset"
+    count="resource.foundCount"
+>
+</xg-pagination>
+<div class="alert alert-info" ng-show="resource.foundCount == 0">
+    Inga poster.
+</div>
