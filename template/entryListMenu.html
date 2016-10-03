@@ -47,6 +47,7 @@
                 <div class="btn-group">
                     <a
                         class="btn btn-default"
+                        ng-show="globalParams.get('user').role !== 'USER'"
                         ng-click="toggleParent()"
                         ng-class="{'active' : params.parentEntry === null }"
                         >Saknar tillhörighet
