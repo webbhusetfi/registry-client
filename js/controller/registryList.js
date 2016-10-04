@@ -21,7 +21,10 @@ angular.module('RegistryClient')
                 "edit":"/registry/edit/[id]",
                 "link":"asdf",
                 "custom":[{
-                    "directive":"xg-open-registry"
+                    "directive":"xg-open-registry",
+                    "params": [
+                        "id"
+                    ]
                 }]
             }
         },
@@ -38,31 +41,11 @@ angular.module('RegistryClient')
                 "service":"registry/search",
                 "arguments": {
                     "offset":0,
-                    "limit":1
+                    "limit":20
                 }
             }
         }
     }
-    var linkCallback = function(id) {
-        $log.log('asdf');
-    }
-    /*
-    $scope.goto = function(id) {
-        dbHandler
-            .getConnectionTypes(id)
-            .getRegistry({"id": id})
-            .runQuery()
-            .then(function(response) {
-                var user = globalParams.get('user');
-                user.registry = Number(id);
-                globalParams.set('user', user);
-                globalParams.set('connectionTypes', response.connectionType);
-                globalParams.set('registry', response.registry[0]);
-                $location.path('entry/list');
-            });
-    }
-    */
-    
     $scope.$watch('config.query', function(newQuery, oldQuery) {
         if($scope.timeout)
             $timeout.cancel($scope.timeout);

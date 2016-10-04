@@ -22,6 +22,10 @@ angular.module('RegistryClient')
                     i++;
                 }
                 
+                if(count < 2) {
+                    $scope.hide = true;
+                }
+                
                 $scope.pagination = function(id) {
                     $scope.offset = $scope.limit * id;
                     $scope.active = id;

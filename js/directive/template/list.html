@@ -26,11 +26,12 @@
                 <i class="fa fa-pencil"></i>
             </a>
             <span ng-if="config.params.functions.custom">
-                <a
-                    {{ value.directive }}
-                    ng-repeat="(key, value) in config.params.functions.custom"
-                    >asdf
-                </a>
+                <xg-compile
+                    ng-repeat="(key, value) in config.params.functions.custom"                    
+                    directive="value.directive"
+                    model="item"
+                >
+                </xg-compile>
             </span>
         </td>
     </tr>
