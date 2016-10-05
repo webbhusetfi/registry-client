@@ -31,6 +31,23 @@ angular.module('RegistryClient')
             }
         }
     })
+    .directive('xgFilter', function($log) {
+        return {
+            restrict: 'E',
+            scope: {
+                model:'='
+            },
+            replace:true,
+            template:'<input type="text" ng-model="model" class="form-control"/>',
+            link: function(scope, elem, attr) {
+                elem.on('keyup', function() {
+                    if(scope.model.length == 0) {
+                        delete scope.model;
+                    }
+                });
+            }
+        }
+    })
     .directive('xgOpenRegistry', function($log, $location, dbHandler, globalParams) {
         return {
             restrict: 'E',

@@ -19,7 +19,6 @@ angular.module('RegistryClient')
                     }
                 },
                 "edit":"/registry/edit/[id]",
-                "link":"asdf",
                 "custom":[{
                     "directive":"xg-open-registry",
                     "params": [
@@ -32,9 +31,7 @@ angular.module('RegistryClient')
             "name":"name",
             "label":"Namn",
             "link": "/registry/edit/[id]",
-            "filter":{
-                "path":"base.arguments.filter"
-            }
+            "filter":true
         }],
         "query":{
             "base": {

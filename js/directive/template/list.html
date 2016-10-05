@@ -2,6 +2,7 @@
     <thead>
         <td ng-repeat="col in config.cols">
             <span class="col-label" ng-show="!col.filter">{{ col.label }}</span>
+            <xg-filter ng-show="col.filter" placeholder="{{ col.label }}" model="config.query.base.filter[col.name]"/>
         </td>
         <td class="functions" ng-show="config.params.functions">
             <span class="col-label">Funktioner</span>
