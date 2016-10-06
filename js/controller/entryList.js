@@ -222,6 +222,7 @@ angular.module('RegistryClient')
                 "offset":$scope.params.offset,
                 "order": {
                     "lastName":"asc",
+                    "firstName":"asc",
                     "name":"asc"
                 }};
         entry_search.filter = $scope.params.filter;
