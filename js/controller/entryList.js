@@ -1,11 +1,11 @@
 angular.module('RegistryClient')
-.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dialogHandler, dbHandler) {
+.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, $filter, globalParams, dialogHandler, dbHandler) {
     $scope.globalParams = globalParams;
     $scope.routeParams = $routeParams;
     $scope.params = {};
     $scope.headers = {
-        'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon'],
-        'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon']
+        'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon', 'Skapad'],
+        'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Bank', 'Kontonr.', 'VAT-nr.', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon', 'Skapad']
     };
 
     if (globalParams.get('user').role == 'USER') {
@@ -186,7 +186,8 @@ angular.module('RegistryClient')
                             ((value.address) ? value.address.country : null),
                             ((value.address) ? value.address.email : null),
                             ((value.address) ? value.address.mobile : null),
-                            ((value.address) ? value.address.phone : null)
+                            ((value.address) ? value.address.phone : null),
+                            $filter('date')(new Date(value.createdAt), "d.M.yyyy HH:mm")
                         ];
                     } else {
                         var row = [
@@ -202,7 +203,8 @@ angular.module('RegistryClient')
                             ((value.address) ? value.address.country : null),
                             ((value.address) ? value.address.email : null),
                             ((value.address) ? value.address.mobile : null),
-                            ((value.address) ? value.address.phone : null)
+                            ((value.address) ? value.address.phone : null),
+                             $filter('date')(new Date(value.createdAt), "d.M.yyyy HH:mm")
                         ];
                     }
                     ret.push(row);

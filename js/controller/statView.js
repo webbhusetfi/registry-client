@@ -99,6 +99,39 @@ angular.module('RegistryClient')
         gender_lang["MALE"] = "Män";
         gender_lang[null] = "Odefinierade";
         
+        var query = {
+            "count" : {
+                "service": "entry/statistics",
+                "arguments": {
+                    "select": "count",
+                    "filter": {
+                        "type": "MEMBER_PERSON",
+                        "registry": Number(globalParams.get('user').registry)
+                    }
+                }
+            },
+            "gender" : {
+                "service": "entry/statistics",
+                "arguments": {
+                    "select": "gender",
+                    "filter": {
+                        "type": "MEMBER_PERSON",
+                        "registry": Number(globalParams.get('user').registry)
+                    }
+                }
+            },
+            "age" : {
+                "service": "entry/statistics",
+                "arguments": {
+                    "select": "age",
+                    "filter": {
+                        "type": "MEMBER_PERSON",
+                        "registry": Number(globalParams.get('user').registry)
+                    }
+                }
+            }
+        };
+        
         if (selected_org == 0) {   // Headorg
             if ($scope.headorg) {
                 $scope.view_org = $scope.headorg;
@@ -113,43 +146,10 @@ angular.module('RegistryClient')
                     $scope.view_org = value;
                 }
             });
+            query.count.arguments.filter.parentEntry = selected_org;
+            query.gender.arguments.filter.parentEntry = selected_org;
+            query.age.arguments.filter.parentEntry = selected_org;
         }
-
-        var query = {
-            "count" : {
-                "service": "entry/statistics",
-                "arguments": {
-                    "select": "count",
-                    "filter": {
-                        "type": "MEMBER_PERSON",
-                        "registry": Number(globalParams.get('user').registry),
-                        "parentEntry": selected_org
-                    }
-                }
-            },
-            "gender" : {
-                "service": "entry/statistics",
-                "arguments": {
-                    "select": "gender",
-                    "filter": {
-                        "type": "MEMBER_PERSON",
-                        "registry": Number(globalParams.get('user').registry),
-                        "parentEntry": selected_org
-                    }
-                }
-            },
-            "age" : {
-                "service": "entry/statistics",
-                "arguments": {
-                    "select": "age",
-                    "filter": {
-                        "type": "MEMBER_PERSON",
-                        "registry": Number(globalParams.get('user').registry),
-                        "parentEntry": selected_org
-                    }
-                }
-            }
-        };
 
         $scope.view_org_gender_show = true;
         $scope.view_org_age_show = true;
@@ -182,7 +182,8 @@ angular.module('RegistryClient')
                 var d = [];
                 var cnt = 0;
                 angular.forEach(response.age.data, function (value, key) {
-                    if (value.age != null && value.age > 50 && value.age < 110) {
+                    //if (value.age != null && value.age > 50 && value.age < 110) {
+                    if (value.age != null) {
                         labels.push(value.age);    
                         d.push(value.found);
                         cnt = cnt + Number(value.found);
