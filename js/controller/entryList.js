@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, $filter, globalParams, dialogHandler, dbHandler) {
+.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, $filter, globalParams, dialogHandler, dbHandler, PDFKit, FileSaver, Blob) {
     $scope.globalParams = globalParams;
     $scope.routeParams = $routeParams;
     $scope.params = {};
@@ -213,6 +213,106 @@ angular.module('RegistryClient')
             });
     }
 
+    $scope.doPdfLabelExport = function (name) {
+        dbHandler
+            .parse(true)
+            .getEntries({
+                "name":"entrylist",
+                "include":['address'],
+                "filter": angular.merge({
+                    "withProperty":$scope.params.withProperty,
+                    "withoutProperty":$scope.params.withoutProperty,
+                    "class":$scope.params.class,
+                    "type":$scope.params.type,
+                    "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : $scope.params.parentEntry),
+                }, $scope.params.filter),
+                "order": {
+                    "lastName":"asc",
+                    "name":"asc"
+                }
+            })
+            .runQuery()
+            .then(function(response) {
+            
+                var document = new PDFKit({'layout':'portrait', 'size':'A4', 'margin': 30});
+                var stream = document.pipe(new blobStream());
+
+                document.fontSize(10);
+                document.fillColor('black');
+
+                row_default = -1;
+                col_default = 0;
+                row = row_default;
+                col = col_default;
+            
+                angular.forEach(response.entrylist, function (value, key) {
+                    label_data = '';
+                    if ($scope.params.type == 'MEMBER_PERSON') {
+                        label_data = value.firstName + ' ' + value.lastName + '\n';
+                        if (value.address) {
+                            if (value.address.street) {
+                                label_data += value.address.street + '\n';
+                            }
+                            if (value.address.postalCode) {
+                                label_data += value.address.postalCode + ' ';
+                            }
+                            if (value.address.town) {
+                                label_data += value.address.town + '\n';
+                            }
+                            if (value.address.country) {
+                                label_data += value.address.country;
+                            }
+                        }
+                    } else {
+                        label_data = value.name + '\n';
+                        if (value.address) {
+                            if (value.address.street) {
+                                label_data += value.address.street + '\n';
+                            }
+                            if (value.address.postalCode) {
+                                label_data += value.address.postalCode + ' ';
+                            }
+                            if (value.address.town) {
+                                label_data += value.address.town + '\n';
+                            }
+                            if (value.address.country) {
+                                label_data += value.address.country;
+                            }
+                        }
+                    }
+                    if (key != 0 && (key % 24 === 0)) {
+                        document.addPage();
+                        row = row_default;
+                        col = col_default;
+                    }
+                    if (key % 3 === 0) {
+                        three = true;
+                        row++;
+                        col = 0;
+                    } else {
+                        three = false;
+                        col++;
+                    }
+
+                    document.text(
+                        label_data,
+                        (col * 201)+30, 
+                        ((row*103)+30), 
+                        {'width':160});    
+                });
+            
+                document.end();
+
+                stream.on('finish', function () {
+                    now = new Date();
+                    fn = name + '_etiketter_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.pdf';
+                    FileSaver.saveAs(stream.toBlob('application/pdf'), fn);
+                });
+            
+            });
+
+    }
+    
     $scope.init = function()
     {
         var entry_search = {

@@ -74,7 +74,6 @@
                         >Kontakt
                     </a>
                 </div>
-                
                 <a class="btn btn-default"
                     ng-csv="doExport();"
                     filename="{{ types[params.type] | lowercase }}.csv"
@@ -82,6 +81,12 @@
                     uib-tooltip="Exportera {{ types[params.type] | lowercase }}"
                    >
                    <i class="fa fa-download"></i>
+                </a>
+                <a class="btn btn-default"
+                    ng-click="doPdfLabelExport(types[params.type]);"
+                    uib-tooltip="Exportera etikett PDF"
+                    target="_blank">
+                   <i class="fa fa-file"></i>
                 </a>
             </div>
         </div>

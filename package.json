@@ -18,6 +18,8 @@
         "grunt-contrib-uglify":"==1.0.0",
         "grunt-contrib-jshint":"==1.0.0",
         "grunt-processhtml":">=0.4.0",
-        "grunt-cache-breaker":">=2.0.1"
+        "grunt-cache-breaker":">=2.0.1",
+        "ng-pdfkit":"==0.0.1",
+        "angular-file-saver":"==1.1.2"
     }
 }
