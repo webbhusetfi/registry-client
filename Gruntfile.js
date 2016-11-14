@@ -40,7 +40,8 @@ module.exports = function(grunt) {
                     'js/controller/userEdit.js',
                     'js/controller/userList.js',
                     'js/controller/userLogin.js',
-                    'js/controller/userLogout.js'
+                    'js/controller/userLogout.js',
+                    'js/controller/labels.js'
                 ],
                 dest:'dist.min.js'
             }
