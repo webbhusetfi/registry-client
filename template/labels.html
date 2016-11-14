@@ -1,0 +1,75 @@
+<style>
+    @media print {
+        .print-loader {display:none;}
+    }
+
+    html, body {background-color:white; font-size: 10pt;}
+    .print-loader { padding: 20px; margin: 20px; }
+    .print-label {
+        height: 36mm;
+        padding: 2.5mm 0 0 5mm;
+        margin-right: 0;
+        float: left;
+        text-align: left;
+        overflow: visible;
+        /* outline: 1px dotted; */
+        white-space:pre-line;
+    }
+   
+    .print-page-break {
+        clear: left;
+        display:block;
+        page-break-after:always;
+    }
+    
+    .col-0 { width: 70mm; }
+    .col-1 { width: 70mm; }
+    .col-2 { width: 66mm; }
+    
+    .row-0 {margin-top:5mm;}
+    .row-7 {margin-bottom:5mm;}
+    
+    /*
+    .col-0.row-0, .col-2.row-0, .col-1.row-1,
+    .col-0.row-2, .col-2.row-2, .col-1.row-3,
+    .col-0.row-4, .col-2.row-4, .col-1.row-5,
+    .col-0.row-6, .col-2.row-6, .col-1.row-7 {background-color:silver;}
+    */
+</style>
+<div class="print-loader">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="btn btn-danger btn-lg" 
+                     style="width:50px; heigth:30px; margin:20px;"
+                     ng-show="executing">
+                    <i class="fa fa-refresh fa-spin"></i>
+                </div>
+                <div class="btn btn-success btn-lg" 
+                     style="width:50px; heigth:30px; margin:20px;"
+                     ng-hide="executing"
+                     ng-click="doPrint()">
+                    <i class="fa fa-check-circle-o"></i>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="alert alert-info">
+                    <strong>Information om dokumentet!</strong><br />
+                    Sidan är formaterad för en A4:a med 24 etiketter á 70x30mm i tre kolumner och 8 rader.
+                    <ul>
+                        <li>Sätt marginalerna till noll.</li>
+                        <li>Eventuella standard sidhuvuden och sidfötter kan med fördel tas bort.</li>
+                        <li>Det går även bra att skriva ut som ett PDF-dokument.</li>
+                        <li>Prova att skriva ut endast en sida först innan du skickar hela dokumentet till skrivaren.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <div ng-repeat="entry in entries">
+        <div class="print-label row-{{entry.row_num}} col-{{entry.col_num}}" 
+             ng-class="{'print-page-break': entry.page_is_full}">{{entry.label}}</div>
+    </div>
+</div>

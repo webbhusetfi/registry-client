@@ -83,10 +83,11 @@
                    <i class="fa fa-download"></i>
                 </a>
                 <a class="btn btn-default"
-                    ng-click="doPdfLabelExport(types[params.type]);"
-                    uib-tooltip="Exportera etikett PDF"
+                    ng-hide="executing"
+                    ng-click="doLabelExport(types[params.type]);"
+                    uib-tooltip="Exportera adressetiketter"
                     target="_blank">
-                   <i class="fa fa-file"></i>
+                   <i class="fa fa-print"></i>
                 </a>
             </div>
         </div>

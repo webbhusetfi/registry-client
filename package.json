@@ -1,25 +1,22 @@
 {
-    "name":"registry-client",
-	"version":"0.2.0",
-    "dependencies":
-    {
-        "angular":">=1.5.8",
-        "angular-resource":">=1.5.8",
-        "angular-route":">=1.5.8",
-        "babel-core":">=5.8.25",
-        "chart.js":"==1.0.2",
-        "angular-chart.js":"==0.10.2",
-        "ng-csv":">=0.3.6",
-        "angular-sanitize":">=1.5.5",
-        "angular-ui-bootstrap":"==0.14.3",
-        "angular-xeditable":"==0.1.11",
-        "grunt":"==1.0.0",
-        "grunt-contrib-concat":"==1.0.1",
-        "grunt-contrib-uglify":"==1.0.0",
-        "grunt-contrib-jshint":"==1.0.0",
-        "grunt-processhtml":">=0.4.0",
-        "grunt-cache-breaker":">=2.0.1",
-        "ng-pdfkit":"==0.0.1",
-        "angular-file-saver":"==1.1.2"
-    }
+  "name": "registry-client",
+  "version": "0.2.0",
+  "dependencies": {
+    "angular": ">=1.5.8",
+    "angular-chart.js": "==0.10.2",
+    "angular-resource": ">=1.5.8",
+    "angular-route": ">=1.5.8",
+    "angular-sanitize": ">=1.5.5",
+    "angular-ui-bootstrap": "==0.14.3",
+    "angular-xeditable": "==0.1.11",
+    "babel-core": ">=5.8.25",
+    "chart.js": "==1.0.2",
+    "grunt": "==1.0.0",
+    "grunt-cache-breaker": ">=2.0.1",
+    "grunt-contrib-concat": "==1.0.1",
+    "grunt-contrib-jshint": "==1.0.0",
+    "grunt-contrib-uglify": "==1.0.0",
+    "grunt-processhtml": ">=0.4.0",
+    "ng-csv": ">=0.3.6"
+  }
 }
