@@ -215,7 +215,7 @@ angular.module('RegistryClient')
 
     $scope.doLabelExport = function (name) {
         globalParams.set('entryList', $scope.params);
-        var printUrl = '/#entry/labels/';
+        var printUrl = '/entry/labels/';
         var popupWin = $window.open(printUrl.toString(), '_blank', 'width=800,height=700');
         return false;
     }
