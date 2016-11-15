@@ -17,6 +17,8 @@
     "grunt-contrib-jshint": "==1.0.0",
     "grunt-contrib-uglify": "==1.0.0",
     "grunt-processhtml": ">=0.4.0",
-    "ng-csv": ">=0.3.6"
+    "ng-csv": ">=0.3.6",
+    "ng-pdfkit":"==0.0.1",
+    "angular-file-saver":"==1.1.2"
   }
 }

@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv'])
+    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv', 'ngPDFKit', 'ngFileSaver'])
     .run(function($window, $log, editableOptions) {
         editableOptions.theme = 'bs3';
     })
@@ -27,10 +27,6 @@ var regApp = angular
             .when('/entry/list/:id?', {
                 templateUrl: '/template/entryList.html',
                 controller: 'entryList'
-            })
-            .when('/entry/labels', {
-                templateUrl: '/template/labels.html',
-                controller: 'labels'
             })
             .when('/entry/:id/edit', {
                 templateUrl: '/template/entryEdit.html',

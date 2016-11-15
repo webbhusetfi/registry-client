@@ -14,6 +14,8 @@ module.exports = function(grunt) {
                     'node_modules/angular-ui-bootstrap/ui-bootstrap.min.js',
                     'node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js',
                     'node_modules/angular-xeditable/dist/js/xeditable.min.js',
+                    'node_modules/ng-pdfkit/build/ng-pdfkit.js', 
+                    'node_modules/angular-file-saver/dist/angular-file-saver.bundle.min.js',
                     'dist.min.js'
                 ],
                 dest: 'dist.js'
@@ -40,8 +42,7 @@ module.exports = function(grunt) {
                     'js/controller/userEdit.js',
                     'js/controller/userList.js',
                     'js/controller/userLogin.js',
-                    'js/controller/userLogout.js',
-                    'js/controller/labels.js'
+                    'js/controller/userLogout.js'
                 ],
                 dest:'dist.min.js'
             }
