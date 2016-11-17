@@ -35,15 +35,21 @@ angular.module('RegistryClient')
         return {
             restrict: 'E',
             scope: {
-                model:'='
+                query:'=',
+                target:'='
             },
             replace:true,
-            template:'<input type="text" ng-model="model" class="form-control"/>',
+            template:'<input type="text" class="form-control"/>',
+            controller: function($scope) {
+                $scope.key;
+            },
             link: function(scope, elem, attr) {
-                elem.on('keyup', function() {
-                    if(scope.model.length == 0) {
-                        delete scope.model;
-                    }
+                elem.on('keyup', function(event) {
+                    if(_.isString(elem[0].value) && String(elem[0].value).length > 0)
+                        _.set(scope.query.arguments.filter, scope.target, elem[0].value);
+                    else
+                        _.unset(scope.query.arguments.filter, scope.target);
+                    scope.$apply();
                 });
             }
         }

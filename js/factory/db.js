@@ -50,7 +50,7 @@ angular.module('RegistryClient')
         setQuery: function(newQuery) {
             if(newQuery !== undefined)
                 query = angular.merge(query, newQuery);
-
+            
             angular.forEach(Object.keys(newQuery), function(value, key) {
                 reports.push(value);
             });

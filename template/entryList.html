@@ -1,3 +1,4 @@
+<!-- pre class="debug">{{ resource | json }}</pre -->
 <div class="outer-section">
     <div ng-include="'/template/topbar.html'"></div>
     <div class="inner-section container-fluid">
@@ -10,114 +11,8 @@
                     <div class="col-sm-12">
                         <div ng-include="'/template/header.html'"></div>
                         <div ng-include="'/template/entryListMenu.html'"></div>
-                        <table class="mainList">
-                            <thead>
-                                <td class="col-xs-1">
-                                   <input
-                                        ng-model="params.filter.id"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="ID"
-                                        class="form-control">                                    
-                                </td>
-                                <td ng-show="params.type == 'ASSOCIATION'">
-                                    <input
-                                        ng-model="params.filter.name"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Föreningsnamn"
-                                        class="form-control">
-                                </td>
-                                <td ng-show="params.type == 'MEMBER_PERSON'">
-                                   <input
-                                        ng-model="params.filter.lastName"
-                                        ng-show="params.type == 'MEMBER_PERSON'"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Efternamn"
-                                        class="form-control">
-                                </td>
-                                <td ng-show="params.type == 'MEMBER_PERSON'">
-                                    <input
-                                        ng-model="params.filter.firstName"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Förnamn"
-                                        class="form-control">
-                                </td>
-                                <td ng-show="params.additionals == 'address'">
-                                    <input
-                                        ng-model="params.filter.address.street"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Adress"
-                                        class="form-control">                                    
-                                </td>
-                                <td ng-show="params.additionals == 'address'">
-                                    <input
-                                        ng-model="params.filter.address.postalCode"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Postnummer"
-                                        class="form-control">                                    
-                                </td>
-                                <td ng-show="params.additionals == 'address'">
-                                    <input
-                                        ng-model="params.filter.address.town"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Postort"
-                                        class="form-control">
-                                </td>
-                                <td ng-show="params.additionals == 'contact'">
-                                    <input
-                                        ng-model="params.filter.address.email"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Epost"
-                                        class="form-control">                                    
-                                </td>
-                                <td ng-show="params.additionals == 'contact'">
-                                    <input
-                                        ng-model="params.filter.address.mobile"
-                                        ng-model-options="{ debounce:500 }"
-                                        ng-change="setSearch();"
-                                        placeholder="Mobil"
-                                        class="form-control">
-                                </td>
-                                <td></td>
-                            </thead>
-                            <tr ng-repeat="(key, item) in entrylist">
-                                <td class="text-center">{{ item.id }}</td>
-                                <td ng-show="item.type == 'ASSOCIATION'">
-                                    {{ item.name }}
-                                </td>
-                                <td ng-show="item.type == 'MEMBER_PERSON'">{{ item.lastName }}</td>
-                                <td ng-show="item.type == 'MEMBER_PERSON'">{{ item.firstName }}</td>
-                                <td ng-show="params.additionals == 'address'">{{ item.address.street }}</td>
-                                <td ng-show="params.additionals == 'address'">{{ item.address.postalCode }}</td>
-                                <td ng-show="params.additionals == 'address'">{{ item.address.town }}</td>
-                                <td ng-show="params.additionals == 'contact'"><a
-                                        class="btn btn-xs btn-default"
-                                        ng-if="item.address.email"
-                                        href="mailto:{{ item.address.email }}">
-                                        <i class="fa fa-envelope"></i>
-                                    </a> {{ item.address.email }}
-                                </td>
-                                <td ng-show="params.additionals == 'contact'">{{ item.address.mobile }}</td>                        
-                                <td class="text-right">
-                                    <a ng-show="item.type == 'MEMBER_PERSON' && globalParams.get('user').role != 'USER'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.firstName + ' ' + item.lastName, 'type':item.type});"><i class="fa fa-times"></i></a>
-                                    <a ng-show="item.type == 'ASSOCIATION' && globalParams.get('user').role != 'USER'" class="btn btn-xs btn-danger" ng-click="deleteConfirm({'id':item.id,'name':item.name, 'type':item.type});"><i class="fa fa-times"></i></a>                                    
-                                    <a class="btn btn-xs btn-primary" ng-click="go('/entry/' + item.id + '/edit',{'type':item.type}, true);"><i class="fa fa-pencil"></i></a>
-                                    <a ng-show="item.type == 'ASSOCIATION'" class="btn btn-xs btn-default" ng-click="go('/entry/list/' + item.id, {});"><i class="fa fa-sign-in"></i></a>
-                                </td>
-                            </tr>
-                        </table>
+                        <xg-list resource="resource" config="config.list" query="config.query"></xg-list>
                     </div>
-                </div>
-                <div ng-include="'/template/pagination.html'"></div>
-                <div class="alert alert-info" ng-show="foundCount.entrylist == 0">
-                    Inga poster.
                 </div>
             </div>
         </div>

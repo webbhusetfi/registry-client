@@ -5,7 +5,14 @@ angular.module('RegistryClient')
     globalParams.set('user', angular.merge(globalParams.get('user'), {"registry":null}));
     
     $scope.config = {
-        "params":{
+        "list":{
+            "cols": {
+                "name": {
+                    "label":"Namn",
+                    "link": "/registry/edit/[id]",
+                    // "filter":true
+                }
+            },
             "pagination":1,
             "functions":{
                 "deleteDialog": {
@@ -27,28 +34,22 @@ angular.module('RegistryClient')
                 }]
             }
         },
-        "cols": [{
-            "name":"name",
-            "label":"Namn",
-            "link": "/registry/edit/[id]",
-            "filter":true
-        }],
         "query":{
-            "base": {
-                "service":"registry/search",
-                "arguments": {
-                    "offset":0,
-                    "limit":20
-                }
+            "service":"registry/search",
+            "arguments": {
+                "offset":0,
+                "limit":25
             }
         }
     }
+    
+    var time = 0;
     $scope.$watch('config.query', function(newQuery, oldQuery) {
         if($scope.timeout)
             $timeout.cancel($scope.timeout);
         $scope.timeout = $timeout(function() {
             dbHandler
-                .setQuery($scope.config.query)
+                .setQuery({"base":$scope.config.query})
                 .runQuery()
                 .then(function(response) {
                     $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
@@ -57,7 +58,8 @@ angular.module('RegistryClient')
                     $log.error(response);
                     $location.path('/user/logout');
                 });
-        }, 500);
+        }, time);
+        time = 200;
     }, true);
 
 });

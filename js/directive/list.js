@@ -5,7 +5,8 @@ angular.module('RegistryClient')
             templateUrl: 'js/directive/template/list.html',
             scope: {
                 config: '=',
-                resource: '='
+                resource: '=',
+                query: '='
             },
             controller: function($scope) {
                 $scope.link = function(link, item) {
@@ -18,30 +19,38 @@ angular.module('RegistryClient')
                     return link;
                 }
                 
-                if($scope.config.params.functions.deleteDialog) {
-                    $scope.deleteDialog = function(item) {
-                        var query = $scope.config.params.functions.deleteDialog.postAction;
-                        angular.forEach(query, function(val1, key1) {
-                            if(val1.arguments) {
-                                var newArgs = {}
-                                angular.forEach(val1.arguments, function(val2, key2) {
-                                    newArgs[val2] = item[val2];
-                                })
-                                query[key1].arguments = newArgs;
-                            }
-                        });
-                        dialogHandler.deleteConfirm(item, query);
+                $scope.resolveValue = function(item, key) {
+                    var values = key.split('.');
+                    if(values.length > 1) {
+                        var traversed;
+                        if(traversed = item[values[0]]) {
+                            values.shift();
+                            angular.forEach(values, function(value, key) {
+                                traversed = traversed[value];
+                            });
+                            return traversed;
+                        }
+                    }else{
+                        return item[key];
                     }
                 }
                 
-                if($scope.config.query) {
-                    /*
-                    angular.forEach($scope.config.query, function(val, key) {
-                        switch (key) {
-                            case 'base':
+                if($scope.config.functions) {
+                    if($scope.config.functions.deleteDialog) {
+                        $scope.deleteDialog = function(item) {
+                            var query = $scope.config.params.functions.deleteDialog.postAction;
+                            angular.forEach(query, function(val1, key1) {
+                                if(val1.arguments) {
+                                    var newArgs = {}
+                                    angular.forEach(val1.arguments, function(val2, key2) {
+                                        newArgs[val2] = item[val2];
+                                    })
+                                    query[key1].arguments = newArgs;
+                                }
+                            });
+                            dialogHandler.deleteConfirm(item, query);
                         }
-                    });
-                    */
+                    }
                 }
             },
             link: function(scope, elem, attr) {

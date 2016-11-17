@@ -1,4 +1,4 @@
-<div class="xg-pagination" ng-hide="hide">
+<div class="xg-pagination" ng-hide="_.size(pages) < 2">
     <div class="btn-group">
         <a
             class="btn btn-default"
@@ -18,7 +18,7 @@
         <a
             class="btn btn-default"
             ng-disabled="active == last"
-            ng-click="active == last ? null : pagination(Number(active)+1)"
+            ng-click="active == last ? null : pagination(next)"
             >&raquo;
         </a>
     </div>

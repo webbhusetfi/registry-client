@@ -1,0 +1,14 @@
+<div class="clearfix">
+    <div class="btn-group pull-right">
+        <a
+            class="btn btn-xs btn-default"
+            ng-class="{
+                'active':step == value
+            }"
+            ng-repeat="step in options"
+            ng-click="setValue(step);"
+            >
+            {{ step }}
+        </a>
+    </div>
+</div>

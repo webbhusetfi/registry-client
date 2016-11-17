@@ -1,49 +1,53 @@
-<table class="xg-list" ng-show="resource.foundCount > 0">
+<table class="xg-list">
     <thead>
-        <td ng-repeat="col in config.cols">
+        <td ng-repeat="(key, col) in config.cols" ng-attr-style="{{ col.width ? 'width:' + col.width : null }}">
             <span class="col-label" ng-show="!col.filter">{{ col.label }}</span>
-            <xg-filter ng-show="col.filter" placeholder="{{ col.label }}" model="config.query.base.filter[col.name]"/>
+            <xg-filter ng-show="col.filter" placeholder="{{ col.label }}" target="key" query="query"/>
         </td>
-        <td class="functions" ng-show="config.params.functions">
+        <td class="functions" ng-show="config.functions">
             <span class="col-label">Funktioner</span>
         </td>
     </thead>
-    <tr ng-repeat="item in resource.items">
-        <td ng-repeat="col in config.cols">
-            <a xg-href="{{ link(col.link, item) }}" ng-show="col.link">{{ item[col.name] }}</a>
-            <span ng-show="!col.link">{{ item[col.name] }}</span>
-        </td>
-        <td class="functions" ng-show="config.params.functions">
-            <a
-                ng-show="config.params.functions.deleteDialog"
-                ng-click="deleteDialog(item);"
-                class="btn btn-xs btn-danger">
-                <i class="fa fa-times"></i>
-            </a>
-            <a
-                ng-show="config.params.functions.edit"
-                xg-href="{{ link(config.params.functions.edit, item); }}"
-                class="btn btn-xs btn-primary">
-                <i class="fa fa-pencil"></i>
-            </a>
-            <span ng-if="config.params.functions.custom">
-                <xg-compile
-                    ng-repeat="(key, value) in config.params.functions.custom"                    
-                    directive="value.directive"
-                    model="item"
-                >
-                </xg-compile>
-            </span>
-        </td>
-    </tr>
+    <tbody ng-show="resource.foundCount > 0">
+        <tr ng-repeat="item in resource.items">
+            <td ng-repeat="(key, col) in config.cols">
+                <a xg-href="{{ link(col.link, item) }}" ng-show="col.link">{{ resolveValue(item, key) }}</a>
+                <span ng-show="!col.link">{{ resolveValue(item, key) }}</span>
+            </td>
+            <td class="functions" ng-show="config.functions">
+                <a
+                    ng-show="config.functions.deleteDialog"
+                    ng-click="deleteDialog(item);"
+                    class="btn btn-xs btn-danger">
+                    <i class="fa fa-times"></i>
+                </a>
+                <a
+                    ng-show="config.functions.edit"
+                    xg-href="{{ link(config.functions.edit, item); }}"
+                    class="btn btn-xs btn-primary">
+                    <i class="fa fa-pencil"></i>
+                </a>
+                <span ng-if="config.functions.custom">
+                    <xg-compile
+                        ng-repeat="(key, value) in config.functions.custom"                    
+                        directive="value.directive"
+                        model="item"
+                    >
+                    </xg-compile>
+                </span>
+            </td>
+        </tr>
+    </tbody>
 </table>
-<xg-pagination
-    ng-if="resource && config && config.params.pagination"
-    limit="config.query.base.arguments.limit"
-    offset="config.query.base.arguments.offset"
-    count="resource.foundCount"
->
-</xg-pagination>
 <div class="alert alert-info" ng-show="resource.foundCount == 0">
     Inga poster.
 </div>
+<xg-limiter value="query.arguments.limit">
+</xg-limiter>
+<xg-pagination
+    ng-if="resource && config.pagination"
+    limit="query.arguments.limit"
+    offset="query.arguments.offset"
+    count="resource.foundCount"
+>
+</xg-pagination>

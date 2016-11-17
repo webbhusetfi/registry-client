@@ -1,7 +1,181 @@
 angular.module('RegistryClient')
-.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, globalParams, dialogHandler, dbHandler) {
-    $scope.globalParams = globalParams;
-    $scope.routeParams = $routeParams;
+.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, $timeout, globalParams, dialogHandler, dbHandler) {
+    var userLevel = globalParams.get('user').role;
+    $scope.config = {};
+    // base configuration
+    $scope.config.typeselect = {
+        "types": globalParams.static.types
+    };
+    $scope.config.include = null;
+    $scope.config.list = {
+        "pagination":1,
+        "functions":{
+            "deleteDialog": {
+                "postAction": {
+                    "entry": {
+                        "service":"entry/delete",
+                        "arguments": [
+                            "id"
+                        ]
+                    }
+                }
+            },
+            "edit":"/entry/edit/[id]",
+            "custom":[{
+                "directive":"xg-open-registry",
+                "params": [
+                    "id"
+                ]
+            }]
+        }
+    };
+    
+    // main query object
+    $scope.config.query = {
+        "service":"entry/search",
+        "arguments": {
+            "filter": {
+                "type":"ASSOCIATION",
+                "registry":globalParams.get('user.registry'),
+            },
+            "offset":0,
+            "limit":25,
+            "order": {
+                "name":"asc"
+            }
+        }
+    };
+    
+    // watch type to reset offset/limit
+    $scope.$watch('config.query.arguments.filter.type', function(value) {
+        $scope.config.query.arguments.offset = 0;
+        $scope.config.query.arguments.limit = 25;
+        $scope.config.query.arguments.filter = {
+            "type":$scope.config.query.arguments.filter.type,
+            "registry":globalParams.get('user').registry
+        }
+        switch(value) {
+            case 'ASSOCIATION':
+                $scope.config.query.arguments.order = {
+                    "name":"asc"
+                }
+            break;
+            case 'MEMBER_PERSON':
+                $scope.config.query.arguments.order = {
+                    "lastName":"asc",
+                    "firstName":"asc"
+                }
+            break;
+        }
+    });
+    
+    // set include columns (separate from query, separate handler)
+    $scope.setInclude = function(include) {
+        if($scope.config.include == include) {
+            $scope.config.include = null;
+            delete $scope.config.query.arguments.include;
+        }else{
+            $scope.config.include = include;
+            $scope.config.query.arguments.include = ['address'];
+        }
+    }
+    
+    // function for dynamic columns
+    $scope.getCols = function() {
+        var baseCols = {
+            "id": {
+                "label":"Id",
+                "width":"5%",
+                "filter":true
+            }
+        }
+        
+        switch($scope.config.query.arguments.filter.type) {
+            default:
+            case 'ASSOCIATION':
+                var typeCols = {
+                    "name": {
+                        "label":"Namn",
+                        "link":"/entry/edit/[id]",
+                        "filter":true
+                    }
+                }
+            break;
+            
+            case 'MEMBER_PERSON':
+                var typeCols = {
+                    "firstName": {
+                        "label":"Förnamn",
+                        "link":"/entry/edit/[id]",
+                        "filter":true
+                    },
+                    "lastName": {
+                        "label":"Efternamn",
+                        "link":"/entry/edit/[id]",
+                        "filter":true
+                    }
+                }
+            break;
+        }
+        
+        var addCols = {};
+        
+        switch($scope.config.include) {
+            case 'address':
+                var addCols = {
+                    "address.street": {
+                        "label":"Adress",
+                        "filter":true
+                    },
+                    "address.postalCode": {
+                        "label":"Postnummer",
+                        "filter":true
+                    },
+                    "address.town": {
+                        "label":"Postort",
+                        "filter":true
+                    }
+                }
+            break;
+            
+            case 'contact':
+                var addCols = {
+                    "address.email": {
+                        "label":"Epost",
+                        "filter":true
+                    },
+                    "address.phone": {
+                        "label":"Mobil",
+                        "filter":true
+                    }
+                }
+            break;
+        }
+        return _.merge(baseCols, typeCols, addCols);
+    }
+    
+    // zero timeout for first load
+    var time = 0;
+    // watch query parameters and update
+    $scope.$watch('config', function(newQuery, oldQuery) {
+        if($scope.timeout)
+            $timeout.cancel($scope.timeout);
+        $scope.timeout = $timeout(function() {
+            dbHandler
+                .setQuery({"base":$scope.config.query})
+                .runQuery()
+                .then(function(response) {
+                    $scope.config.list.cols = $scope.getCols();
+                    $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
+                })
+                .catch(function(response) {
+                    $log.error(response);
+                    $location.path('/user/logout');
+                });
+        }, time);
+        time = 300;
+    }, true);
+    
     $scope.params = {};
     $scope.headers = {
         'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon'],
@@ -11,19 +185,8 @@ angular.module('RegistryClient')
     if (globalParams.get('user').role == 'USER') {
         $scope.params.type = 'MEMBER_PERSON';
     }
-
-    $scope.deleteConfirm = function(item) {
-        dialogHandler.deleteConfirm(item, {
-            "entry": {
-                "service":"entry/delete",
-                "arguments": {
-                    "id": item.id,
-                    "type": item.type
-                }
-            }
-        })
-    };
-
+    
+    /*
     $scope.checkProperty = function(id)
     {
         var onIndex = Number($scope.params.withProperty.indexOf(id));
@@ -41,64 +204,6 @@ angular.module('RegistryClient')
             $scope.params.withoutProperty.splice(offIndex,1);
         }
         $scope.init();
-    }
-
-    $scope.setAdditionals = function(id)
-    {
-        var onIndex = Number($scope.params.additionals.indexOf(id));
-
-        if(onIndex == -1)
-        {
-            $scope.params.additionals = [];
-            $scope.params.additionals = id;
-            switch(id)
-            {
-                case 'address':
-                    $scope.params.includes = ['address'];
-                break;
-                case 'contact':
-                    $scope.params.includes = ['address'];
-                break;
-            }
-        }
-        else
-        {
-            $scope.params.includes = [];
-            $scope.params.additionals = [];
-        }
-
-        $scope.init();
-    }
-
-    $scope.setSearch = function()
-    {
-        angular.forEach($scope.params.filter, function(val, key) {
-            if(val == null || val == undefined || val == "")
-                delete $scope.params.filter[key];
-        });
-        $scope.params.offset = 0;
-        $scope.init();
-    }
-
-    $scope.setType = function(type)
-    {
-        $scope.params.type = type;
-        $scope.params.filter = {};
-        $scope.params.offset = 0;
-        $scope.init();
-    }
-
-    $scope.setLimit = function(limit)
-    {
-        $scope.params.limit = limit;
-        $scope.init();
-    }
-
-    $scope.setOffset = function(offset)
-    {
-        $scope.params.offset = offset;
-        $scope.init();
-        $window.scroll(0,0);
     }
 
     $scope.go = function(location, params, savestate)
@@ -296,4 +401,5 @@ angular.module('RegistryClient')
     };
 
     $scope.init();
+    */
 });

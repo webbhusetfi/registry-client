@@ -4,6 +4,7 @@ module.exports = function(grunt) {
         concat: {
             dist: {
                 src: [
+                    'node_modules/lodash/lodash.min.js',
                     'node_modules/angular/angular.min.js',
                     'node_modules/angular-route/angular-route.min.js',
                     'node_modules/angular-resource/angular-resource.min.js',
@@ -32,6 +33,7 @@ module.exports = function(grunt) {
                     'js/directive/directives.js',
                     'js/directive/list.js',
                     'js/directive/pagination.js',
+                    'js/directive/limiter.js',
                     'js/controller/navigation.js',
                     'js/controller/statView.js',
                     'js/controller/registryList.js',

@@ -1,6 +1,11 @@
 var regApp = angular
     .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv'])
-    .run(function($window, $log, editableOptions) {
+    .constant('_', window._)
+    .run(function($window, $log, $rootScope, editableOptions, globalParams) {
+        if(typeof($window._) == 'function')
+            $rootScope._ = $window._;
+        else
+            $rootScope._ = false;
         editableOptions.theme = 'bs3';
     })
     .config(function($httpProvider, $routeProvider, $locationProvider) {
@@ -28,7 +33,7 @@ var regApp = angular
                 templateUrl: '/template/entryList.html',
                 controller: 'entryList'
             })
-            .when('/entry/:id/edit', {
+            .when('/entry/edit/:id', {
                 templateUrl: '/template/entryEdit.html',
                 controller: 'entryEdit'
             })
