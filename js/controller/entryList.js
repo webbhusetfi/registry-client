@@ -61,15 +61,9 @@ angular.module('RegistryClient')
         }
     };
     
-    // set defaults for opened association
+    // set defaults for opened association, invokes watch & sets id
     if($routeParams.id) {
-        $scope.config.query.arguments.filter = _.merge(
-            $scope.config.query.arguments.filter,
-            {
-                "type":"MEMBER_PERSON",
-                "parentEntry":"asdf"
-            }
-        );
+        $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
     }
     
     // watch type to reset offset/limit
