@@ -29,11 +29,18 @@
                 </a>
                 <span ng-if="config.functions.custom">
                     <xg-compile
-                        ng-repeat="(key, value) in config.functions.custom"                    
+                        ng-repeat="(key, value) in config.functions.custom"
+                        ng-if="value.directive"
                         directive="value.directive"
                         model="item"
                     >
                     </xg-compile>
+                    <a
+                        ng-repeat="(key, value) in config.functions.custom"
+                        ng-if="value.function && _.invoke(config, 'functions.custom[' + key + '].if', item)"
+                        class="btn btn-default btn-xs"
+                        ng-click="_.invoke(config, 'functions.custom[' + key + '].function', item);"
+                        ><i class="{{ value.icon ? value.icon : 'fa fa-exclamation-triangle' }}"></i></a>
                 </span>
             </td>
         </tr>

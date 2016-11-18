@@ -8,7 +8,8 @@ angular.module('RegistryClient')
                 resource: '=',
                 query: '='
             },
-            controller: function($scope) {
+            controller: function($scope, $rootScope) {
+                $scope._ = $rootScope._;
                 $scope.link = function(link, item) {
                     var pattern = /\[([^\]]+)\]/;
                     var results = [];

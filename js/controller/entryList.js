@@ -22,10 +22,25 @@ angular.module('RegistryClient')
             },
             "edit":"/entry/edit/[id]",
             "custom":[{
-                "directive":"xg-open-registry",
-                "params": [
-                    "id"
-                ]
+                "function": function(item) {
+                    globalParams.set('entryList', $scope.config.query);
+                    /*
+                    if(angular.isObject(params)) {
+                        if(Object.keys(params).length)
+                            globalParams.sendParams(params);
+                    }else{
+                        globalParams.sendParams(undefined);
+                    }
+                    */
+                    $location.path('/entry/list/' + item.id);
+                },
+                "if": function(item) {
+                    if(item.type == 'MEMBER_PERSON')
+                        return false;
+                    else
+                        return true;
+                },
+                "icon":"fa fa-sign-in"
             }]
         }
     };
@@ -46,6 +61,17 @@ angular.module('RegistryClient')
         }
     };
     
+    // set defaults for opened association
+    if($routeParams.id) {
+        $scope.config.query.arguments.filter = _.merge(
+            $scope.config.query.arguments.filter,
+            {
+                "type":"MEMBER_PERSON",
+                "parentEntry":"asdf"
+            }
+        );
+    }
+    
     // watch type to reset offset/limit
     $scope.$watch('config.query.arguments.filter.type', function(value) {
         $scope.config.query.arguments.offset = 0;
@@ -53,6 +79,9 @@ angular.module('RegistryClient')
         $scope.config.query.arguments.filter = {
             "type":$scope.config.query.arguments.filter.type,
             "registry":globalParams.get('user').registry
+        }
+        if($routeParams.id) {
+            $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
         }
         switch(value) {
             case 'ASSOCIATION':
@@ -204,22 +233,6 @@ angular.module('RegistryClient')
             $scope.params.withoutProperty.splice(offIndex,1);
         }
         $scope.init();
-    }
-
-    $scope.go = function(location, params, savestate)
-    {
-        if(savestate)
-            globalParams.set('entryList', $scope.params);
-        else
-            globalParams.unset('entryList');
-        if(angular.isObject(params)) {
-            if(Object.keys(params).length)
-                globalParams.sendParams(params);
-        }else{
-            globalParams.sendParams(undefined);
-        }
-
-        $location.path(location);
     }
 
     if(globalParams.get('entryList'))

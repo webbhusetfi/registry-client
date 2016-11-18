@@ -3,7 +3,7 @@
         <h2>Medlemsregister</h2>
         <h3 ng-show="organization.name !== undefined">{{ organization.name }}</h3>
     </div>
-    <div class="col-xs-4 text-right" style="padding-top:2rem;">
+    <div class="col-xs-4 text-right" style="padding-top:2rem;" ng-controller="navigation">
         <div ng-show="globalParams.get('user').role == 'SUPER_ADMIN' || routeParams.id !== undefined">
             <xg-back/>
         </div>
