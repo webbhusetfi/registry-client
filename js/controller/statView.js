@@ -36,6 +36,8 @@ angular.module('RegistryClient')
                     "filter": {
                         "type": "ASSOCIATION",
                         "registry": Number(globalParams.get('user').registry)
+                    }, "order": {
+                        "name":"asc"
                     }
                 }
             },
@@ -46,6 +48,8 @@ angular.module('RegistryClient')
                     "filter": {
                         "type": "UNION",
                         "registry": Number(globalParams.get('user').registry)
+                    }, "order": {
+                        "name":"asc"
                     }
                 }
             },

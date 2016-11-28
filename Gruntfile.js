@@ -38,6 +38,8 @@ module.exports = function(grunt) {
                     'js/controller/statView.js',
                     'js/controller/registryList.js',
                     'js/controller/registryEdit.js',
+                    'js/controller/invoiceList.js',
+                    'js/controller/invoiceEdit.js',
                     'js/controller/entryList.js',
                     'js/controller/entryEdit.js',
                     'js/controller/propertyList.js',

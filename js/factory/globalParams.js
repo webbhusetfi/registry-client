@@ -75,6 +75,7 @@ angular.module('RegistryClient')
     return {
         static: {
             "types":{
+                "UNION":"Förbund",
                 "ASSOCIATION":"Förening",
                 "MEMBER_PERSON":"Medlem"
             },

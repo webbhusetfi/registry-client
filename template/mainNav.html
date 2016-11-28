@@ -12,6 +12,12 @@
                 <span class="hidden-xs hidden-sm"> Statistik</span>
             </a>
         </li>
+        <li ng-show="user.registry !== null">
+            <a xg-href="/invoice/list">
+                <i class="fa fa-sticky-note"></i>
+                <span class="hidden-xs hidden-sm"> Fakturamallar</span>
+            </a>
+        </li>
         <!-- <li><a><i class="fa fa-cog"></i> Inställningar</a></li> //-->
         <li ng-show="user.role !== 'USER' && user.registry !== null">
             <a xg-href="/property/list"><i class="fa fa-edit"></i>
