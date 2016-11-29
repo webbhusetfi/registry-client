@@ -200,10 +200,6 @@ angular.module('RegistryClient')
     }, true);
     
     $scope.params = {};
-    $scope.headers = {
-        'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon'],
-        'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon']
-    };
 
     if (globalParams.get('user').role == 'USER') {
         $scope.params.type = 'MEMBER_PERSON';
@@ -252,68 +248,7 @@ angular.module('RegistryClient')
         $scope.params.parentEntry = $routeParams.id;
         $scope.params.orgId = $routeParams.id;
     }
-
-    $scope.doExport = function () {
-        return dbHandler
-            .parse(true)
-            .getEntries({
-                "name":"entrylist",
-                "include":['address'],
-                "filter": angular.merge({
-                    "withProperty":$scope.params.withProperty,
-                    "withoutProperty":$scope.params.withoutProperty,
-                    "class":$scope.params.class,
-                    "type":$scope.params.type,
-                    "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : $scope.params.parentEntry),
-                }, $scope.params.filter),
-                "order": {
-                    "lastName":"asc",
-                    "name":"asc"
-                }
-            })
-            .runQuery()
-            .then(function(response) {
-                var ret = [];
-                angular.forEach(response.entrylist, function (value, key) {
-                    if ($scope.params.type == 'MEMBER_PERSON') {
-                        var row = [
-                            value.id,
-                            value.firstName,
-                            value.lastName,
-                            value.birthDay,
-                            value.birthMonth,
-                            value.birthYear,
-                            ((value.address) ? value.address.street : null),
-                            ((value.address) ? value.address.postalCode : null),
-                            ((value.address) ? value.address.town : null),
-                            ((value.address) ? value.address.country : null),
-                            ((value.address) ? value.address.email : null),
-                            ((value.address) ? value.address.mobile : null),
-                            ((value.address) ? value.address.phone : null)
-                        ];
-                    } else {
-                        var row = [
-                            value.id,
-                            value.name,
-                            value.description,
-                            value.bank,
-                            value.account,
-                            value.vat,
-                            ((value.address) ? value.address.street : null),
-                            ((value.address) ? value.address.postalCode : null),
-                            ((value.address) ? value.address.town : null),
-                            ((value.address) ? value.address.country : null),
-                            ((value.address) ? value.address.email : null),
-                            ((value.address) ? value.address.mobile : null),
-                            ((value.address) ? value.address.phone : null)
-                        ];
-                    }
-                    ret.push(row);
-                });
-                return ret;
-            });
-    }
-
+    
     $scope.init = function()
     {
         var entry_search = {
@@ -323,6 +258,7 @@ angular.module('RegistryClient')
                 "offset":$scope.params.offset,
                 "order": {
                     "lastName":"asc",
+                    "firstName":"asc",
                     "name":"asc"
                 }};
         entry_search.filter = $scope.params.filter;

@@ -1,5 +1,5 @@
 var regApp = angular
-    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv'])
+    .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv', 'ngPDFKit', 'ngFileSaver'])
     .constant('_', window._)
     .run(function($window, $log, $rootScope, editableOptions, globalParams) {
         if(typeof($window._) == 'function')

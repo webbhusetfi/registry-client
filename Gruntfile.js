@@ -15,6 +15,8 @@ module.exports = function(grunt) {
                     'node_modules/angular-ui-bootstrap/ui-bootstrap.min.js',
                     'node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js',
                     'node_modules/angular-xeditable/dist/js/xeditable.min.js',
+                    'node_modules/ng-pdfkit/build/ng-pdfkit.js', 
+                    'node_modules/angular-file-saver/dist/angular-file-saver.bundle.min.js',
                     'dist.min.js'
                 ],
                 dest: 'dist.js'
@@ -31,6 +33,7 @@ module.exports = function(grunt) {
                     'js/factory/dialog.js',
                     'js/factory/globalParams.js',
                     'js/directive/directives.js',
+                    'js/directive/exportDirectives.js',
                     'js/directive/list.js',
                     'js/directive/pagination.js',
                     'js/directive/limiter.js',
