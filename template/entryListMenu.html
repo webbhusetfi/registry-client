@@ -55,9 +55,7 @@
                 </div>
             </div>
             <div class="col-xs-2">
-                <div ng-show="foundCount.entrylist" class="fc text-center">
-                    Visar {{ params.offset+1 }}-{{ params.offset+params.limit > foundCount.entrylist ? foundCount.entrylist : params.offset+params.limit }} av {{ foundCount.entrylist }}
-                </div>
+                <xg-list-count offset="config.query.arguments.offset" limit="config.query.arguments.limit" count="resource.foundCount"></xg-list-count>
             </div>
             <div class="col-xs-5 text-right">
                 <div class="btn-group">
@@ -74,13 +72,8 @@
                         >Kontakt
                     </a>
                 </div>
-
-
                 <xg-csv-export-button></xg-csv-export-button>
-                
                 <xg-pdf-label-button></xg-pdf-label-button>
-                
-                
             </div>
         </div>
     </div>

@@ -186,9 +186,12 @@ angular.module('RegistryClient')
         $scope.timeout = $timeout(function() {
             dbHandler
                 .setQuery({"base":$scope.config.query})
+                .getProperties({"all":true})
                 .runQuery()
                 .then(function(response) {
+                    $log.log(response);
                     $scope.config.list.cols = $scope.getCols();
+                    $scope.properties = response.properties;
                     $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
                 })
                 .catch(function(response) {

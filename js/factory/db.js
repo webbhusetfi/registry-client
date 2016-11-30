@@ -156,6 +156,15 @@ angular.module('RegistryClient')
                 args = {};
             if(args.name === undefined)
                 args.name = 'properties';
+            if(args.all !== undefined) {
+                this.setJoin({
+                    "resource":args.name,
+                    "service":"property/search",
+                    "field":"id",
+                    "equals":"propertyGroup",
+                    "name":"children"
+                })
+            }
 
             reports.push(args.name);
 

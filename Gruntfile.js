@@ -36,6 +36,7 @@ module.exports = function(grunt) {
                     'js/directive/exportDirectives.js',
                     'js/directive/list.js',
                     'js/directive/pagination.js',
+                    'js/directive/listCount.js',
                     'js/directive/limiter.js',
                     'js/controller/navigation.js',
                     'js/controller/statView.js',
