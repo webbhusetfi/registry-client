@@ -87,7 +87,6 @@ angular.module('RegistryClient')
                         val.type = globalParams.static.types[val.type];
                         $scope.orgs.push(val);
                     });
-                    console.log($scope.orgs);
                 } else {
                     if (response.suborg) {
                         $scope.suborg = response.suborg;

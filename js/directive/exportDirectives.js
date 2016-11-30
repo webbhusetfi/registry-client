@@ -1,7 +1,7 @@
 angular.module('RegistryClient')
     .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler) {
         return {
-            template: '<a class="btn btn-default" ng-csv="doCsvExport();" ng-hide="csvExportProcessing" filename="{{ types[params.type] | lowercase }}.csv" csv-header="doCsvHeaders(params.type)" uib-tooltip="Exportera {{ types[params.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-csv="doCsvExport();" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Exportera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
@@ -19,12 +19,12 @@ angular.module('RegistryClient')
                             "name":"entrylist",
                             "include":['address'],
                             "filter": angular.merge({
-                                "withProperty":scope.params.withProperty,
-                                "withoutProperty":scope.params.withoutProperty,
-                                "class":scope.params.class,
-                                "type":scope.params.type,
-                                "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.params.parentEntry),
-                            }, scope.params.filter),
+                                "withProperty":scope.config.query.arguments.filter.withProperty,
+                                "withoutProperty":scope.config.query.arguments.filter.withoutProperty,
+                                "class":scope.config.query.arguments.filter.class,
+                                "type":scope.config.query.arguments.filter.type,
+                                "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry),
+                            }, scope.config.query.arguments.filter),
                             "order": {
                                 "lastName":"asc",
                                 "name":"asc"
@@ -34,7 +34,7 @@ angular.module('RegistryClient')
                         .then(function(response) {
                             var ret = [];
                             angular.forEach(response.entrylist, function (value, key) {
-                                if (scope.params.type == 'MEMBER_PERSON') {
+                                if (scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
                                     var row = [
                                         value.id, 
                                         value.firstName,
@@ -80,9 +80,9 @@ angular.module('RegistryClient')
     })
     .directive('xgPdfLabelButton', function($window, $log, $uibModal, globalParams, dbHandler, PDFKit, FileSaver, Blob) {
         return {
-            template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport(types[params.type]);" uib-tooltip="Exportera etiketter PDF" target="_blank"><i class="fa fa-file"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport();" uib-tooltip="Exportera etiketter PDF" target="_blank"><i class="fa fa-file"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
-                scope.doPdfLabelExport = function (name) {
+                scope.doPdfLabelExport = function () {
                     scope.pdfLabelsProcessing = true;
                     dbHandler
                         .parse(true)
@@ -90,12 +90,12 @@ angular.module('RegistryClient')
                             "name":"entrylist",
                             "include":['address'],
                             "filter": angular.merge({
-                                "withProperty":scope.params.withProperty,
-                                "withoutProperty":scope.params.withoutProperty,
-                                "class":scope.params.class,
-                                "type":scope.params.type,
-                                "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.params.parentEntry),
-                            }, scope.params.filter),
+                                "withProperty":scope.config.query.arguments.filter.withProperty,
+                                "withoutProperty":scope.config.query.arguments.filter.withoutProperty,
+                                "class":scope.config.query.arguments.filter.class,
+                                "type":scope.config.query.arguments.filter.type,
+                                "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry),
+                            }, scope.config.query.arguments.filter),
                             "order": {
                                 "lastName":"asc",
                                 "name":"asc"
@@ -124,11 +124,9 @@ angular.module('RegistryClient')
                                 row = row_default;
                                 col = col_default;
 
-
-
                                 angular.forEach(response.entrylist, function (value, key) {
                                     label_data = '';
-                                    if (scope.params.type == 'MEMBER_PERSON') {
+                                    if (scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
                                         label_data = value.firstName + ' ' + value.lastName + '\n';
                                         if (value.address) {
                                             if (value.address.street) {
@@ -184,10 +182,9 @@ angular.module('RegistryClient')
 
                             document.end();
 
-
                             stream.on('finish', function () {
                                 now = new Date();
-                                fn = name + '_etiketter_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.pdf';
+                                fn = globalParams.static.types[scope.config.query.arguments.filter.type] + '_etiketter_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.pdf';
                                 FileSaver.saveAs(stream.toBlob('application/pdf'), fn);
                                 scope.pdfLabelsProcessing = false;
                                 scope.$digest();

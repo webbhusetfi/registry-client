@@ -9,42 +9,19 @@
             <div class="col-xs-offset-2 col-xs-10 mainList-ct">
                 <div class="controls list-functions" ng-controller="navigation">
                     <div class="row functions">
-                        <div class="col-sm-6"><h2>Medlemsregister</h2></div>
+                        <div class="col-sm-6"><h2>Användare</h2></div>
                         <div class="col-sm-6 text-right">
                             <a class="btn btn-default" xg-href="/user/edit">
-                                <i class="fa fa-pencil"></i> Skapa
+                                <i class="fa fa-pencil"></i> Skapa användare
                             </a>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <table class="mainList">
-                            <thead>
-                                <td>Användarnamn</td>
-                                <td>Roll</td>
-                                <td style="text-align:left;">Funktioner</td>
-                            </thead>
-                            <tr ng-repeat="item in resource.users">
-                                <td><a xg-href="/user/edit/{{ item.id }}">{{item.username}}</a></td>
-                                <td>{{ roles[item.role] }}</td>
-                                <td>
-                                    <a
-                                        ng-disabled="globalParams.get('user').id == item.id"
-                                        class="btn btn-xs btn-danger"
-                                        ng-click="globalParams.get('user').id == item.id ? null : deleteConfirm({'id':item.id,'name':item.username});">
-                                        <i class="fa fa-times"></i>
-                                    </a>
-                                    <a xg-href="/user/edit/{{ item.id }}" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></a>
-                                </td>
-                            </tr>
-                        </table>
+                        <xg-list resource="resource" config="config.list" query="config.query"></xg-list>
                     </div>
                 </div>
-                <div class="alert alert-info" ng-show="resource.foundCount.users == 0">
-                    Inga poster.
-                </div>
-                <div ng-include="'/template/pagination.html'"></div>
             </div>
         </div>
     </div>
