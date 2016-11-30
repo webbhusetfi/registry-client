@@ -1,0 +1,38 @@
+<div class="row property-control">
+    <div class="col-xs-12">
+        <div class="row" style="margin-bottom:1rem;">
+            <div class="col-xs-4">
+                <select
+                    class="form-control"
+                    ng-model="selected"
+                    ng-options="key as property.name for (key, property) in properties"
+                ></select>
+            </div>
+            <div class="col-xs-8 properties-labels">
+                <a
+                    ng-repeat="(key, value) in withProperty"
+                    class="label label-success property-label"
+                >{{ mapValue(value) }}</a><a
+                    ng-repeat="id in withoutProperty"
+                    class="label label-danger property-label"
+                >{{ mapValue(id) }}</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <span class="btn-group">
+                    <a
+                        ng-repeat="item in properties[selected].children"
+                        ng-click="setProperties(item.id)"
+                        class="btn btn-default btn-xs"
+                        ng-class="{
+                            'btn-success' : _.includes(withProperty, item.id),
+                            'btn-danger' : _.includes(withoutProperty, item.id)
+                        }"
+
+                    >{{ item.name }}</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

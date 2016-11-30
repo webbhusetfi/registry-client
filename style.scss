@@ -6,6 +6,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,300,300italic);
 @import '_defaults';
 @import 'Template/_compatibility';
+@import 'Template/_bootstrap-row-height';
 @import 'scss/_parameters';
 @import 'scss/_offcanvas';
 @import 'scss/_toolbars';
@@ -147,6 +148,19 @@ h3 { font-size:2rem; }
                     background:#337ab7;
                 }
             }
+        }
+    }
+}
+
+.property-control {
+    .properties-labels {
+        line-height:1rem;
+        max-height:3.4rem;
+        overflow:hidden;
+        .property-label {
+            display:inline-block;
+            margin-right:0.2rem;
+            margin-bottom:0.4rem;
         }
     }
 }

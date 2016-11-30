@@ -248,7 +248,7 @@ angular.module('RegistryClient')
                                 // push item to items.0
                                 if(response.data[report].data && queryType === 'read')
                                 {
-                                    response.data[report].data.items = {"0":response.data[report].data.item}
+                                    response.data[report].data.items = [response.data[report].data.item];
                                     // delete original
                                     delete response.data[report].data.item;
                                 }
@@ -347,7 +347,7 @@ angular.module('RegistryClient')
                     case 'read':
                         if (result[value].status === 'success' && (result[value].data.foundCount > 0 || queryType === 'read'))
                         {
-                            parsedResult[value] = {};
+                            parsedResult[value] = [];
                             angular.forEach(result[value].data.items, function(row, key2)
                             {
                                 if(options.joins !== undefined)
@@ -359,7 +359,7 @@ angular.module('RegistryClient')
                                         });
                                     }
                                 }
-                                parsedResult[value][key2] = row;
+                                parsedResult[value].push(row);
                             });
                             if(parsedResult.foundCount === undefined)
                                 parsedResult.foundCount = {};

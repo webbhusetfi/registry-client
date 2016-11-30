@@ -189,7 +189,6 @@ angular.module('RegistryClient')
                 .getProperties({"all":true})
                 .runQuery()
                 .then(function(response) {
-                    $log.log(response);
                     $scope.config.list.cols = $scope.getCols();
                     $scope.properties = response.properties;
                     $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
@@ -209,25 +208,6 @@ angular.module('RegistryClient')
     }
     
     /*
-    $scope.checkProperty = function(id)
-    {
-        var onIndex = Number($scope.params.withProperty.indexOf(id));
-        var offIndex = Number($scope.params.withoutProperty.indexOf(id));
-
-        if(onIndex == -1 && offIndex == -1)
-            $scope.params.withProperty.push(id);
-        else if(offIndex == -1)
-        {
-            $scope.params.withProperty.splice(onIndex,1);
-            $scope.params.withoutProperty.push(id);
-        }
-        else
-        {
-            $scope.params.withoutProperty.splice(offIndex,1);
-        }
-        $scope.init();
-    }
-
     if(globalParams.get('entryList'))
     {
         $scope.params = globalParams.get('entryList');
