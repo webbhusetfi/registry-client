@@ -1,7 +1,7 @@
 angular.module('RegistryClient')
     .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler) {
         return {
-            template: '<a class="btn btn-default" ng-csv="doCsvExport();" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Exportera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Exportera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
