@@ -2,6 +2,7 @@ angular.module('RegistryClient')
 .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, $timeout, globalParams, dialogHandler, dbHandler) {
     var userLevel = globalParams.get('user').role;
     $scope.config = {};
+    
     // base configuration
     $scope.config.typeselect = {
         "types": globalParams.static.types
@@ -20,77 +21,53 @@ angular.module('RegistryClient')
                     }
                 }
             },
-            "edit":"/entry/edit/[id]",
-            "custom":[{
-                "function": function(item) {
-                    globalParams.set('entryList', $scope.config.query);
-                    /*
-                    if(angular.isObject(params)) {
-                        if(Object.keys(params).length)
-                            globalParams.sendParams(params);
-                    }else{
-                        globalParams.sendParams(undefined);
-                    }
-                    */
-                    $location.path('/entry/list/' + item.id);
+            "custom":[
+                {
+                    "function": function(item) {
+                        globalParams.set('entryList', $scope.config.query);
+                        $location.path('/entry/edit/' + item.id);
+                    },
+                    "icon":"fa fa-pencil",
+                    "btnclass":"btn-primary"
                 },
-                "if": function(item) {
-                    if(item.type == 'MEMBER_PERSON')
-                        return false;
-                    else
-                        return true;
-                },
-                "icon":"fa fa-sign-in"
-            }]
+                {
+                    "function": function(item) {
+                        $location.path('/entry/list/' + item.id);
+                    },
+                    "if": function(item) {
+                        if(item.type == 'MEMBER_PERSON')
+                            return false;
+                        else
+                            return true;
+                    },
+                    "icon":"fa fa-sign-in"
+                }]
         }
     };
     
     // main query object
-    $scope.config.query = {
-        "service":"entry/search",
-        "arguments": {
-            "filter": {
-                "type":"ASSOCIATION",
-                "registry":globalParams.get('user.registry'),
-            },
-            "offset":0,
-            "limit":25,
-            "order": {
-                "name":"asc"
-            }
+    if(globalParams.get('entryList')) {
+        if(globalParams.get('entryList')) {
+            $scope.config.query = globalParams.get('entryList');
+            $scope.config.query.arguments.filter.registry = globalParams.get('user.registry');
+            globalParams.unset('entryList');
         }
-    };
-    
-    // set defaults for opened association, invokes watch & sets id
-    if($routeParams.id) {
-        $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
-    }
-    
-    // watch type to reset offset/limit
-    $scope.$watch('config.query.arguments.filter.type', function(value) {
-        $scope.config.query.arguments.offset = 0;
-        $scope.config.query.arguments.limit = 25;
-        $scope.config.query.arguments.filter = {
-            "type":$scope.config.query.arguments.filter.type,
-            "registry":globalParams.get('user').registry
-        }
-        if($routeParams.id) {
-            $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
-        }
-        switch(value) {
-            case 'ASSOCIATION':
-                $scope.config.query.arguments.order = {
+    }else{
+        $scope.config.query = {
+            "service":"entry/search",
+            "arguments": {
+                "filter": {
+                    "type":"ASSOCIATION",
+                    "registry":globalParams.get('user.registry'),
+                },
+                "offset":0,
+                "limit":25,
+                "order": {
                     "name":"asc"
                 }
-            break;
-            case 'MEMBER_PERSON':
-                $scope.config.query.arguments.order = {
-                    "lastName":"asc",
-                    "firstName":"asc"
-                }
-            break;
-        }
-    });
+            }
+        };
+    }
     
     // set include columns (separate from query, separate handler)
     $scope.setInclude = function(include) {
@@ -177,10 +154,36 @@ angular.module('RegistryClient')
         return _.merge(baseCols, typeCols, addCols);
     }
     
+    // default to MEMBER_PERSON when ASSOCIATION open and set parentEntry filter
+    if($routeParams.id) {
+        $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
+        $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
+    }    
+    
     // zero timeout for first load
     var time = 0;
     // watch query parameters and update
-    $scope.$watch('config', function(newQuery, oldQuery) {
+    $scope.$watch('config.query', function(newQuery, oldQuery) {
+        // reset some parameters in case of type change
+        if(oldQuery.arguments.filter.type) {
+            if(oldQuery.arguments.filter.type !== newQuery.arguments.filter.type) {
+                $scope.config.query.arguments.offset = 0;
+                $scope.config.query.arguments.limit = 25;
+                switch(newQuery.arguments.filter.type) {
+                    case 'ASSOCIATION':
+                        $scope.config.query.arguments.order = {
+                            "name":"asc"
+                        }
+                    break;
+                    case 'MEMBER_PERSON':
+                        $scope.config.query.arguments.order = {
+                            "lastName":"asc",
+                            "firstName":"asc"
+                        }
+                    break;
+                }
+            }
+        }
         if($scope.timeout)
             $timeout.cancel($scope.timeout);
         $scope.timeout = $timeout(function() {
@@ -200,132 +203,4 @@ angular.module('RegistryClient')
         }, time);
         time = 300;
     }, true);
-    
-    $scope.params = {};
-
-    if (globalParams.get('user').role == 'USER') {
-        $scope.params.type = 'MEMBER_PERSON';
-    }
-    
-    /*
-    if(globalParams.get('entryList'))
-    {
-        $scope.params = globalParams.get('entryList');
-        globalParams.unset('entryList');
-    }else{
-        $scope.params = {
-            "type": ((globalParams.get('user').role == 'USER') ? "MEMBER_PERSON":"ASSOCIATION"),
-            "limit":50,
-            "offset":0,
-            "withProperty":[],
-            "withoutProperty":[],
-            "additionals":[],
-            "includes":[],
-            "filter":{}
-        }
-    }
-
-    if($routeParams.id !== undefined)
-    {
-        $scope.params.type = "MEMBER_PERSON";
-        $scope.params.parentEntry = $routeParams.id;
-        $scope.params.orgId = $routeParams.id;
-    }
-    
-    $scope.init = function()
-    {
-        var entry_search = {
-                "name":"entrylist",
-                "include":$scope.params.includes,
-                "limit":$scope.params.limit,
-                "offset":$scope.params.offset,
-                "order": {
-                    "lastName":"asc",
-                    "firstName":"asc",
-                    "name":"asc"
-                }};
-        entry_search.filter = $scope.params.filter;
-        entry_search.filter.withProperty = $scope.params.withProperty;
-        entry_search.filter.withoutProperty = $scope.params.withoutProperty;
-        entry_search.filter.class = $scope.params.class;
-        entry_search.filter.type = $scope.params.type;
-        if(globalParams.get('user').role == 'USER') {
-            if($scope.params.type == 'ASSOCIATION') {
-                entry_search.filter.id = globalParams.get('user').entry;    
-            }else{
-                entry_search.filter.parentEntry = globalParams.get('user').entry;    
-            }
-        }else{
-            entry_search.filter.parentEntry = $scope.params.parentEntry;
-        }
-
-        dbHandler
-            .getEntry({
-                "name":"organization",
-                "id": $scope.params.orgId
-            })
-            .getProperties()
-            .setJoin({
-                "resource":"properties",
-                "service":"property/search",
-                "field":"id",
-                "equals":"propertyGroup",
-                "name":"children"
-            })
-            .getEntries(entry_search)
-            .runQuery()
-            .then(function(response) {
-                $scope.types = globalParams.static.types;
-                $scope.entrylist = response.entrylist;
-                $scope.organization = response.organization;
-                $scope.properties = response.properties;
-                $scope.foundCount = response.foundCount;
-
-                if(angular.isObject($scope.properties) && $scope.params.propertyGroup === undefined)
-                {
-                    angular.isObject($scope.properties[0])
-                        $scope.params.propertyGroup = String($scope.properties[0].id);
-                }
-
-                if($scope.foundCount.entrylist > 0)
-                {
-                    var active = $scope.params.offset/$scope.params.limit;
-                    var total = Math.ceil(Number($scope.foundCount.entrylist)/$scope.params.limit);
-
-                    if(total < 6)
-                    {
-                        var lower = 0;
-                        var upper = total;
-                    }else if(active > 4)
-                    {
-                        var lower = active - 4;
-                        var upper = active + 5 < total ? active + 5 : total;
-                    }else if(active > total - 5 && total > 10){
-                        var lower = total - 10;
-                        var upper = total;
-                    }else if(active < 5 && total > 9)
-                    {
-                        lower = 0;
-                        upper = 9;
-                    }else{
-                        var lower = 0;
-                        var upper = total;
-                    }
-
-                    var pagination = [];
-                    for(i = lower; i < upper; i++)
-                    {
-                        var page = {};
-                        page.name = i;
-                        if(i == active)
-                            page.class = 'active';
-                        pagination.push(page);
-                    }
-                }
-                $scope.pagination = pagination;
-            });
-    };
-
-    $scope.init();
-    */
 });
