@@ -20,10 +20,10 @@ angular.module('RegistryClient')
 
     var set = function(key, value)
     {
-        var stringValue = $window.sessionStorage.getItem('registryParams');
-        var jsonValue = $window.JSON.parse(stringValue) || {};
-
-        jsonValue[key] = value;
+        if(jsonValue = $window.JSON.parse($window.sessionStorage.getItem('registryParams')))
+            jsonValue = _.set(jsonValue, key, value);
+        else
+            jsonValue = _.set({}, key, value);
         $window.sessionStorage.setItem('registryParams', $window.JSON.stringify(jsonValue));
     }
 
