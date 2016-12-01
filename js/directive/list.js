@@ -20,6 +20,14 @@ angular.module('RegistryClient')
                     return link;
                 }
                 
+                // helper for sorting out function if
+                $scope.functionIf = function(key, value, item) {
+                    if(value.if)
+                        return _.invoke($scope.config, 'functions.custom[' + key + '].if', item);
+                    else
+                        return true;
+                }
+                
                 $scope.resolveValue = function(item, key) {
                     var values = key.split('.');
                     if(values.length > 1) {

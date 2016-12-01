@@ -30,7 +30,7 @@
                 <span ng-if="config.functions.custom">
                     <span ng-repeat="(key, value) in config.functions.custom">
                         <a
-                            ng-attr-ng-="functionIf(key, value, item)"
+                            ng-if="functionIf(key, value, item)"
                             class="btn btn-xs"
                             ng-class="value.btnclass ? value.btnclass : 'btn-default'"
                             ng-click="_.invoke(config, 'functions.custom[' + key + '].function', item);"
