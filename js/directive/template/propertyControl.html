@@ -11,10 +11,12 @@
             <div class="col-xs-9 properties-labels">
                 <a
                     ng-repeat="(key, value) in withProperty"
+                    ng-if="mapValue(value)"
                     ng-click="setProperties(value)"
                     class="label label-success property-label"
                 >{{ mapValue(value) }}</a><a
                     ng-repeat="(key, value) in withoutProperty"
+                    ng-if="mapValue(value)"
                     ng-click="setProperties(value)"
                     class="label label-danger property-label"
                 >{{ mapValue(value) }}</a>

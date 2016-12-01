@@ -10,16 +10,20 @@ angular.module('RegistryClient')
             },
             controller: function($scope) {
                 $scope._ = _;
-                $scope.withProperty = [];
-                $scope.withoutProperty = [];
+                $scope.withProperty = $scope.query.arguments.filter.withProperty || [];
+                $scope.withoutProperty = $scope.query.arguments.filter.withoutProperty || [];
                 $scope.selected = '0';
                 
                 $scope.mapValue = function(id) {
-                    return _.find(
+                    var text = _.find(
                             _.map(_.flatten(_.map($scope.properties, 'children')), function(value, key) {
                                 return {"k":value.id,"v":value.name}
                             }),
-                        {"k":id}).v;
+                        {"k":id});
+                    if(text)
+                        return text.v
+                    else
+                        return false;
                 }
                 
                 $scope.setProperties = function(value) {
