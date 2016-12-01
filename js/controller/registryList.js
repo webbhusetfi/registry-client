@@ -27,10 +27,19 @@ angular.module('RegistryClient')
                 },
                 "edit":"/registry/edit/[id]",
                 "custom":[{
-                    "directive":"xg-open-registry",
-                    "params": [
-                        "id"
-                    ]
+                    "function": function(item) {
+                        dbHandler
+                            .getConnectionTypes(item.id)
+                            .getRegistry({"id": item.id})
+                            .runQuery()
+                            .then(function(response) {
+                                globalParams.set('user.registry', item.id);
+                                globalParams.set('connectionTypes', response.connectionType);
+                                globalParams.set('registry', response.registry[0]);
+                                $location.path('entry/list');
+                            });
+                    },
+                    "icon":"fa fa-sign-in"
                 }]
             }
         },
