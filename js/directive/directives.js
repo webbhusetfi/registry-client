@@ -80,23 +80,4 @@ angular.module('RegistryClient')
                 });
             }
         }
-    })
-    .directive('xgCompile', function($log, $compile) {
-        return {
-            restrict: 'AEC',
-            scope: {
-                directive: '=',
-                model: '@',
-                params: '@',
-            },
-            controller: function($scope) {
-            },
-            link: function(scope, elem, attr) {
-                var str = '<' + scope.directive +
-                    (scope.model ? ' model="' + scope.model + '"' : null) +
-                    (scope.params ? ' params="' + scope.params + '"' : null) +
-                    + '></' + scope.directive + '>';
-                elem.replaceWith($compile(str)(scope.$parent));
-            }
-        }
     });
