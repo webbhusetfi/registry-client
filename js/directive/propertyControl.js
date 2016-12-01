@@ -15,15 +15,14 @@ angular.module('RegistryClient')
                 $scope.selected = '0';
                 
                 $scope.mapValue = function(id) {
-                    var text = _.find(
-                            _.map(_.flatten(_.map($scope.properties, 'children')), function(value, key) {
-                                return {"k":value.id,"v":value.name}
-                            }),
-                        {"k":id});
-                    if(text)
-                        return text.v
-                    else
+                    if($scope.properties === undefined)
                         return false;
+                    
+                    return _.find(
+                        _.map(_.flatten(_.map($scope.properties, 'children')), function(value, key) {
+                            return {"k":value.id,"v":value.name}
+                        }),
+                    {"k":id}).v;
                 }
                 
                 $scope.setProperties = function(value) {
