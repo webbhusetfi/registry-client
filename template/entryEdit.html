@@ -19,125 +19,130 @@
                                 <p class="form-text" ng-show="routeParams.id !== '-1' || globalParams.get('user').role === 'USER'">{{ entryTypes[entry.type] }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON' && entry.id">
-                            <label class="control-label col-sm-4">MedlemsID</label>
-                            <div class="col-sm-8">
-                                <p class="form-control-static">{{ entry.id }}</p>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
-                            <label class="control-label col-sm-4">Förnamn</label>
-                            <div class="col-sm-8">
-                                <input class="form-control" ng-model="entry.firstName" placeholder="Förnamn" type="text">
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
-                            <label class="control-label col-sm-4">Efternamn</label>
-                            <div class="col-sm-8">
-                                <input class="form-control" ng-model="entry.lastName" placeholder="Efternamn" type="text">
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="entry.type == 'ASSOCIATION'">
-                            <label class="control-label col-sm-4">Namn</label>
-                            <div class="col-sm-8">
-                                <input class="form-control" ng-model="entry.name" placeholder="Namn" type="text">
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
-                            <label class="control-label col-sm-4">Födelseår</label>
-                            <div class="col-sm-8">
-                                <div class="row">
-                                    <div class="col-xs-4">
-                                        <div class="input-group">
-                                            <input
-                                                placeholder="År"
-                                                type="text"
-                                                class="form-control"
-                                                uib-datepicker-popup="yyyy" 
-                                                ng-model="meta.birthYear"
-                                                is-open="meta.birthyearOpen"
-                                                min-mode="'year'"
-                                                ng-required="false"
-                                                ng-change="setCalTime('YYYY', meta.birthYear, entry.birthYear);"
-                                                close-text="Stäng" />
-                                            <span class="input-group-btn">
-                                                <button
-                                                    class="btn btn-default"
-                                                    ng-click="meta.birthyearOpen = true"
-                                                >
-                                                    <i class="fa fa-calendar"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-4">
-                                        <div class="input-group">
-                                            <input
-                                                placeholder="Månad"
-                                                type="text"
-                                                class="form-control"
-                                                uib-datepicker-popup="M" 
-                                                ng-model="meta.birthMonth"
-                                                init-date="meta.birthMonth" 
-                                                is-open="meta.birthmonthOpen"
-                                                max-mode="'month'"
-                                                min-mode="'month'"
-                                                ng-required="false"
-                                                ng-change="setCalTime('MM', meta.birthMonth, entry.birthMonth);"
-                                                close-text="Stäng" />
-                                            <span class="input-group-btn">
-                                                <button
-                                                    class="btn btn-default"
-                                                    ng-click="meta.birthmonthOpen = true"
-                                                >
-                                                    <i class="fa fa-calendar"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-3">
-                                        <div class="input-group">
-                                            <input
-                                                placeholder="Dag"
-                                                type="text"
-                                                class="form-control"
-                                                uib-datepicker-popup="d" 
-                                                ng-model="meta.birthDate"
-                                                init-date="meta.birthDate" 
-                                                is-open="meta.birthDateOpen"
-                                                max-mode="'day'"
-                                                min-mode="'day'"
-                                                ng-required="false"
-                                                ng-change="setCalTime('DD', meta.birthDate, entry.birthDate);"
-                                                close-text="Stäng" />
-                                            <span class="input-group-btn">
-                                                <button
-                                                    class="btn btn-default"
-                                                    ng-click="meta.birthDateOpen = true"
-                                                >
-                                                    <i class="fa fa-calendar"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-1">
-                                        <span class="label label-info" ng-show="age(meta.birthYear, meta.birthMonth, meta.birthDate)">
-                                            {{ age(meta.birthYear, meta.birthMonth, meta.birthDate) }}
-                                        </span>
-                                    </div>
+                        <div ng-show="entry.type == 'ASSOCIATION'">
+                            <div class="form-group" ng-show="entry.type == 'ASSOCIATION'">
+                                <label class="control-label col-sm-4">Namn</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" ng-model="entry.name" placeholder="Namn" type="text">
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" ng-show="entry.type == 'MEMBER_PERSON'">
-                            <label class="control-label col-sm-4">Kön</label>
-                            <div class="col-sm-8">
-                                <select class="form-control" ng-model="entry.gender">
-                                    <option value="">-</option>
-                                    <option value="FEMALE">Kvinna</option>
-                                    <option value="MALE">Man</option>
-                                </select>
+                        <div ng-show="entry.type == 'MEMBER_PERSON'">
+                            <div class="form-group" ng-show="entry.id">
+                                <label class="control-label col-sm-4">MedlemsID</label>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static">{{ entry.id }}</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Förnamn</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" ng-model="entry.firstName" placeholder="Förnamn" type="text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Efternamn</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" ng-model="entry.lastName" placeholder="Efternamn" type="text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Födelseår</label>
+                                <div class="col-sm-8">
+                                    <div class="row">
+                                        <div class="col-xs-4">
+                                            <div class="input-group">
+                                                <input
+                                                    placeholder="År"
+                                                    type="text"
+                                                    class="form-control"
+                                                    uib-datepicker-popup="yyyy" 
+                                                    ng-model="meta.birthYear"
+                                                    is-open="meta.birthyearOpen"
+                                                    min-mode="'year'"
+                                                    ng-required="false"
+                                                    ng-change="setCalTime('YYYY', meta.birthYear, entry.birthYear);"
+                                                    close-text="Stäng" />
+                                                <span class="input-group-btn">
+                                                    <button
+                                                        class="btn btn-default"
+                                                        ng-click="meta.birthyearOpen = true"
+                                                    >
+                                                        <i class="fa fa-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <div class="input-group">
+                                                <input
+                                                    placeholder="Månad"
+                                                    type="text"
+                                                    class="form-control"
+                                                    uib-datepicker-popup="M" 
+                                                    ng-model="meta.birthMonth"
+                                                    init-date="meta.birthMonth" 
+                                                    is-open="meta.birthmonthOpen"
+                                                    max-mode="'month'"
+                                                    min-mode="'month'"
+                                                    ng-required="false"
+                                                    ng-change="setCalTime('MM', meta.birthMonth, entry.birthMonth);"
+                                                    close-text="Stäng" />
+                                                <span class="input-group-btn">
+                                                    <button
+                                                        class="btn btn-default"
+                                                        ng-click="meta.birthmonthOpen = true"
+                                                    >
+                                                        <i class="fa fa-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3">
+                                            <div class="input-group">
+                                                <input
+                                                    placeholder="Dag"
+                                                    type="text"
+                                                    class="form-control"
+                                                    uib-datepicker-popup="d" 
+                                                    ng-model="meta.birthDate"
+                                                    init-date="meta.birthDate" 
+                                                    is-open="meta.birthDateOpen"
+                                                    max-mode="'day'"
+                                                    min-mode="'day'"
+                                                    ng-required="false"
+                                                    ng-change="setCalTime('DD', meta.birthDate, entry.birthDate);"
+                                                    close-text="Stäng" />
+                                                <span class="input-group-btn">
+                                                    <button
+                                                        class="btn btn-default"
+                                                        ng-click="meta.birthDateOpen = true"
+                                                    >
+                                                        <i class="fa fa-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-1">
+                                            <span class="label label-info" ng-show="age(meta.birthYear, meta.birthMonth, meta.birthDate)">
+                                                {{ age(meta.birthYear, meta.birthMonth, meta.birthDate) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Kön</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="entry.gender">
+                                        <option value="">-</option>
+                                        <option value="FEMALE">Kvinna</option>
+                                        <option value="MALE">Man</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
+                        <hr>
                         <div>
                             <h2>Tillhörighet</h2>
                             <div class="membership-list" ng-show="entry.connection !== undefined">
