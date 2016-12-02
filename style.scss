@@ -7,7 +7,10 @@
 @import '_defaults';
 
 $palette-color2:#337ab7;
-$base-font-family:Lato, Arial, Tahoma, Sans-serif;
+$base-font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+$base-font-family-headers:Lato, Arial, Tahoma, Sans-serif;
+$base-font-size:1.4rem;
+$base-line-height:1.8rem;
 
 @import 'Template/_compatibility';
 @import 'Template/_bootstrap-row-height';
