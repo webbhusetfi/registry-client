@@ -1,0 +1,7 @@
+angular.module('RegistryClient')
+.controller('pageController',  function ($scope, $location, $log) {
+    if($location.path().trim('/') == '/user/login')
+        $scope.layout = 'login';
+    else
+        $scope.layout = 'default';
+});
