@@ -30,6 +30,7 @@
         <script type="text/javascript" src="js/directive/limiter.js"></script>
         <script type="text/javascript" src="js/directive/listCount.js"></script>
         <script type="text/javascript" src="js/directive/propertyControl.js"></script>
+        <script type="text/javascript" src="js/controller/pageController.js"></script>
         <script type="text/javascript" src="js/controller/navigation.js"></script>
         <script type="text/javascript" src="js/controller/statView.js"></script>
         <script type="text/javascript" src="js/controller/registryList.js"></script>
@@ -51,7 +52,24 @@
         <!-- /build -->
         <link rel="stylesheet" type="text/css" href="style.css"/>
     </head>
-    <body>
-        <div ng-view class="main"></div>
+    <body ng-controller="pageController">
+        <div ng-if="layout == 'login'">
+            <div ng-view class="main"></div>
+        </div>
+        <div ng-if="layout == 'default'" class="main">
+            <div class="outer-section">
+                <div ng-include="'/template/topbar.html'"></div>
+                <div class="inner-section container-fluid">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
+                        </div>
+                        <div class="col-xs-offset-2 col-xs-10 mainList-ct">
+                            <div ng-view class="main"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

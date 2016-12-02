@@ -1,18 +1,6 @@
-<div class="outer-section">
-    <div ng-include="'/template/topbar.html'"></div>
-    <div class="inner-section container-fluid">
-        <div class="row">
-            <div class="col-xs-2">
-                <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
-            </div>
-            <div class="col-xs-offset-2 col-xs-10 mainList-ct">
-                <div ng-include="'/template/registryListMenu.html'"></div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <xg-list resource="resource" config="config.list" query="config.query"></xg-list>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div ng-include="'/template/registryListMenu.html'"></div>
+<div class="row">
+    <div class="col-sm-12">
+        <xg-list resource="resource" config="config.list" query="config.query"></xg-list>
     </div>
 </div>

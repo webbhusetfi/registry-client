@@ -36,7 +36,7 @@ angular.module('RegistryClient')
                                 globalParams.set('user.registry', item.id);
                                 globalParams.set('connectionTypes', response.connectionType);
                                 globalParams.set('registry', response.registry[0]);
-                                $location.path('entry/list');
+                                $window.location.href = 'entry/list';
                             });
                     },
                     "icon":"fa fa-sign-in"
@@ -65,7 +65,7 @@ angular.module('RegistryClient')
                 })
                 .catch(function(response) {
                     $log.error(response);
-                    $location.path('/user/logout');
+                    $window.location.href = '/user/logout';
                 });
         }, time);
         time = 200;

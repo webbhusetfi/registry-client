@@ -1,7 +1,19 @@
 <div class="mainNav" ng-controller="navigation">
     <ul>
-        <li>
+        <li ng-show="user.role == 'SUPER_ADMIN'">
             <a xg-href="/registry/list">
+                <i class="fa fa-cubes"></i>
+                <span class="hidden-xs hidden-sm"> Register</span>
+            </a>
+        </li>
+        <li ng-show="user.role == 'ADMIN'">
+            <a xg-href="/entry/list">
+                <i class="fa fa-cubes"></i>
+                <span class="hidden-xs hidden-sm"> Register</span>
+            </a>
+        </li>
+        <li ng-show="user.role == 'USER'">
+            <a xg-href="/entry/list/{{ globalParams.get('user.entry') }}">
                 <i class="fa fa-cubes"></i>
                 <span class="hidden-xs hidden-sm"> Register</span>
             </a>

@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('userLogin', function($scope, $http, $resource, $location, $log, globalParams, dbHandler) {
+.controller('userLogin', function($scope, $http, $resource, $window, $log, globalParams, dbHandler) {
     $scope.loginform = {};
     $scope.loginform.user = {};
     $scope.loginform.password = {};
@@ -19,7 +19,7 @@ angular.module('RegistryClient')
                     $scope.message = response.message;
                 }else{
                     if(response.role == 'SUPER_ADMIN')
-                        $location.path('/registry/list');
+                        $window.location.href = '/registry/list';
                     else{
                         dbHandler
                             .getConnectionTypes()
@@ -30,8 +30,11 @@ angular.module('RegistryClient')
                                 {
                                     var user = globalParams.get('user');
                                     globalParams.set('connectionTypes', response.connectionType);
-                                    globalParams.set('registry', response.registry[0]);  
-                                    $location.path('entry/list');
+                                    globalParams.set('registry', response.registry[0]);
+                                    if(user.role == 'USER')
+                                        $window.location.href = 'entry/list/' + user.entry;
+                                    else
+                                        $window.location.href = 'entry/list'
                                 }else{
                                     $scope.message = 'Fatal error.';
                                 }

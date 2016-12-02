@@ -1,198 +1,188 @@
-<div class="outer-section">
-    <div ng-include="'/template/topbar.html'"></div>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xs-2">
-                <div class="mainNav-ct" ng-include="'/template/mainNav.html'"></div>
-            </div>
-            <div class="col-xs-10 mainList-ct">
-                <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
-                    <div class="inner-form">
-                        <div class="functions"><xg-back/></div>
-                        <form class="form-horizontal" name="invoiceForm">
-                            <div class="form-group" ng-show="invoice.id">
-                                <label class="control-label col-sm-4">ID</label>
-                                <div class="col-sm-8">
-                                    <p class="form-control-static">{{ invoice.id }}</p>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-class="{ 'has-error' : invoiceForm.name.$invalid && invoiceForm.name.$touched }">
-                                <label class="control-label col-sm-4">Namn</label>
-                                <div class="col-sm-8">
-                                    <input 
-                                           class="form-control" 
-                                           name="name" 
-                                           ng-model="invoice.name" 
-                                           placeholder="Namn" 
-                                           type="text" 
-                                           ng-required="true">
-                                    <p ng-show="invoiceForm.name.$invalid && invoiceForm.name.$touched" class="help-block">Ett namn är obligatoriskt</p>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-show="role_admin" ng-class="{ 'has-error' : invoiceForm.entry.$invalid && invoiceForm.entry.$touched }">
-                                <label class="control-label col-sm-4">Fakturerare</label>
-                                <div class="col-sm-8">
-                                    <select 
-                                            ng-options="org.id as org.name group by org.type for org in orgs" 
-                                            ng-model="invoice.entry" 
-                                            class="form-control" 
-                                            ng-required="true" 
-                                            ng-show="orgs.length"
-                                            name="entry">
-                                    </select>
-                                    <p ng-show="invoiceForm.entry.$invalid && invoiceForm.entry.$touched" class="help-block">Ange fakturerare</p>
-                                    <div ng-show="!orgs.length">
-                                        <br />
-                                        <div class="alert alert-danger">
-                                            Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-show="!role_admin">
-                                <label class="control-label col-sm-4">Fakturerare</label>
-                                <div class="col-sm-8">
-                                    {{ suborg.name }} ({{ suborg.id }})
-                                </div>
-                                <div ng-show="!orgs.length">
-                                    <br />
-                                    <div class="alert alert-danger">
-                                        Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
-                                    </div>
-                                </div>
-                            </div>
-                           <div class="form-group" ng-class="{ 'has-error' : invoiceForm.dueAt.$invalid && invoiceForm.dueAt.$touched }">
-                                <label class="control-label col-sm-4">Förfallodag</label>
-                                <div class="col-sm-8">
-                                    <div class="input-group">
-                                        <input
-                                            placeholder="Förfallodatum"
-                                            name="dueAt"
-                                            type="text"
-                                            class="form-control"
-                                            uib-datepicker-popup="dd.MM.yyyy" 
-                                            aaaaaaaaaaaaaa-ng-model-options="{allowInvalid: true}"
-                                            init-date="today"
-                                            ng-model="invoice.dueAt"
-                                            is-open="form.dueAtOpen"
-                                           ng-required="true"
-                                            close-text="Stäng" />
-                                        <span class="input-group-btn">
-                                            <button
-                                                class="btn btn-default"
-                                                ng-click="form.dueAtOpen = true">
-                                                <i class="fa fa-calendar"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <p ng-show="invoiceForm.dueAt.$invalid && invoiceForm.dueAt.$touched" class="help-block">Ange förfallodatum</p>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-class="{ 'has-error' : invoiceForm.amount.$invalid && invoiceForm.amount.$touched }">
-                                <label class="control-label col-sm-4">Summa</label>
-                                <div class="col-sm-8">
-                                    <input 
-                                           class="form-control" 
-                                           ng-required="true" 
-                                           ng-model="invoice.amount" 
-                                           placeholder="Summa" 
-                                           type="text" 
-                                           name="amount">
-                                    <p ng-show="invoiceForm.amount.$invalid && invoiceForm.amount.$touched" class="help-block">Summan är obligatorisk</p>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-class="{ 'has-error' : invoiceForm.bank.$invalid && invoiceForm.bank.$touched }">
-                                <label class="control-label col-sm-4">Bank</label>
-                                <div class="col-sm-8">
-                                    <input 
-                                           class="form-control" 
-                                           ng-required="true" 
-                                           ng-model="invoice.bank" 
-                                           placeholder="Bank" 
-                                           type="text" 
-                                           name="bank">
-                                    <p ng-show="invoiceForm.bank.$invalid && invoiceForm.bank.$touched" class="help-block">Bank är obligatorisk</p>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-class="{ 'has-error' : invoiceForm.bankAccount.$invalid && invoiceForm.bankAccount.$touched }">
-                                <label class="control-label col-sm-4">Bankkonto (IBAN)</label>
-                                <div class="col-sm-8">
-                                    <input 
-                                           class="form-control" 
-                                           ng-model="invoice.bankAccount" 
-                                           placeholder="Bankkonto" 
-                                           type="text" 
-                                           ng-required="true"
-                                           name="bankAccount">
-                                    <p ng-show="invoiceForm.bankAccount.$invalid && invoiceForm.bankAccount.$touched" class="help-block">Bankkonto är obligatorisk</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4">VAT</label>
-                                <div class="col-sm-8">
-                                    <input 
-                                           class="form-control" 
-                                           ng-model="invoice.vat" 
-                                           placeholder="VAT" 
-                                           type="text" 
-                                           name="vat">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4">Meddelande</label>
-                                <div class="col-sm-8">
-                                    <textarea 
-                                              class="form-control" 
-                                              placeholder="Meddelande" 
-                                              ng-model="invoice.message" 
-                                              rows="2"
-                                              name="message">
-                                    </textarea>
-                                    <p class="help-block">Meddelande till fakturorna</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4">Info / beskrivning</label>
-                                <div class="col-sm-8">
-                                    <textarea 
-                                        class="form-control" 
-                                        placeholder="Beskrivning" 
-                                        ng-model="invoice.description" 
-                                        rows="5"
-                                        name="description">
-                                    </textarea>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-show="invoice.id">
-                                <label class="control-label col-sm-4">Skapad</label>
-                                <div class="col-sm-8">
-                                    <p class="form-control-static">{{ invoice.createdAt | date:'d.M.yyyy HH:mm' }}</p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div ng-show="invoice.id !== undefined">
-                                        <a
-                                            class="btn btn-default"
-                                            ng-click="deleteInvoice({'id':invoice.id,'name':invoice.name, 'post':{'action':'back'}})">
-                                            <i class="fa fa-times"></i> Radera
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 text-right">
-                                    <xg-cancel></xg-cancel>
-                                    <button 
-                                        type="submit" 
-                                        class="btn btn-default" 
-                                        ng-click="submit()">
-                                        <i class="fa fa-save"></i> Spara
-                                    </button>
-                                </div>
-                            </div>            
-                        </form>
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
+        <div class="inner-form">
+            <div class="functions"><xg-back/></div>
+            <form class="form-horizontal" name="invoiceForm">
+                <div class="form-group" ng-show="invoice.id">
+                    <label class="control-label col-sm-4">ID</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-static">{{ invoice.id }}</p>
                     </div>
                 </div>
-            </div>
+                <div class="form-group" ng-class="{ 'has-error' : invoiceForm.name.$invalid && invoiceForm.name.$touched }">
+                    <label class="control-label col-sm-4">Namn</label>
+                    <div class="col-sm-8">
+                        <input 
+                               class="form-control" 
+                               name="name" 
+                               ng-model="invoice.name" 
+                               placeholder="Namn" 
+                               type="text" 
+                               ng-required="true">
+                        <p ng-show="invoiceForm.name.$invalid && invoiceForm.name.$touched" class="help-block">Ett namn är obligatoriskt</p>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="role_admin" ng-class="{ 'has-error' : invoiceForm.entry.$invalid && invoiceForm.entry.$touched }">
+                    <label class="control-label col-sm-4">Fakturerare</label>
+                    <div class="col-sm-8">
+                        <select 
+                                ng-options="org.id as org.name group by org.type for org in orgs" 
+                                ng-model="invoice.entry" 
+                                class="form-control" 
+                                ng-required="true" 
+                                ng-show="orgs.length"
+                                name="entry">
+                        </select>
+                        <p ng-show="invoiceForm.entry.$invalid && invoiceForm.entry.$touched" class="help-block">Ange fakturerare</p>
+                        <div ng-show="!orgs.length">
+                            <br />
+                            <div class="alert alert-danger">
+                                Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="!role_admin">
+                    <label class="control-label col-sm-4">Fakturerare</label>
+                    <div class="col-sm-8">
+                        {{ suborg.name }} ({{ suborg.id }})
+                    </div>
+                    <div ng-show="!orgs.length">
+                        <br />
+                        <div class="alert alert-danger">
+                            Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
+                        </div>
+                    </div>
+                </div>
+               <div class="form-group" ng-class="{ 'has-error' : invoiceForm.dueAt.$invalid && invoiceForm.dueAt.$touched }">
+                    <label class="control-label col-sm-4">Förfallodag</label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input
+                                placeholder="Förfallodatum"
+                                name="dueAt"
+                                type="text"
+                                class="form-control"
+                                uib-datepicker-popup="dd.MM.yyyy" 
+                                aaaaaaaaaaaaaa-ng-model-options="{allowInvalid: true}"
+                                init-date="today"
+                                ng-model="invoice.dueAt"
+                                is-open="form.dueAtOpen"
+                               ng-required="true"
+                                close-text="Stäng" />
+                            <span class="input-group-btn">
+                                <button
+                                    class="btn btn-default"
+                                    ng-click="form.dueAtOpen = true">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <p ng-show="invoiceForm.dueAt.$invalid && invoiceForm.dueAt.$touched" class="help-block">Ange förfallodatum</p>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : invoiceForm.amount.$invalid && invoiceForm.amount.$touched }">
+                    <label class="control-label col-sm-4">Summa</label>
+                    <div class="col-sm-8">
+                        <input 
+                               class="form-control" 
+                               ng-required="true" 
+                               ng-model="invoice.amount" 
+                               placeholder="Summa" 
+                               type="text" 
+                               name="amount">
+                        <p ng-show="invoiceForm.amount.$invalid && invoiceForm.amount.$touched" class="help-block">Summan är obligatorisk</p>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : invoiceForm.bank.$invalid && invoiceForm.bank.$touched }">
+                    <label class="control-label col-sm-4">Bank</label>
+                    <div class="col-sm-8">
+                        <input 
+                               class="form-control" 
+                               ng-required="true" 
+                               ng-model="invoice.bank" 
+                               placeholder="Bank" 
+                               type="text" 
+                               name="bank">
+                        <p ng-show="invoiceForm.bank.$invalid && invoiceForm.bank.$touched" class="help-block">Bank är obligatorisk</p>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : invoiceForm.bankAccount.$invalid && invoiceForm.bankAccount.$touched }">
+                    <label class="control-label col-sm-4">Bankkonto (IBAN)</label>
+                    <div class="col-sm-8">
+                        <input 
+                               class="form-control" 
+                               ng-model="invoice.bankAccount" 
+                               placeholder="Bankkonto" 
+                               type="text" 
+                               ng-required="true"
+                               name="bankAccount">
+                        <p ng-show="invoiceForm.bankAccount.$invalid && invoiceForm.bankAccount.$touched" class="help-block">Bankkonto är obligatorisk</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">VAT</label>
+                    <div class="col-sm-8">
+                        <input 
+                               class="form-control" 
+                               ng-model="invoice.vat" 
+                               placeholder="VAT" 
+                               type="text" 
+                               name="vat">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Meddelande</label>
+                    <div class="col-sm-8">
+                        <textarea 
+                                  class="form-control" 
+                                  placeholder="Meddelande" 
+                                  ng-model="invoice.message" 
+                                  rows="2"
+                                  name="message">
+                        </textarea>
+                        <p class="help-block">Meddelande till fakturorna</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Info / beskrivning</label>
+                    <div class="col-sm-8">
+                        <textarea 
+                            class="form-control" 
+                            placeholder="Beskrivning" 
+                            ng-model="invoice.description" 
+                            rows="5"
+                            name="description">
+                        </textarea>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="invoice.id">
+                    <label class="control-label col-sm-4">Skapad</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-static">{{ invoice.createdAt | date:'d.M.yyyy HH:mm' }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div ng-show="invoice.id !== undefined">
+                            <a
+                                class="btn btn-default"
+                                ng-click="deleteInvoice({'id':invoice.id,'name':invoice.name, 'post':{'action':'back'}})">
+                                <i class="fa fa-times"></i> Radera
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <xg-cancel></xg-cancel>
+                        <button 
+                            type="submit" 
+                            class="btn btn-default" 
+                            ng-click="submit()">
+                            <i class="fa fa-save"></i> Spara
+                        </button>
+                    </div>
+                </div>            
+            </form>
         </div>
     </div>
 </div>
