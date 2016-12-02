@@ -39,9 +39,11 @@ angular.module('RegistryClient')
                 target:'='
             },
             replace:true,
-            template:'<input type="text" class="form-control"/>',
+            template:'<input type="text" class="form-control" value="{{value}}"/>',
             controller: function($scope) {
-                $scope.key;
+                $log.log($scope.query.arguments.filter);
+                $log.log($scope.target);
+                $scope.value = _.get($scope.query.arguments.filter, $scope.target);
             },
             link: function(scope, elem, attr) {
                 elem.on('keyup', function(event) {
