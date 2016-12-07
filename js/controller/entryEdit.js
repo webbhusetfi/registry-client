@@ -198,14 +198,7 @@ angular.module('RegistryClient')
                 "type":"UNION",
             }
         })
-        .getProperties()
-        .setJoin({
-            "resource":"properties",
-            "service":"property/search",
-            "field":"id",
-            "equals":"propertyGroup",
-            "name":"children"
-        });
+        .getProperties({"all":"true"});
 
     $scope.init = function() {
         if($routeParams.id == '-1')
@@ -401,6 +394,7 @@ angular.module('RegistryClient')
                     angular.forEach($scope.entry.address, function(values, key) {
                         address['contactsheet' + key] = {};
                         address['contactsheet' + key].arguments = {
+                            "class": values.class,
                             "name": values.name,
                             "street": values.street,
                             "postalCode": values.postalCode,
@@ -440,7 +434,7 @@ angular.module('RegistryClient')
                         });
                         dbHandler
                             .setQuery(addressDelete); 
-                    }                    
+                    }
 
                     dbHandler
                         .runQuery()
