@@ -31,9 +31,11 @@
                                 class="form-control" 
                                 ng-required="true" 
                                 ng-show="orgs.length"
-                                name="entry">
+                                name="entry"
+                                ng-change="addBankInfo()">
                         </select>
                         <p ng-show="invoiceForm.entry.$invalid && invoiceForm.entry.$touched" class="help-block">Ange fakturerare</p>
+                        <p class="alert alert-info help-block">Bank och kontonr. förifylls baserat på fakturerare.</p>
                         <div ng-show="!orgs.length">
                             <br />
                             <div class="alert alert-danger">
@@ -46,12 +48,13 @@
                     <label class="control-label col-sm-4">Fakturerare</label>
                     <div class="col-sm-8">
                         {{ suborg.name }} ({{ suborg.id }})
-                    </div>
-                    <div ng-show="!orgs.length">
-                        <br />
-                        <div class="alert alert-danger">
-                            Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
+                        <div ng-show="!orgs.length">
+                            <br />
+                            <div class="alert alert-danger">
+                                Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
+                            </div>
                         </div>
+                        <p class="alert alert-info help-block">Bank och kontonr. förifylls baserat på fakturerare.</p>
                     </div>
                 </div>
                <div class="form-group" ng-class="{ 'has-error' : invoiceForm.dueAt.$invalid && invoiceForm.dueAt.$touched }">
@@ -64,7 +67,6 @@
                                 type="text"
                                 class="form-control"
                                 uib-datepicker-popup="dd.MM.yyyy" 
-                                aaaaaaaaaaaaaa-ng-model-options="{allowInvalid: true}"
                                 init-date="today"
                                 ng-model="invoice.dueAt"
                                 is-open="form.dueAtOpen"
@@ -132,28 +134,30 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-4">Meddelande</label>
-                    <div class="col-sm-8">
-                        <textarea 
-                                  class="form-control" 
-                                  placeholder="Meddelande" 
-                                  ng-model="invoice.message" 
-                                  rows="2"
-                                  name="message">
-                        </textarea>
-                        <p class="help-block">Meddelande till fakturorna</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4">Info / beskrivning</label>
+                    <label class="control-label col-sm-4">Fakturans meddelande</label>
                     <div class="col-sm-8">
                         <textarea 
                             class="form-control" 
                             placeholder="Beskrivning" 
                             ng-model="invoice.description" 
-                            rows="5"
+                            rows="2"
+                            maxlength="255"
                             name="description">
                         </textarea>
+                        <p class="help-block">Meddelande på fakturan. Maximal synlig längd är ca. 70 tecken.</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Info</label>
+                    <div class="col-sm-8">
+                        <textarea 
+                                  class="form-control" 
+                                  placeholder="Meddelande" 
+                                  ng-model="invoice.message" 
+                                  rows="15"
+                                  name="message">
+                        </textarea>
+                        <p class="help-block">Längre meddelande på fakturan. Maximal synlig längd är ca. 25 rader.</p>
                     </div>
                 </div>
                 <div class="form-group" ng-show="invoice.id">
@@ -163,7 +167,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div ng-show="invoice.id !== undefined">
                             <a
                                 class="btn btn-default"
@@ -172,8 +176,14 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-sm-6 text-right">
+                    <div class="col-sm-8 text-right">
                         <xg-cancel></xg-cancel>
+                        <button 
+                            ng-show="invoice.id"
+                            class="btn btn-default" 
+                            ng-click="preview()">
+                            <i class="fa fa-search"></i> Förhandsgranska
+                        </button>
                         <button 
                             type="submit" 
                             class="btn btn-default" 
