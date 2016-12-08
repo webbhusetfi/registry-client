@@ -24,7 +24,8 @@ angular.module('RegistryClient')
             "custom":[
                 {
                     "function": function(item) {
-                        globalParams.set('entryList', $scope.config.query);
+                        globalParams.set('entryList.query', $scope.config.query);
+                        globalParams.set('entryList.include', $scope.config.include);
                         $location.path('/entry/edit/' + item.id);
                     },
                     "icon":"fa fa-pencil",
@@ -45,10 +46,31 @@ angular.module('RegistryClient')
         }
     };
     
+    // set include columns (separate from query, separate handler)
+    $scope.setInclude = function(include) {
+        if($scope.config.include == include) {
+            $scope.config.include = null;
+            delete $scope.config.query.arguments.include;
+        }else{
+            $scope.config.include = include;
+            $scope.config.query.arguments.include = ['address'];
+        }
+    }
+    
+    // toggle empty parent value
+    $scope.toggleParent = function() {
+        $log.log('asdf');
+        if($scope.config.query.arguments.filter.parentEntry === null)
+            delete $scope.config.query.arguments.filter.parentEntry;
+        else
+            $scope.config.query.arguments.filter.parentEntry = null;
+    }
+    
     // main query object
     if(globalParams.get('entryList')) {
         if(globalParams.get('entryList')) {
-            $scope.config.query = globalParams.get('entryList');
+            $scope.config.query = globalParams.get('entryList.query');
+            $scope.setInclude(globalParams.get('entryList.include'));
             $scope.config.query.arguments.filter.registry = globalParams.get('user.registry');
             globalParams.unset('entryList');
         }
@@ -67,17 +89,6 @@ angular.module('RegistryClient')
                 }
             }
         };
-    }
-    
-    // set include columns (separate from query, separate handler)
-    $scope.setInclude = function(include) {
-        if($scope.config.include == include) {
-            $scope.config.include = null;
-            delete $scope.config.query.arguments.include;
-        }else{
-            $scope.config.include = include;
-            $scope.config.query.arguments.include = ['address'];
-        }
     }
     
     // function for dynamic columns

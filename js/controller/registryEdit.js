@@ -16,7 +16,6 @@ angular.module('RegistryClient')
             })
             .runQuery()
             .then(function(response) {
-                $log.log(response);
                 $scope.registry = response.registry[0];
             })
             .catch(function(response) {

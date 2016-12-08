@@ -27,8 +27,8 @@
                     <a
                         class="btn btn-default"
                         ng-show="globalParams.get('user').role !== 'USER'"
-                        ng-click="toggleParent()"
-                        ng-class="{'active' : params.parentEntry === null }"
+                        ng-click="toggleParent();"
+                        ng-class="{'active' : config.query.arguments.filter.parentEntry === null }"
                         >Saknar tillhörighet
                     </a>
                 </div>

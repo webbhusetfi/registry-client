@@ -41,8 +41,6 @@ angular.module('RegistryClient')
             replace:true,
             template:'<input type="text" class="form-control" value="{{value}}"/>',
             controller: function($scope) {
-                $log.log($scope.query.arguments.filter);
-                $log.log($scope.target);
                 $scope.value = _.get($scope.query.arguments.filter, $scope.target);
             },
             link: function(scope, elem, attr) {
