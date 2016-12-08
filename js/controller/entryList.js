@@ -59,7 +59,6 @@ angular.module('RegistryClient')
     
     // toggle empty parent value
     $scope.toggleParent = function() {
-        $log.log('asdf');
         if($scope.config.query.arguments.filter.parentEntry === null)
             delete $scope.config.query.arguments.filter.parentEntry;
         else
