@@ -1,12 +1,13 @@
 var regApp = angular
     .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv', 'ngPDFKit', 'ngFileSaver'])
     .constant('_', window._)
-    .run(function($window, $log, $rootScope, editableOptions, globalParams) {
+    .run(function($window, $log, $rootScope, loadOverlay, editableOptions, globalParams) {
         if(typeof($window._) == 'function')
             $rootScope._ = $window._;
         else
             $rootScope._ = false;
         editableOptions.theme = 'bs3';
+        loadOverlay.init();
     })
     .config(function($httpProvider, $routeProvider, $locationProvider) {
         $httpProvider.defaults.headers.post['Content-Type'] = 'application/json; charset=UTF-8';

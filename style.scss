@@ -50,6 +50,26 @@ body {
         }
     }
     overflow-x:hidden;
+    > .load-overlay {
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(255,255,255,0.6);
+        z-index:2;
+        opacity:1;
+        pointer-events:auto;
+        @include defaultTransition();
+        &.inactive {
+            opacity:0;
+            pointer-events:none;
+        }
+        > i {
+            @include center();
+            color:#aaaaaa;
+        }
+    }
 }
 
 h1, h2, h3 { font-weight:300; }

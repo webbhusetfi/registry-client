@@ -32,6 +32,7 @@ module.exports = function(grunt) {
                     'js/factory/db.js',
                     'js/factory/dialog.js',
                     'js/factory/globalParams.js',
+                    'js/factory/loadOverlay.js',
                     'js/directive/directives.js',
                     'js/directive/exportDirectives.js',
                     'js/directive/list.js',

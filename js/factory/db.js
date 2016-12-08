@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.factory('dbHandler', ['$http', '$q', '$log', '$location', 'globalParams', function($http, $q, $log, $location, globalParams) {
+.factory('dbHandler', ['$http', '$q', '$log', '$location', 'globalParams', 'loadOverlay', function($http, $q, $log, $location, globalParams, loadOverlay) {
     var query = {};
     var options = {};
     var joins = {};
@@ -9,6 +9,7 @@ angular.module('RegistryClient')
     var url = "";
 
     var parse = true;
+    var overlay = true;
 
     // internal functions
     var dbInternals = {
@@ -43,6 +44,11 @@ angular.module('RegistryClient')
         },
         parse: function(value) {
             parse = !!value;
+
+            return this;
+        },
+        overlay: function(value) {
+            overlay = !!value;
 
             return this;
         },
@@ -234,6 +240,7 @@ angular.module('RegistryClient')
             return this;
         },
         runQuery: function() {
+            if(overlay) { loadOverlay.enable(); };
             var result = $q.defer();
             if(Object.keys(query).length > 0)
             {
@@ -242,7 +249,7 @@ angular.module('RegistryClient')
                         .post(config.apiurl + url, query)
                         .then(function(response)
                         {
-                            // $log.log(response);
+                            if(overlay && !options.joins) { loadOverlay.disable(); };
                             angular.forEach(reports, function(report, rkey) {
                                 var queryType = query[report].service.split('/')[1];
                                 // push item to items.0
@@ -255,6 +262,7 @@ angular.module('RegistryClient')
                             });
                             if(options.joins)
                             {
+                                if(overlay) { loadOverlay.disable(); };
                                 var joinQuery = {};
                                 angular.forEach(reports, function(report, rkey) {
                                     if(response.data[report] && options.joins[report] !== undefined)
