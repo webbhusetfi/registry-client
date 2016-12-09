@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-    .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler) {
+    .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay) {
         return {
             template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Exportera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
@@ -33,6 +33,7 @@ angular.module('RegistryClient')
                         .runQuery()
                         .then(function(response) {
                             var ret = [];
+                            loadOverlay.enable();
                             angular.forEach(response.entrylist, function (value, key) {
                                 if (scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
                                     var row = [
@@ -72,13 +73,14 @@ angular.module('RegistryClient')
                                 ret.push(row);
                             });
                             scope.csvExportProcessing = false;
+                            loadOverlay.disable();
                             return ret;
                         });
                 }
             }
         }
     })
-    .directive('xgPdfLabelButton', function($window, $log, $uibModal, globalParams, dbHandler, PDFKit, FileSaver, Blob) {
+    .directive('xgPdfLabelButton', function($window, $log, $uibModal, globalParams, dbHandler, PDFKit, FileSaver, Blob, loadOverlay) {
         return {
             template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport();" uib-tooltip="Exportera etiketter PDF" target="_blank"><i class="fa fa-file"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
@@ -103,12 +105,12 @@ angular.module('RegistryClient')
                         })
                         .runQuery()
                         .then(function(response) {
-
+                            loadOverlay.enable();
                             _do = true;
                             if (response.foundCount.entrylist > 2000) {
                                 msg = 'OBS! Du har valt att exportera en stor mängd poster, vill du fortsätta?\n\n' +
                                     'Beroende på antalet kan exporten kan ta länge att genomföra. ' + 
-                                    'Om processen tar för lång tid kan webbläsaren meddela att sidan har stannat, välj i sådana fall att inte stänga den utan välj att fortsätt.';
+                                    'Om processen tar för lång tid kan webbläsaren meddela att sidan har stannat, välj i sådana fall att inte stänga den utan välj att fortsätta.';
                                 _do = confirm(msg);
                             }
 
@@ -186,12 +188,11 @@ angular.module('RegistryClient')
                                 now = new Date();
                                 fn = globalParams.static.types[scope.config.query.arguments.filter.type] + '_etiketter_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.pdf';
                                 FileSaver.saveAs(stream.toBlob('application/pdf'), fn);
-                                scope.pdfLabelsProcessing = false;
                                 scope.$digest();
                             });
-                        } else {
-                            scope.pdfLabelsProcessing = false;
                         }
+                        scope.pdfLabelsProcessing = false;
+                        loadOverlay.disable();
                     });
                 }
             }
