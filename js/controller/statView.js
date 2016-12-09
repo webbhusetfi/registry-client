@@ -32,7 +32,6 @@ angular.module('RegistryClient')
             "suborgs": {
                 "service": "entry/search",
                 "arguments": {
-                    "select": "count",
                     "filter": {
                         "type": "ASSOCIATION",
                         "registry": Number(globalParams.get('user').registry)
@@ -44,7 +43,6 @@ angular.module('RegistryClient')
             "headorg": {
                 "service": "entry/search",
                 "arguments": {
-                    "select": "count",
                     "filter": {
                         "type": "UNION",
                         "registry": Number(globalParams.get('user').registry)
