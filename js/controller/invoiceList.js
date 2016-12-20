@@ -41,7 +41,7 @@ angular.module('RegistryClient')
             "service":"invoice/search",
             "arguments": {
                 "filter": {
-                    "registry":globalParams.get('user.registry'),
+                    "registry":globalParams.get('user').registry,
                 },
                 "offset":0,
                 "limit":25,
