@@ -1,12 +1,13 @@
 angular.module('RegistryClient')
-    .directive('xgAssignInvoiceButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay, dialogHandler, CSV, FileSaver, invoicePdfWriter) {
+    .directive('xgAssignInvoiceButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay, dialogHandler, CSV, FileSaver, invoicePdfWriter, invoiceCsvWriter) {
         return {
             template: '<a class="btn btn-default" ng-click="doAssignInvoiceDialog();" uib-tooltip="Fakturera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-sticky-note"></i></a>',
             link: function(scope) {
-                
+                /*
                 scope.doCsvInvoiceAssignHeaders = function (type) {
                     return ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
                 }
+                */
                 
                 scope.doAssignInvoiceDialog = function () {
                     var modalInstance = $uibModal.open({
@@ -45,10 +46,7 @@ angular.module('RegistryClient')
                                     }
                                 }
                             };
-                            
-
-                            //console.log(JSON.stringify(query));
-
+        
                             dbHandler
                                 .parse(true)
                                 .setQuery(query)
@@ -65,8 +63,7 @@ angular.module('RegistryClient')
                                     $scope.invoice_models = response.invoice_models;
                                     $scope.invoice_model = '';
                                 });
-
-                            
+                    
                             $scope.dismiss = function() {
                                 $uibModalInstance.dismiss();
                             }
@@ -130,50 +127,7 @@ angular.module('RegistryClient')
                                                     invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice);
                                                 } else if ($scope.invoice_format == 'csv') {
                                                     // do csv
-                                                    dbHandler
-                                                        .parse(false)
-                                                        .setQuery(outquery)
-                                                        .runQuery()
-                                                        .then(function(response) {
-                                                            //console.log(JSON.stringify(response));
-                                                            // entryInvoice/search tar emot "include": ["entry", "primaryAddress"]
-                                                            var csv_options = {};
-                                                            csv_options.header = scope.doCsvInvoiceAssignHeaders(scope.config.query.arguments.filter.type);
-                                                            csv_options.quoteStrings = "true";
-                                                            csv_options.txtDelim = '"';
-
-                                                            var ret = [];                                                            
-                                                            angular.forEach(response.entryinvoice.data.items, function (value, key) {
-                                                                var row = {};
-                                                                row.a = value.id;
-                                                                row.b = ((value.paid) ? 'Ja' : 'Nej');
-                                                                row.c = value.invoice;
-                                                                row.d = value.entry.id;
-                                                                row.e = scope.config.typeselect.types[value.entry.type];
-                                                                if (value.entry.type == 'MEMBER_PERSON') {
-                                                                    row.f = value.entry.firstName + ' ' + value.entry.lastName;
-                                                                } else {
-                                                                    row.f = value.entry.name;
-                                                                }
-                                                                row.g = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
-                                                                row.h = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
-                                                                row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
-                                                                row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);
-                                                                ret.push(row);
-                                                            });  
-                                                            
-                                                            CSV.stringify(ret, csv_options).then(function(result){
-                                                                //console.log(result);
-                                                                
-                                                                now = new Date();
-                                                                fn = globalParams.static.types[scope.config.query.arguments.filter.type] + '_fakturor_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.csv';
-                                                                var blob = new Blob([result], {type : 'text/csv'});
-                                                                FileSaver.saveAs(blob, fn);
-                                                            }); 
-                                                        })
-                                                        .catch(function(response) {
-                                                            $log.error(response);
-                                                        });                                          
+                                                    invoiceCsvWriter.run(outquery.entryinvoice);
                                                 }
                                                 
                                             }

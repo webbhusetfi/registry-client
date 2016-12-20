@@ -34,6 +34,7 @@ module.exports = function(grunt) {
                     'js/factory/globalParams.js',
                     'js/factory/loadOverlay.js',
                     'js/factory/invoicePdfWriter.js',
+                    'js/factory/invoiceCsvWriter.js',
                     'js/directive/directives.js',
                     'js/directive/exportDirectives.js',
                     'js/directive/list.js',

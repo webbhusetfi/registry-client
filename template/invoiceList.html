@@ -1,6 +1,85 @@
 <div ng-include="'/template/invoiceListMenu.html'"></div>
 <div class="row">
     <div class="col-sm-12">
-        <xg-list resource="resource" config="config.list" query="config.query"></xg-list>
+        <table class="xg-list">
+            <thead>
+                <td>
+                    <span class="col-label">Id</span>
+                </td>
+                <td>
+                    <span class="col-label">Namn</span>
+                </td>
+                <td>
+                    <span class="col-label">Fakturor</span>
+                </td>
+                <td class="functions">
+                    <span class="col-label">Funktioner</span>
+                </td>
+            </thead>
+            <tbody ng-show="list.foundCount > 0">
+                <tr ng-repeat="item in list.items">
+                    <td>
+                        {{ item.id }}
+                    </td>
+                    <td>
+                        <a href="/invoice/edit/{{ item.id }}">{{ item.name }}</a>
+                    </td>
+                    <td>
+                        <strong>{{ item.invoices.length }}</strong>
+
+                        <a
+                            ng-show="item.invoices.length"
+                            ng-click="deassignInvoices(item.id);"
+                            class="btn btn-xs btn-warning"
+                            uib-tooltip="Radera fakturor">
+                            <i class="fa fa-times"></i>
+                            Radera fakturor
+                        </a>
+                        
+                        <a
+                            ng-show="item.invoices.length"
+                            ng-click="exportInvoices(item.id, 'csv');"
+                            class="btn btn-xs btn-default"
+                            uib-tooltip="Exportera fakturor i CSV">
+                            <i class="fa fa-download"></i>
+                            CSV
+                        </a>
+                        
+                        <a
+                            ng-show="item.invoices.length && item.invoices.length <= 1000"
+                            ng-click="exportInvoices(item.id, 'pdf');"
+                            class="btn btn-xs btn-default"
+                            uib-tooltip="Exportera fakturor i PDF">
+                            <i class="fa fa-download"></i>
+                            PDF
+                        </a>
+                        
+                    </td>
+                    <td class="functions">
+                        <a
+                            ng-disabled="item.invoices.length"
+                            ng-click="deleteDialog(item);"
+                            class="btn btn-xs btn-danger">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        <a
+                            ng-disabled="item.invoices.length"
+                            href="/invoice/edit/{{ item.id }}"
+                            class="btn btn-xs btn-primary">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        <a
+                            ng-show="true"
+                            href="/invoice/edit/-1/{{ item.id }}"
+                            class="btn btn-xs btn-default">
+                            <i class="fa fa-files-o"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="alert alert-info" ng-show="list.foundCount == 0">
+            Inga poster.
+        </div>
     </div>
 </div>
