@@ -1,38 +1,32 @@
 var regApp = angular.module('RegistryClient')
 .factory('dialogHandler', ['$http', '$q', '$log', '$route', '$window', '$location', '$uibModal', 'dbHandler', function($http, $q, $log, $route, $window, $location, $uibModal, dbHandler) {
     var dialogHandler = {
-        create: function(dialogTemplate, item, action) {
-            if(dialogTemplate)
+        form: function(dialogProps) {
+            if(dialogProps)
             {
-                var modalInstance = $uibModal.open({
-                    templateUrl: dialogTemplate,
-                    controller: function($scope, $uibModalInstance, $log, item) {
-                        $scope.item = item;
+                var modalInstance = $uibModal.open(_.assign({
+                    templateUrl: 'js/factory/template/dialogForm.html',
+                    controller: function($scope, $uibModalInstance, $log, $q) {
+                        $scope._ = _;
+                        $scope.output = dialogProps.args;
+                        $scope.data = {};
                         $scope.dismiss = function() {
                             $uibModalInstance.dismiss();
                         }
 
-                        $scope.go = function($scope) {
-                            $uibModalInstance.close(item);
+                        $scope.process = function() {
+                            $uibModalInstance.close($scope.data);
                         }
                     },
-                    size: 'sm',
-                    resolve: {
-                        item: item
-                    }
-                });
+                    size: 'lg'
+                    }, dialogProps));
                 
-                modalInstance.result.then(function (item) {
-                    dbHandler
-                        .setQuery(action(item))
-                        .runQuery()
-                        .then(function(response) {
-                            $route.reload();
-                        })
-                        .catch(function(response) {
-                            $log.error(response);
-                        });
-                });                
+                modalInstance.result
+                    .then(function(result) {
+                        // error management and all that
+                        _.invoke(dialogProps, 'args.buttons.save', result)
+                    });
+                    // dialog cancelled, do nothing
             }else{
                 $log.error('no dialog template')
             }

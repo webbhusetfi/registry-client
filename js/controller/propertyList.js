@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('propertyList', function($scope, $http, $location, $log, $routeParams, $route, globalParams, dbHandler, dialogHandler) {
+.controller('propertyList', function($scope, $http, $location, $log, $routeParams, $route, $q, globalParams, dbHandler, dialogHandler) {
     if(globalParams.get('user').role === 'USER')
         $location.path('/entry/list/' + globalParams.get('user').entry);
 
@@ -23,34 +23,56 @@ angular.module('RegistryClient')
         .then(function(response) {
             $scope.properties = response.properties;
 
-            $scope.createProperty = function(item) {
-                if(item.service === 'propertyGroup') {
-                    var action = function(item) {
-                        return {
-                            "property": {
-                                "service":item.service + '/create',
-                                "arguments":{
-                                    "name":item.name,
-                                    "registry":globalParams.get('user').registry
+            $scope.createProperty = function(args) {
+                dialogHandler.form({
+                        args: {
+                            title: "Skapa egenskap",
+                            templateUrl:'template/propertyCreate.html',
+                            buttons: {
+                                cancel:true,
+                                save: function(data) {
+                                    if(args.service == 'propertyGroup') {
+                                        dbHandler
+                                            .setQuery({
+                                                "property": {
+                                                    "service":args.service + '/create',
+                                                    "arguments": _.assign(
+                                                        data,
+                                                        {
+                                                            "registry":globalParams.get('user.registry')
+                                                        }
+                                                    )
+                                                }
+                                            });
+                                    }else{
+                                        dbHandler
+                                            .setQuery({
+                                                "property": {
+                                                    "service":args.service + '/create',
+                                                    "arguments": _.assign(
+                                                        data,
+                                                        {
+                                                            "propertyGroup":args.propertyGroup,
+                                                            "registry":globalParams.get('user.registry')
+                                                        }
+                                                    )
+                                                }
+                                            });
+                                    }
+                                    
+                                    dbHandler
+                                        .runQuery()
+                                        .then(function(response) {
+                                            $route.reload();
+                                        })
+                                        .catch(function(response) {
+                                            $log.error('dialog failed');
+                                        });
                                 }
                             }
                         }
                     }
-                }else if(item.service === 'property') {
-                    var action = function(item) {
-                        return {
-                            "property": {
-                                "service":item.service + '/create',
-                                "arguments":{
-                                    "name":item.name,
-                                    "propertyGroup":item.propertyGroup
-                                }
-                            }
-                        }
-                    }
-                }
-
-                dialogHandler.create('template/propertyCreate.html', item, action);
+                );
             }
 
             $scope.deleteConfirm = function(item) {

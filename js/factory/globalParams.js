@@ -7,15 +7,7 @@ angular.module('RegistryClient')
         var stringValue = $window.sessionStorage.getItem('registryParams');
         var jsonValue = $window.JSON.parse(stringValue) || {};
         
-        if(key.split('.').length > 1) {
-            if(value = key.split('.').reduce(function(obj, i) { return obj[i]}, jsonValue))
-                return value;
-            else
-                return false;
-        }else if(jsonValue[key] !== undefined) {
-            return jsonValue[key]
-        }else
-            return false;
+        return _.get(jsonValue, key);
     }
 
     var set = function(key, value)

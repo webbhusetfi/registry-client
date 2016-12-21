@@ -18,7 +18,7 @@ angular.module('RegistryClient')
             var defaults = {
                 apiurl: "https://api.registry.huset.fi/",
                 url: url,
-                registry: Number(globalParams.get('user').registry)
+                registry: Number(globalParams.get('user.registry'))
             }
             $http
                 .get('/config.local.json')
