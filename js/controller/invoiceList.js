@@ -1,75 +1,77 @@
 angular.module('RegistryClient')
-.controller('invoiceList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams) {
-    
-    $scope.config = {
-        "list":{
-            "cols": {
-                "name": {
-                    "label":"Fakturamall",
-                    "link": "/invoice/edit/[id]",
-                    "filter":false
-                }
-            },
-            "pagination":1,
-            "functions":{
-                "deleteDialog": {
-                    "postAction": {
-                        "entry": {
-                            "service":"invoice/delete",
-                            "arguments": [
-                                "id"
-                            ]
-                        }
-                    }
-                },
-                "edit":"/invoice/edit/[id]",
-                "custom":[{
-                    "function": function(item) {
-                        $location.path('/invoice/edit/-1/' + item.id);
-                    },
-                    "if": function(item) {
-                        if (item.id) {
-                            return true;
-                        }
-                        return false;
-                    },
-                    "icon":"fa fa-files-o"
-                }]
-            }
-        },
-        "query":{
+.controller('invoiceList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter) {
+
+    query = {};
+    query.list = {
             "service":"invoice/search",
             "arguments": {
                 "filter": {
-                    "registry":globalParams.get('user.registry'),
+                    "registry":globalParams.get('user').registry,
                 },
-                "offset":0,
-                "limit":25,
                 "order": {
                     "name":"asc"
                 }
             }
+        };
+    dbHandler
+        .setQuery(query)
+        .setJoin({
+            "resource":"list",
+            "service":"entryInvoice/search",
+            "field":"id",
+            "equals":"invoice",
+            "name":"invoices"
+        })
+        .runQuery()
+        .then(function(response) {
+            $scope.list = { "items": response.list, "foundCount": response.foundCount.list };
+        })
+        .catch(function(response) {
+            $log.error(response);
+            $location.path('/user/logout');
+        });
+        
+    $scope.exportInvoices = function(id, type) {
+        console.log(id + ' -> ' + type);
+        var outquery = {};
+        outquery.entryinvoice = {
+                        "service": "entryInvoice/search",
+                        "arguments" :{
+                            "include": ["entry", "primaryAddress"],
+                            "filter": {
+                                "invoice": id,
+                            }
+                        }
+                    };
+        outquery.invoiceModel = {
+                            "service": "invoice/read",
+                            "arguments": {
+                                "id": id
+                            }
+                        };
+        
+        if (type == 'pdf') {
+            // do pdf
+            invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice);
+        } else if (type == 'csv') {
+            // do csv
+            invoiceCsvWriter.run(outquery.entryinvoice);
         }
     }
     
+    $scope.deassignInvoices = function(id) {
+            alert('Not yet!');
+    }
     
-    var time = 0;
-    $scope.$watch('config.query', function(newQuery, oldQuery) {
-        if($scope.timeout)
-            $timeout.cancel($scope.timeout);
-        $scope.timeout = $timeout(function() {
-            dbHandler
-                .setQuery({"base":$scope.config.query})
-                .runQuery()
-                .then(function(response) {
-                    $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
-                })
-                .catch(function(response) {
-                    $log.error(response);
-                    $location.path('/user/logout');
-                });
-        }, time);
-        time = 200;
-    }, true);
-
+    $scope.deleteDialog = function(item) {
+        var query = {
+                        "invoice_del": {
+                            "service":"invoice/delete",
+                            "arguments": {
+                                "id": item.id
+                            }
+                        }
+                    };
+        dialogHandler.deleteConfirm(item, query);
+    }
 });

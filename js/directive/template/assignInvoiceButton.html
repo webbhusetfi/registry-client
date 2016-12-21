@@ -1,0 +1,64 @@
+<div class="modal-header">
+    <h3>Fakturera</h3>
+</div>
+<div class="modal-body form-horizontal">
+    <form name="assignInvoiceForm">
+        <div class="form-group">
+            <div class="col-xs-12">
+                Du har valt att skapa fakturor för {{ to_be_invoiced_foundcount }} st. av typen {{ to_be_invoiced_type | lowercase }}. 
+            </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : assignInvoiceForm.invoice_model.$invalid && assignInvoiceForm.invoice_model.$touched }">
+            <label class="col-xs-4 control-label">Fakturamall</label>
+            <div class="col-xs-8">
+                <select 
+                    ng-options="invoice.id as invoice.name for invoice in invoice_models" 
+                    ng-model="invoice_model" 
+                    class="form-control" 
+                    ng-required="true" 
+                    ng-show="invoice_models.length"
+                    name="invoice_model">
+                </select>
+                <p ng-show="assignInvoiceForm.invoice_model.$invalid && assignInvoiceForm.invoice_model.$touched" class="help-block">
+                    Välj fakturamall.
+                </p>
+                <div class="alert alert-info">
+                    Varje fakturamall kan endast kopplas till en medlem eller förening en gång.
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-4 control-label">Format</label>
+            <div class="col-xs-8">
+                <div class="radio">
+                    <label>
+                        <input type="radio" ng-model="invoice_format" value="pdf" ng-disabled="to_be_invoiced_foundcount > 1000" />
+                        Skriv ut som fakturor i PDF-format.
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" ng-model="invoice_format" value="csv" />
+                        Som datafil i CSV-format.
+                    </label>
+                </div>
+                <div class="alert alert-info">
+                    I utmatningsformatet kommer all som blivit fakturerade med fakturan med.
+                    OBS! Max 1000 fakturor kan tas ut åt gången i pdf-format. 
+                    På fakturamallsidan kan de tas ut 1000 st. åt gången.
+                    Om processen tar för lång tid kan webbläsaren meddela att sidan har stannat, välj i sådana fall att inte stänga den utan välj att fortsätta.
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="dismiss();">
+        <i class="fa fa-times"></i> 
+        Avbryt
+    </button>
+    <button class="btn btn-primary" ng-click="go();">
+        <i class="fa fa-check"></i> 
+        Fakturera
+    </button>
+</div>

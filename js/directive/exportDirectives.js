@@ -1,4 +1,161 @@
 angular.module('RegistryClient')
+    .directive('xgAssignInvoiceButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay, dialogHandler, CSV, FileSaver, invoicePdfWriter, invoiceCsvWriter) {
+        return {
+            template: '<a class="btn btn-default" ng-click="doAssignInvoiceDialog();" uib-tooltip="Fakturera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-sticky-note"></i></a>',
+            link: function(scope) {
+                /*
+                scope.doCsvInvoiceAssignHeaders = function (type) {
+                    return ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
+                }
+                */
+                
+                scope.doAssignInvoiceDialog = function () {
+                    var modalInstance = $uibModal.open({
+                        templateUrl: 'js/directive/template/assignInvoiceButton.html',
+                        controller: function($scope, $uibModalInstance, $log) {
+                            $scope.to_be_invoiced_foundcount = 0;
+                            $scope.to_be_invoiced_type = scope.config.typeselect.types[scope.config.query.arguments.filter.type];
+                            var query = {};
+                            query.summary = {
+                                "service":"entry/search",
+                                "arguments":{
+                                    "filter": {
+                                        "registry": globalParams.get('user').registry,
+                                        "withProperty":scope.config.query.arguments.filter.withProperty,
+                                        "withoutProperty":scope.config.query.arguments.filter.withoutProperty,
+                                        "class":scope.config.query.arguments.filter.class,
+                                        "type":scope.config.query.arguments.filter.type,
+                                        "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry)
+                                    },
+                                    "order": {
+                                        "lastName":"asc",
+                                        "name":"asc"
+                                    }
+                                }
+                            };
+                            query.summary.arguments.filter = angular.merge(query.summary.arguments.filter, scope.config.query.arguments.filter);
+                            
+                            query.invoice_models = {
+                                "service":"invoice/search",
+                                "arguments": {
+                                    "filter": {
+                                        "registry":globalParams.get('user').registry,
+                                    },
+                                    "order": {
+                                        "name":"asc"
+                                    }
+                                }
+                            };
+        
+                            dbHandler
+                                .parse(true)
+                                .setQuery(query)
+                                .runQuery()
+                                .then(function(response) {
+                                    //console.log(response.foundCount.summary);   
+                                    $scope.to_be_invoiced_foundcount = response.foundCount.summary;
+                                    if ($scope.to_be_invoiced_foundcount <= 1000) {
+                                        $scope.invoice_format = 'pdf';
+                                    } else {
+                                        $scope.invoice_format = 'csv';
+                                    }
+                                    
+                                    $scope.invoice_models = response.invoice_models;
+                                    $scope.invoice_model = '';
+                                });
+                    
+                            $scope.dismiss = function() {
+                                $uibModalInstance.dismiss();
+                            }
+
+                            $scope.go = function() {
+                                 if ($scope.assignInvoiceForm.$valid) {
+                                    loadOverlay.enable();
+                                    
+                                    var query = {};
+                                    query.summary = {
+                                        "service":"entry/assignInvoice",
+                                        "arguments":{
+                                            "filter": {
+                                                "registry": globalParams.get('user').registry,
+                                                "withProperty":scope.config.query.arguments.filter.withProperty,
+                                                "withoutProperty":scope.config.query.arguments.filter.withoutProperty,
+                                                "class":scope.config.query.arguments.filter.class,
+                                                "type":scope.config.query.arguments.filter.type,
+                                                "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry)
+                                            },
+                                            "invoice": $scope.invoice_model,
+                                            "order": {
+                                                "lastName":"asc",
+                                                "name":"asc"
+                                            }
+                                        }
+                                    };
+                                    query.summary.arguments.filter = angular.merge(query.summary.arguments.filter, scope.config.query.arguments.filter);
+                                    
+                                    dbHandler
+                                        .parse(false)
+                                        .setQuery(query)
+                                        .runQuery()
+                                        .then(function(response) {
+                                            //console.log(JSON.stringify(response));
+                                            //console.log(response.status);
+                                            if (response.summary.status == 'success') {
+                                                assigned_count = response.summary.data.assigned;
+                                                //console.log('fakturornas rader skapade');
+                                                
+                                                var outquery = {};
+                                                outquery.entryinvoice = {
+                                                                "service": "entryInvoice/search",
+                                                                "arguments" :{
+                                                                    "include": ["entry", "primaryAddress"],
+                                                                    "filter": {
+                                                                        "invoice": $scope.invoice_model,
+                                                                    }
+                                                                }
+                                                            };
+                                                outquery.invoiceModel = {
+                                                                    "service": "invoice/read",
+                                                                    "arguments": {
+                                                                        "id": $scope.invoice_model
+                                                                    }
+                                                                };
+                                                
+                                                if ($scope.invoice_format == 'pdf') {
+                                                    // do pdf
+                                                    //console.log('running pdf');
+                                                    invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice);
+                                                } else if ($scope.invoice_format == 'csv') {
+                                                    // do csv
+                                                    invoiceCsvWriter.run(outquery.entryinvoice);
+                                                }
+                                                
+                                            }
+                                        })
+                                        .catch(function(response) {
+                                            $log.error(response);
+                                        });
+                                    loadOverlay.disable();
+                                    $uibModalInstance.close();
+                                 } else {
+                                    angular.forEach($scope.assignInvoiceForm.$error, function (field) {
+                                        angular.forEach(field, function(errorField){
+                                            errorField.$setTouched();
+                                        })
+                                    });
+                                 }
+                            }
+                        },
+                        size: 'md'
+                    });
+
+                    modalInstance.result.then(function() {
+                        
+                    }); 
+                };
+            }
+        }
+    })
     .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay) {
         return {
             template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Exportera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
@@ -82,7 +239,7 @@ angular.module('RegistryClient')
     })
     .directive('xgPdfLabelButton', function($window, $log, $uibModal, globalParams, dbHandler, PDFKit, FileSaver, Blob, loadOverlay) {
         return {
-            template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport();" uib-tooltip="Exportera etiketter PDF" target="_blank"><i class="fa fa-file"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport();" uib-tooltip="Exportera etiketter PDF" target="_blank"><i class="fa fa-tag"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doPdfLabelExport = function () {
                     scope.pdfLabelsProcessing = true;
