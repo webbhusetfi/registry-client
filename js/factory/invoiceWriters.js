@@ -1,5 +1,81 @@
 angular.module('RegistryClient')
-.factory('invoicePdfWriter', ['$log', '$filter', 'globalParams', 'dbHandler', 'PDFKit', 'FileSaver', 'Blob', 'loadOverlay', function($log, $filter, globalParams, dbHandler, PDFKit, FileSaver, Blob, loadOverlay) {
+.factory('referenceNumberCalculator', ['$log', function($log) {
+    var referenceNumberCalculator = {
+        calculate: function(number) {
+            var num = '';
+            var ki = 0;
+            var summa = 0;
+            var kertoimet = [7, 3, 1];
+
+            num = number+'';
+            for (var i = num.length; i > 0; i--) {
+                summa += num.charAt(i - 1) * kertoimet[ki++ % 3];
+            }
+            
+            return num + (10 - (summa % 10)) % 10;
+        }
+    }
+    
+    return referenceNumberCalculator;
+}])
+.factory('invoiceCsvWriter', ['$log', '$filter', 'globalParams', 'dbHandler', 'FileSaver', 'loadOverlay', 'CSV', 'referenceNumberCalculator', function($log, $filter, globalParams, dbHandler, FileSaver, loadOverlay, CSV, referenceNumberCalculator) {
+
+    var invoiceCsvWriter = {
+        run: function(outQry) {
+        
+            var outquery = {};
+            outquery.entryinvoice = outQry;
+            
+            dbHandler
+                .parse(false)
+                .setQuery(outquery)
+                .runQuery()
+                .then(function(response) {
+                    //console.log(JSON.stringify(response));
+                    // entryInvoice/search tar emot "include": ["entry", "primaryAddress"]
+                    var csv_options = {};
+                    csv_options.header = ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
+                    csv_options.quoteStrings = "true";
+                    csv_options.txtDelim = '"';
+
+                    var ret = [];                                                            
+                    angular.forEach(response.entryinvoice.data.items, function (value, key) {
+                        var row = {};
+                        row.a = referenceNumberCalculator.calculate(value.id);
+                        row.b = ((value.paid) ? 'Ja' : 'Nej');
+                        row.c = value.invoice;
+                        row.d = value.entry.id;
+                        row.e = globalParams.static.types[value.entry.type];
+                        if (value.entry.type == 'MEMBER_PERSON') {
+                            row.f = value.entry.firstName + ' ' + value.entry.lastName;
+                        } else {
+                            row.f = value.entry.name;
+                        }
+                        row.g = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
+                        row.h = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
+                        row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
+                        row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);
+                        ret.push(row);
+                    });  
+                    
+                    CSV.stringify(ret, csv_options).then(function(result){ 
+                        now = new Date();
+                        // globalParams.static.types[scope.config.query.arguments.filter.type] + 
+                        fn = 'fakturor_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.csv';
+                        var blob = new Blob([result], {type : 'text/csv'});
+                        FileSaver.saveAs(blob, fn);
+                    }); 
+                })
+                .catch(function(response) {
+                    $log.error(response);
+                });
+        }
+    }
+
+    return invoiceCsvWriter;
+                
+}])
+.factory('invoicePdfWriter', ['$log', '$filter', 'globalParams', 'dbHandler', 'PDFKit', 'FileSaver', 'Blob', 'loadOverlay', 'referenceNumberCalculator', function($log, $filter, globalParams, dbHandler, PDFKit, FileSaver, Blob, loadOverlay, referenceNumberCalculator) {
 
     var invoicePdfWriter = {
         run: function(invoiceModelQry, invoiceesQry) {
@@ -60,9 +136,7 @@ angular.module('RegistryClient')
                     if (response.invoicees) {
                         invoicees = response.invoicees.data.items;
                     }
-                    //console.log(response);
-                    //console.log(JSON.stringify(invoicees));
-                    //console.log(invoicemodel.entry);
+
                     var user_entry = null;
                     if (!globalParams.get('user').entry && globalParams.get('user').role != 'USER') {
                         user_entry = invoicemodel.entry;
@@ -78,15 +152,12 @@ angular.module('RegistryClient')
                             "registry": Number(globalParams.get('user').registry)
                         }
                     };
-                    //console.log(query2.invoicer);
                     dbHandler
                         .parse(false)
                         .setQuery(query2)
                         .runQuery()
                         .then(function(response) {
-                            //console.log(response);
                             if (response.invoicer.data.items[0]) {
-                                //console.log('found it!');
                                 invoicer = response.invoicer.data.items[0];
                             }
                             
@@ -95,7 +166,6 @@ angular.module('RegistryClient')
                                 return false;
                             } else {
                                 // do work...
-
                                 var row = 14;
                                 var margin = 50;
                                 var fullwidth = 595 - margin*2;
@@ -226,7 +296,7 @@ angular.module('RegistryClient')
                                     current += row;
                                     current += row;
                                     document.font('Helvetica-Bold');
-                                    document.text("Referensnummer: " + value.id, margin, current).stroke();
+                                    document.text("Referensnummer: " + referenceNumberCalculator.calculate(value.id), margin, current).stroke();
                                     document.text("Summa:", col_2_1, current, {'width': halfpage, 'height': row});
                                     document.text(invoicemodel.amount, col_2_2, current, {'width': halfpage, 'height': row});
                                     document.font('Helvetica');

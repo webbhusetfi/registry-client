@@ -3,12 +3,7 @@ angular.module('RegistryClient')
         return {
             template: '<a class="btn btn-default" ng-click="doAssignInvoiceDialog();" uib-tooltip="Fakturera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-sticky-note"></i></a>',
             link: function(scope) {
-                /*
-                scope.doCsvInvoiceAssignHeaders = function (type) {
-                    return ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
-                }
-                */
-                
+
                 scope.doAssignInvoiceDialog = function () {
                     var modalInstance = $uibModal.open({
                         templateUrl: 'js/directive/template/assignInvoiceButton.html',
@@ -52,7 +47,6 @@ angular.module('RegistryClient')
                                 .setQuery(query)
                                 .runQuery()
                                 .then(function(response) {
-                                    //console.log(response.foundCount.summary);   
                                     $scope.to_be_invoiced_foundcount = response.foundCount.summary;
                                     if ($scope.to_be_invoiced_foundcount <= 1000) {
                                         $scope.invoice_format = 'pdf';
@@ -98,11 +92,8 @@ angular.module('RegistryClient')
                                         .setQuery(query)
                                         .runQuery()
                                         .then(function(response) {
-                                            //console.log(JSON.stringify(response));
-                                            //console.log(response.status);
                                             if (response.summary.status == 'success') {
                                                 assigned_count = response.summary.data.assigned;
-                                                //console.log('fakturornas rader skapade');
                                                 
                                                 var outquery = {};
                                                 outquery.entryinvoice = {
@@ -122,11 +113,8 @@ angular.module('RegistryClient')
                                                                 };
                                                 
                                                 if ($scope.invoice_format == 'pdf') {
-                                                    // do pdf
-                                                    //console.log('running pdf');
                                                     invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice);
                                                 } else if ($scope.invoice_format == 'csv') {
-                                                    // do csv
                                                     invoiceCsvWriter.run(outquery.entryinvoice);
                                                 }
                                                 

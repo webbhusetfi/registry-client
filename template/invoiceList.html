@@ -26,15 +26,6 @@
                     </td>
                     <td>
                         <strong>{{ item.invoices.length }}</strong>
-
-                        <a
-                            ng-show="item.invoices.length"
-                            ng-click="deassignInvoices(item.id);"
-                            class="btn btn-xs btn-warning"
-                            uib-tooltip="Radera fakturor">
-                            <i class="fa fa-times"></i>
-                            Radera fakturor
-                        </a>
                         
                         <a
                             ng-show="item.invoices.length"
@@ -53,11 +44,12 @@
                             <i class="fa fa-download"></i>
                             PDF
                         </a>
-                        
+                        <span class="alert alert-warning" ng-show="item.invoices.length && item.invoices.length > 1000">
+                            Max 1000 fakturor kan tas ut som pdf
+                        </span>
                     </td>
                     <td class="functions">
                         <a
-                            ng-disabled="item.invoices.length"
                             ng-click="deleteDialog(item);"
                             class="btn btn-xs btn-danger">
                             <i class="fa fa-times"></i>

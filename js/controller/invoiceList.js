@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('invoiceList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter) {
+.controller('invoiceList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter, referenceNumberCalculator) {
 
     query = {};
     query.list = {
@@ -30,9 +30,8 @@ angular.module('RegistryClient')
             $log.error(response);
             $location.path('/user/logout');
         });
-        
+
     $scope.exportInvoices = function(id, type) {
-        console.log(id + ' -> ' + type);
         var outquery = {};
         outquery.entryinvoice = {
                         "service": "entryInvoice/search",
@@ -57,10 +56,6 @@ angular.module('RegistryClient')
             // do csv
             invoiceCsvWriter.run(outquery.entryinvoice);
         }
-    }
-    
-    $scope.deassignInvoices = function(id) {
-            alert('Not yet!');
     }
     
     $scope.deleteDialog = function(item) {
