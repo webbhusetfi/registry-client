@@ -1,7 +1,7 @@
 var regApp = angular.module('RegistryClient')
 .factory('dialogHandler', ['$http', '$q', '$log', '$route', '$window', '$location', '$uibModal', 'dbHandler', function($http, $q, $log, $route, $window, $location, $uibModal, dbHandler) {
     var dialogHandler = {
-        form: function(dialogProps) {
+        form: function(dialogProps, data) {
             if(dialogProps)
             {
                 var modalInstance = $uibModal.open(_.assign({
@@ -9,7 +9,7 @@ var regApp = angular.module('RegistryClient')
                     controller: function($scope, $uibModalInstance, $log, $q) {
                         $scope._ = _;
                         $scope.output = dialogProps.args;
-                        $scope.data = {};
+                        $scope.data = _.assign({}, data);
                         $scope.dismiss = function() {
                             $uibModalInstance.dismiss();
                         }
@@ -25,6 +25,9 @@ var regApp = angular.module('RegistryClient')
                     .then(function(result) {
                         // error management and all that
                         _.invoke(dialogProps, 'args.buttons.save', result)
+                    })
+                    .catch(function() {
+                        return false;
                     });
                     // dialog cancelled, do nothing
             }else{

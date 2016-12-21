@@ -118,7 +118,7 @@ angular.module('RegistryClient')
                     orgParentTypeId = type.id;
             });
         }
-
+        
         $scope.entry.connection.push({
             "parentType": orgType ? orgType : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].parentType,
             "connectionType": orgParentTypeId ? orgParentTypeId : $scope.connectionTypes[$scope.entry.type][Object.keys($scope.connectionTypes[$scope.entry.type])[0]].id,

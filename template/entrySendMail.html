@@ -1,0 +1,26 @@
+<div class="row">
+    <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+        <div class="form-group">
+            <div class="col-xs-12">
+                <p class="alert alert-info">Gör utskick till {{ data.foundCount }} poster. Epostfunktionen är litet beta.</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-4 control-label">Ärende</label>
+            <div class="col-xs-8">
+                <input ng-model="data.subject" placeholder="Ärende" type="text" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-4 control-label">Meddelande</label>
+            <div class="col-xs-8">
+                <textarea
+                    ng-model="data.message"
+                    style="min-height:40rem;"
+                    placeholder="Meddelande"
+                    class="form-control"
+                ></textarea>
+            </div>
+        </div>        
+    </div>
+</div>

@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $uibModal, $timeout, globalParams, dialogHandler, dbHandler) {
+.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $timeout, globalParams, dialogHandler, dbHandler) {
     var userLevel = globalParams.get('user').role;
     $scope.config = {};
     
@@ -8,6 +8,49 @@ angular.module('RegistryClient')
         "types": globalParams.static.types
     };
     $scope.config.include = null;
+    $scope.config.sendMail = function() {
+        dialogHandler.form({
+                args: {
+                    title: "Skicka epost",
+                    templateUrl:'template/entrySendMail.html',
+                    buttons: {
+                        cancel:true,
+                        save: function(data) {
+                            // fluff query object for mail
+                            var query = _.cloneDeep($scope.config.query);
+                            query.service = 'mail/create';
+                            _.unset(query, 'arguments.offset');
+                            _.unset(query, 'arguments.limit');
+                            _.unset(query, 'arguments.order');
+                            _.assign(query.arguments, {
+                                "subject":data.subject,
+                                "message":data.message
+                            });
+                            
+                            // save state
+                            globalParams.set('entryList.query', $scope.config.query);
+                            globalParams.set('entryList.include', $scope.config.include);
+                            
+                            // run mail query
+                            dbHandler
+                                .setQuery({
+                                    "mail": query
+                                })
+                                .runQuery()
+                                .then(function(response) {
+                                    $log.log(response);
+                                    $route.reload();
+                                })
+                                .catch(function(response) {
+                                    $log.error('dialog failed');
+                                });
+                        }
+                    }
+                }
+            }, { 
+                "foundCount":$scope.resource.foundCount
+            });
+    };
     $scope.config.list = {
         "pagination":1,
         "functions":{
