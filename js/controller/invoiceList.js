@@ -58,6 +58,24 @@ angular.module('RegistryClient')
         }
     }
     
+    $scope.goto = function(url) {
+        $window.location.href = url;
+    }
+    
+    $scope.paidCount = function(item) {
+        if (item.invoices.length) {
+            var paid = 0;
+            angular.forEach(item.invoices, function (value, key) {
+                if (value.paid) {
+                    paid++;
+                }
+            });
+            item.paidCount = paid;
+            return paid;
+        }
+        return 0;
+    }
+    
     $scope.deleteDialog = function(item) {
         var query = {
                         "invoice_del": {

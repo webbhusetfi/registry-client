@@ -1,7 +1,7 @@
 angular.module('RegistryClient')
 .factory('referenceNumberCalculator', ['$log', function($log) {
     var referenceNumberCalculator = {
-        calculate: function(number) {
+        calculate: function(number, only_control = false) {
             var num = '';
             var ki = 0;
             var summa = 0;
@@ -12,7 +12,12 @@ angular.module('RegistryClient')
                 summa += num.charAt(i - 1) * kertoimet[ki++ % 3];
             }
             
-            return num + (10 - (summa % 10)) % 10;
+            ctrl = (10 - (summa % 10)) % 10;
+            if (only_control) {
+                return ctrl;
+            } else {
+                return num + ctrl;
+            }
         }
     }
     

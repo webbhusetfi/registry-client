@@ -1,0 +1,113 @@
+<div ng-include="'/template/invoiceListMenu.html'"></div>
+<div class="alert alert-danger" ng-show="{{ routeParams.id == undefined }}">
+    Ingen fakturamall har angetts
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="alert alert-info">
+                Referensnummret består av denna id plus en kontrollsiffra.
+                För att söka på referensnumret använd inte kontrollsiffran. 
+                OBS! Sökningen är exakt.
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <a class="btn btn-default pull-right" ng-click="back();"><i class="fa fa-reply"></i> Tillbaka</a>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-hide="{{ routeParams.id == undefined }}">
+    <div class="col-sm-12">
+        <table class="xg-list">
+            <thead>
+                <td>
+                    <span class="col-label">Ref.nr.</span>
+                </td>
+                <td>
+                    <span class="col-label" uib-tooltip="Kontrollsiffra">K</span>
+                </td>
+                <td>
+                    <span class="col-label" uib-tooltip="Betalat">Bet.</span>
+                </td>
+                <td>
+                    <span class="col-label">Namn</span>
+                </td>
+                <td>
+                    <span class="col-label">Typ</span>
+                </td>
+                <td class="functions">
+                    <span class="col-label">Funktioner</span>
+                </td>
+            </thead>
+            <thead>
+                <td width="15%">
+                    <xg-filter placeholder="ref.nr." target="'id'" query="config.query"/>
+                </td>
+                <td width="1%">
+                    &nbsp;
+                </td>
+                <td width="5%">
+                    &nbsp;
+                </td>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    &nbsp;
+                </td>
+                <td class="functions">
+                    &nbsp;
+                </td>
+            </thead>
+            <tbody ng-show="resource.foundCount > 0">
+                <tr ng-repeat="item in resource.items">
+                    <td>
+                        {{ item.id }}
+                    </td>
+                    <td>
+                        {{ ref(item.id) }}
+                    </td>
+                    <td>
+                        <a
+                            ng-click="setPaid(item, !item.paid);"
+                            class="btn btn-xs"
+                            ng-class="((item.paid) ? 'btn-success' : 'btn-danger')">
+                            <i class="fa" ng-class="((item.paid) ? 'fa-check' : 'fa-times')"></i>
+                        </a>
+                    </td>
+                    <td>
+                        {{ item.combined }}
+                    </td>
+                    <td>
+                        {{ item.type2 }}
+                    </td>
+                    <td class="functions">
+                        <a
+                            ng-show="globalParams.get('user').role != 'USER'"
+                            ng-click="deleteDialog(item);"
+                            class="btn btn-xs btn-danger">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="alert alert-info" ng-show="resource.foundCount == 0">
+            Inga poster.
+        </div>
+        <div class="row" style="margin-bottom:1rem;">
+            <div class="col-xs-offset-4 col-xs-4">
+                <xg-list-count offset="config.query.arguments.offset" limit="config.query.arguments.limit" count="resource.foundCount"></xg-list-count>
+            </div>
+        </div>
+        <xg-pagination
+            ng-if="resource && config.pagination"
+            limit="config.query.arguments.limit"
+            offset="config.query.arguments.offset"
+            count="resource.foundCount"
+        >
+        </xg-pagination>
+        
+    </div>
+</div>

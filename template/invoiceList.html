@@ -1,4 +1,7 @@
 <div ng-include="'/template/invoiceListMenu.html'"></div>
+<div class="alert alert-info">
+    Själva faktureringen sker via listan på domhär sidorna kan man hantera fakturamallar, färdiga fakturor och reskontra.
+</div>
 <div class="row">
     <div class="col-sm-12">
         <table class="xg-list">
@@ -8,6 +11,9 @@
                 </td>
                 <td>
                     <span class="col-label">Namn</span>
+                </td>
+                <td>
+                    <span class="col-label">Betalat</span>
                 </td>
                 <td>
                     <span class="col-label">Fakturor</span>
@@ -25,7 +31,18 @@
                         <a href="/invoice/edit/{{ item.id }}">{{ item.name }}</a>
                     </td>
                     <td>
-                        <strong>{{ item.invoices.length }}</strong>
+                        <strong>
+                            {{ paidCount(item) }} av {{ item.invoices.length }}
+                        </strong>
+                    </td>
+                    <td>
+                        <a
+                            ng-show="item.invoices.length"
+                            href="/invoice/ledger/{{ item.id }}"
+                            class="btn btn-xs btn-primary">
+                            <i class="fa fa-check"></i>
+                            Reskontra
+                        </a>
                         
                         <a
                             ng-show="item.invoices.length"
@@ -54,12 +71,12 @@
                             class="btn btn-xs btn-danger">
                             <i class="fa fa-times"></i>
                         </a>
-                        <a
+                        <button
                             ng-disabled="item.invoices.length"
-                            href="/invoice/edit/{{ item.id }}"
+                            ng-click="goto('/invoice/edit/' + item.id);"
                             class="btn btn-xs btn-primary">
                             <i class="fa fa-pencil"></i>
-                        </a>
+                        </button>
                         <a
                             ng-show="true"
                             href="/invoice/edit/-1/{{ item.id }}"
