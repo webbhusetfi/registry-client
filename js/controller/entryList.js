@@ -8,6 +8,7 @@ angular.module('RegistryClient')
         "types": globalParams.static.types
     };
     $scope.config.include = null;
+    /*
     $scope.config.sendMail = function() {
         dialogHandler.form({
                 args: {
@@ -31,19 +32,64 @@ angular.module('RegistryClient')
                             globalParams.set('entryList.query', $scope.config.query);
                             globalParams.set('entryList.include', $scope.config.include);
                             
-                            // run mail query
-                            dbHandler
-                                .setQuery({
-                                    "mail": query
-                                })
-                                .runQuery()
-                                .then(function(response) {
-                                    $log.log(response);
-                                    $route.reload();
-                                })
-                                .catch(function(response) {
-                                    $log.error('dialog failed');
-                                });
+                            switch(globalParams.get('user.role')) {
+                                case 'ADMIN':
+                                case 'SUPER_ADMIN':
+                                    dbHandler
+                                        .setQuery({
+                                            "union": {
+                                                "service":"entry/search",
+                                                "arguments": {
+                                                    "filter": {
+                                                        "registry":globalParams.get('user.registry'),
+                                                        "type":"UNION"
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .runQuery()
+                                        .then(function(response) {
+                                            if(_.isNumber(response.union[0].id)) {
+                                                _.assign(query.arguments, {
+                                                    "entry": $routeParams.id ? $routeParams.id : response.union[0].id
+                                                })
+                                                dbHandler
+                                                    .setQuery({"mail":query})
+                                                    .runQuery()
+                                                    .then(function(response) {
+                                                        $log.log(response);
+                                                        // $route.reload();
+                                                    })
+                                                    .catch(function(response) {
+                                                        $log.error('sending failed');
+                                                        $log.log(response);
+                                                    });
+                                                }
+                                        })
+                                break;
+                                
+                                case 'USER':
+                                    if($routeParams.id) {
+                                        _.assign(query.arguments, {
+                                            "entry": $routeParams.id
+                                        });
+                                        dbHandler
+                                            .setQuery({
+                                                "mail": query
+                                            })
+                                            .runQuery()
+                                            .then(function(response) {
+                                                $route.reload();
+                                            })
+                                            .catch(function(response) {
+                                                $log.error('sending failed');
+                                                $log.log(response);
+                                            });
+                                    }else{
+                                        $log.error('no entry id for mail');
+                                    }
+                                break;
+                            }
                         }
                     }
                 }
@@ -51,6 +97,7 @@ angular.module('RegistryClient')
                 "foundCount":$scope.resource.foundCount
             });
     };
+    */
     $scope.config.list = {
         "pagination":1,
         "functions":{
