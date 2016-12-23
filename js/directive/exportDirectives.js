@@ -1,7 +1,7 @@
 angular.module('RegistryClient')
     .directive('xgAssignInvoiceButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay, dialogHandler, CSV, FileSaver, invoicePdfWriter, invoiceCsvWriter) {
         return {
-            template: '<a class="btn btn-default" ng-click="doAssignInvoiceDialog();" uib-tooltip="Fakturera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-sticky-note"></i></a>',
+            template: '<a class="btn btn-default" ng-click="doAssignInvoiceDialog();" uib-tooltip="Fakturera"><i class="fa fa-sticky-note"></i></a>',
             link: function(scope) {
 
                 scope.doAssignInvoiceDialog = function () {
@@ -146,7 +146,7 @@ angular.module('RegistryClient')
     })
     .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay) {
         return {
-            template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Exportera {{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Ladda ner"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
@@ -227,7 +227,7 @@ angular.module('RegistryClient')
     })
     .directive('xgPdfLabelButton', function($window, $log, $uibModal, globalParams, dbHandler, PDFKit, FileSaver, Blob, loadOverlay) {
         return {
-            template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport();" uib-tooltip="Exportera etiketter PDF" target="_blank"><i class="fa fa-tag"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-hide="pdfLabelsProcessing" ng-click="doPdfLabelExport();" uib-tooltip="Etiketter PDF" target="_blank"><i class="fa fa-tag"></i></a><div class="btn btn-danger" ng-show="pdfLabelsProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doPdfLabelExport = function () {
                     scope.pdfLabelsProcessing = true;
