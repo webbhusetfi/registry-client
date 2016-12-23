@@ -146,7 +146,7 @@ angular.module('RegistryClient')
     })
     .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay) {
         return {
-            template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ config.typeselect.types[config.query.arguments.filter.type] | lowercase }}.csv" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Ladda ner"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Ladda ner"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
@@ -154,6 +154,12 @@ angular.module('RegistryClient')
                         'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Bank', 'Kontonr.', 'VAT-nr.', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon', 'Skapad']
                     };
                     return scope.headers[type];
+                }
+                
+                scope.fileName = function() {
+                    now = new Date();
+                    fn = globalParams.static.types[scope.config.query.arguments.filter.type] + '_' + now.getDate() + '.' + (now.getMonth()+1) + '.' + now.getFullYear() + '.csv';
+                    return fn;
                 }
                 
                 scope.doCsvExport = function () {
