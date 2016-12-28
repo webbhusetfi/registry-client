@@ -8,15 +8,54 @@ angular.module('RegistryClient')
         "types": globalParams.static.types
     };
     $scope.config.include = null;
-    /*
+
     $scope.config.sendMail = function() {
-        dialogHandler.form({
+        var qry = {};
+        if ($routeParams.id || globalParams.get('user').entry) {
+            console.log($routeParams.id +'-'+ globalParams.get('user').entry);
+            entry = (($routeParams.id) ? $routeParams.id : globalParams.get('user').entry);
+            qry = {
+                "sender": {
+                    "service":"entry/read",
+                    "arguments": {
+                        "id":entry,
+                        "registry":globalParams.get('user.registry')
+                    }
+                }
+            };
+        } else {
+            qry = {
+                "sender": {
+                    "service":"entry/search",
+                    "arguments": {
+                        "filter": {
+                            "registry":globalParams.get('user.registry'),
+                            "type":"UNION"
+                        }
+                    }
+                }
+            };
+        }
+       
+        dbHandler
+        .setQuery(qry)
+        .runQuery()
+        .then(function(response) {
+            if(_.isNumber(response.sender[0].id)) {
+                entry = response.sender[0].id;
+            }
+            if(_.isString(response.sender[0].name)) {
+                name = response.sender[0].name;
+            }
+
+            dialogHandler.form({
                 args: {
                     title: "Skicka epost",
                     templateUrl:'template/entrySendMail.html',
                     buttons: {
                         cancel:true,
                         save: function(data) {
+                            // validation would be nice...
                             // fluff query object for mail
                             var query = _.cloneDeep($scope.config.query);
                             query.service = 'mail/create';
@@ -25,79 +64,39 @@ angular.module('RegistryClient')
                             _.unset(query, 'arguments.order');
                             _.assign(query.arguments, {
                                 "subject":data.subject,
-                                "message":data.message
+                                "message":data.message,
+                                "entry":data.entry
                             });
                             
                             // save state
                             globalParams.set('entryList.query', $scope.config.query);
                             globalParams.set('entryList.include', $scope.config.include);
                             
-                            switch(globalParams.get('user.role')) {
-                                case 'ADMIN':
-                                case 'SUPER_ADMIN':
-                                    dbHandler
-                                        .setQuery({
-                                            "union": {
-                                                "service":"entry/search",
-                                                "arguments": {
-                                                    "filter": {
-                                                        "registry":globalParams.get('user.registry'),
-                                                        "type":"UNION"
-                                                    }
-                                                }
-                                            }
-                                        })
-                                        .runQuery()
-                                        .then(function(response) {
-                                            if(_.isNumber(response.union[0].id)) {
-                                                _.assign(query.arguments, {
-                                                    "entry": $routeParams.id ? $routeParams.id : response.union[0].id
-                                                })
-                                                dbHandler
-                                                    .setQuery({"mail":query})
-                                                    .runQuery()
-                                                    .then(function(response) {
-                                                        $log.log(response);
-                                                        // $route.reload();
-                                                    })
-                                                    .catch(function(response) {
-                                                        $log.error('sending failed');
-                                                        $log.log(response);
-                                                    });
-                                                }
-                                        })
-                                break;
-                                
-                                case 'USER':
-                                    if($routeParams.id) {
-                                        _.assign(query.arguments, {
-                                            "entry": $routeParams.id
-                                        });
-                                        dbHandler
-                                            .setQuery({
-                                                "mail": query
-                                            })
-                                            .runQuery()
-                                            .then(function(response) {
-                                                $route.reload();
-                                            })
-                                            .catch(function(response) {
-                                                $log.error('sending failed');
-                                                $log.log(response);
-                                            });
-                                    }else{
-                                        $log.error('no entry id for mail');
-                                    }
-                                break;
-                            }
+                            dbHandler
+                            .setQuery({"mail":query})
+                            .runQuery()
+                            .then(function(response) {
+                                $log.log(response);
+                                // $route.reload();
+                            })
+                            .catch(function(response) {
+                                $log.error('sending failed');
+                                $log.log(response);
+                            });
                         }
                     }
                 }
             }, { 
-                "foundCount":$scope.resource.foundCount
+                "foundCount":$scope.resource.foundCount,
+                "entry": entry,
+                "name": name
             });
+        }).catch(function(response) {
+            $log.error('query failed');
+            $log.log(response);
+        });
     };
-    */
+
     $scope.config.list = {
         "pagination":1,
         "functions":{

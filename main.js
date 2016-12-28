@@ -34,6 +34,14 @@ var regApp = angular
                 templateUrl: '/template/invoiceLedger.html',
                 controller: 'invoiceLedger'
             })
+            .when('/mailing/list', {
+                templateUrl: '/template/mailingList.html',
+                controller: 'mailingList'
+            })
+            .when('/mailing/:id?', {
+                templateUrl: '/template/mailingView.html',
+                controller: 'mailingView'
+            })
             .when('/invoice/edit/:id?', {
                 templateUrl: '/template/invoiceEdit.html',
                 controller: 'invoiceEdit'

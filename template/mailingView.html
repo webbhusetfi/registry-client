@@ -1,0 +1,168 @@
+<div class="alert alert-danger" ng-show="routeParams.id == undefined">
+    Ingen utskicksid har angetts
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>Utskickstatus</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
+            <!--
+            <div class="alert alert-info">
+                Info?
+            </div>
+            //-->
+        </div>
+        <div class="col-sm-2">
+            <a class="btn btn-default pull-right" 
+                ng-click="back();">
+                <i class="fa fa-reply"></i> 
+                Tillbaka
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12 form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-sm-4">Jobb ID</label>
+            <div class="col-sm-6">
+                <p class="form-control-static">{{ mailstatus.id }}</p>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-4">Avsändare</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">{{ mailstatus.entry }}, {{ mailstatus.entryObject[0].name }}</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-4">Startad</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">{{ mailstatus.createdAt | date:'d.M.yyyy H:mm' }}</p>
+                </div>
+            </div>
+            <!--
+            <div class="form-group">
+                <label class="control-label col-sm-4">Jobb ID hos e-postleverantör</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">{{ mailstatus.job.id }}</p>
+                </div>
+            </div>
+            //-->
+            <div class="form-group">
+                <label class="control-label col-sm-4">Jobbstatus hos leverantör</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">
+                        <span class="alert alert-success" ng-show="mailstatus.job.status=='complete'">Klar</span>
+                        <span class="alert alert-warning" ng-show="mailstatus.job.status=='in_progress'">Håller på</span>
+                        <span class="alert alert-warning" ng-show="mailstatus.job.status=='submitted'">Mottagen</span>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-4"><h3>Skickningsrapport</h3></label>
+                <div class="col-sm-8">
+                    <p class="form-control-static">Mottagare: {{ mailstatus.job.recipientscount }} st.</p>
+                    <p class="form-control-static">
+                        Lyckade skickningar: {{ mailstatus.job.deliveredcount }}  st. 
+                        <a ng-click="delivered=true" ng-show="!delivered && mailstatus.job.delivered.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="delivered=false" ng-show="delivered && mailstatus.job.delivered.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="delivered" style="width: 100%; max-height:300px; overflow:auto;">
+                            {{ mailstatus.job.delivered.join(', ') }}
+                        </div>
+                    </p>
+                    <p class="form-control-static">
+                        Misslyckade skickningar: {{ mailstatus.job.failedcount }} st.
+                        <a ng-click="failed=true" ng-show="!failed && mailstatus.job.failed.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="failed=false" ng-show="failed && mailstatus.job.failed.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="failed" style="width: 100%; max-height:300px; overflow:auto;">
+                            <span ng-repeat="obj in mailstatus.job.failed">{{ obj.address }}{{$last ? '' : ', '}}</span>
+                        </div>
+                    </p>
+                    <p class="form-control-static">
+                        Pågående skickningar: {{ mailstatus.job.pendingcount }} st.
+                        <a ng-click="pending=true" ng-show="!pending && mailstatus.job.pending.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="pending=false" ng-show="pending && mailstatus.job.pending.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="pending" style="width: 100%; max-height:300px; overflow:auto;">
+                            {{ mailstatus.job.pending.join(', ') }}
+                        </div>
+                    </p>
+                    <p class="form-control-static">
+                        Öppnade e-postbrev: {{ mailstatus.job.openedcount }} st.
+                        <a ng-click="opened=true" ng-show="!opened && mailstatus.job.opened.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="opened=false" ng-show="opened && mailstatus.job.opened.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="opened" style="width: 100%; max-height:300px; overflow:auto;">
+                            {{ mailstatus.job.opened.join(', ') }}
+                        </div>
+                    </p>
+                    <p class="form-control-static">
+                        Klickade e-postbrev: {{ mailstatus.job.clickedcount }} st.
+                        <a ng-click="clicked=true" ng-show="!clicked && mailstatus.job.clicked.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="clicked=false" ng-show="clicked && mailstatus.job.clicked.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="clicked" style="width: 100%; max-height:300px; overflow:auto;">
+                            {{ mailstatus.job.clicked.join(', ') }}
+                        </div>
+                    </p>
+                    </p>
+                    <p class="form-control-static">
+                        Avbrutna prenumerationer: {{ mailstatus.job.unsubscribedcount }} st.
+                        <a ng-click="unsubscribed=true" ng-show="!unsubscribed && mailstatus.job.unsubscribed.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="unsubscribed=false" ng-show="unsubscribed && mailstatus.job.unsubscribed.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="unsubscribed" style="width: 100%; max-height:300px; overflow:auto;">
+                            {{ mailstatus.job.unsubscribed.join(', ') }}
+                        </div>
+                    </p>
+                    <p class="form-control-static">
+                        Missbruksrapporter: {{ mailstatus.job.abusereportscount }} st.
+                        <a ng-click="abusereports=true" ng-show="!abusereports && mailstatus.job.abusereports.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a ng-click="abusereports=false" ng-show="abusereports && mailstatus.job.abusereports.length" class="btn btn-xs btn-default">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <div class="well" ng-show="abusereports" style="width: 100%; max-height:300px; overflow:auto;">
+                            {{ mailstatus.job.abusereports.join(', ') }}
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+<div class="row">
+    <div class="col-sm-12">
+        <pre>
+        {{ mailstatus | json }}
+        </pre>
+    </div>
+</div>
+//-->

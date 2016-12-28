@@ -1,0 +1,51 @@
+<div class="controls list-functions">
+    <div class="row functions">
+        <div class="col-sm-12"><h2>Utskick</h2></div>
+    </div>
+</div>
+<div class="alert alert-info">
+    Själva utskicken sker via listan, på domhär sidorna kan man se statusen på utskicksjobben.
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <table class="xg-list">
+            <thead>
+                <td>
+                    <span class="col-label">Id</span>
+                </td>
+                <td>
+                    <span class="col-label">Avsändare</span>
+                </td>
+                <td>
+                    <span class="col-label">Startad</span>
+                </td>
+                <td class="functions">
+                    <span class="col-label">Funktioner</span>
+                </td>
+            </thead>
+            <tbody ng-show="list.foundCount > 0">
+                <tr ng-repeat="item in list.items">
+                    <td>
+                        {{ item.id }}
+                    </td>
+                    <td>
+                        <a href="/mailing/{{ item.id }}"> {{ item.entry }}, {{ item.entryObject[0].name }}</a>
+                    </td>
+                    <td>
+                        {{ item.createdAt | date:'d.M.yyyy H:mm' }}
+                    </td>
+                    <td>
+                        <a href="/mailing/{{ item.id }}"
+                            class="btn btn-primary btn-xs"
+                            >
+                            <i class="fa fa-search"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="alert alert-info" ng-show="list.foundCount == 0">
+            Inga poster.
+        </div>
+    </div>
+</div>

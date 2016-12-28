@@ -30,6 +30,12 @@
                 <span class="hidden-xs hidden-sm"> Fakturering</span>
             </a>
         </li>
+        <li ng-show="user.registry !== null">
+            <a xg-href="/mailing/list">
+                <i class="fa fa-envelope"></i>
+                <span class="hidden-xs hidden-sm"> Utskick</span>
+            </a>
+        </li>
         <!-- <li><a><i class="fa fa-cog"></i> Inställningar</a></li> //-->
         <li ng-show="user.role !== 'USER' && user.registry !== null">
             <a xg-href="/property/list"><i class="fa fa-edit"></i>

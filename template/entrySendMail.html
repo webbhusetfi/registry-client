@@ -2,7 +2,18 @@
     <div class="col-xs-12 col-sm-offset-1 col-sm-10">
         <div class="form-group">
             <div class="col-xs-12">
-                <p class="alert alert-info">Gör utskick till {{ data.foundCount }} poster. Epostfunktionen är litet beta.</p>
+                <p class="alert alert-info">
+                    Gör utskick till {{ data.foundCount }} poster, av dessa skickas endast till de som har en e-postadress. 
+                    Funktionen startar e-postjobben, statusen på dessa kan ses på utskick-sidan.
+                    Epostfunktionen är litet beta.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-4 control-label">Avsändare</label>
+            <div class="col-xs-8">
+                <p class="form-control-static">{{ data.name }}</p>
+                <input type="hidden" ng-model="data.entry" />
             </div>
         </div>
         <div class="form-group">
