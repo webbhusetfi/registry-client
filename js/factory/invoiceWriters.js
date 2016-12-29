@@ -259,21 +259,23 @@ angular.module('RegistryClient')
                                     document.text($filter('date')(new Date(invoicemodel.dueAt), "d.M.yyyy"), col_2_2, current, {'width': field, 'height': row});
 
                                     // Adress
-                                    if (Object.keys(invoicee_adr).length) {
-                                        if (invoicee_adr.name) {
-                                            document.text(invoicee_adr.name, margin, current, {'width': halfpage, 'height': row});
-                                            current += row;
-                                        }
-                                        if (invoicee_adr.street) {
-                                            document.text(invoicee_adr.street, margin, current, {'width': halfpage, 'height': row});
-                                            current += row;
-                                        }
-                                        if (invoicee_adr.postalCode && invoicee_adr.town) {
-                                            document.text(invoicee_adr.postalCode + ' ' + invoicee_adr.town, margin, current, {'width': halfpage, 'height': row});
-                                            current += row;
-                                        }
-                                        if (invoicee_adr.country) {
-                                            document.text(invoicee_adr.country, margin, current, {'width': halfpage, 'height': row});
+                                    if (invoicee_adr) {
+                                        if (Object.keys(invoicee_adr).length) {
+                                            if (invoicee_adr.name) {
+                                                document.text(invoicee_adr.name, margin, current, {'width': halfpage, 'height': row});
+                                                current += row;
+                                            }
+                                            if (invoicee_adr.street) {
+                                                document.text(invoicee_adr.street, margin, current, {'width': halfpage, 'height': row});
+                                                current += row;
+                                            }
+                                            if (invoicee_adr.postalCode && invoicee_adr.town) {
+                                                document.text(invoicee_adr.postalCode + ' ' + invoicee_adr.town, margin, current, {'width': halfpage, 'height': row});
+                                                current += row;
+                                            }
+                                            if (invoicee_adr.country) {
+                                                document.text(invoicee_adr.country, margin, current, {'width': halfpage, 'height': row});
+                                            }
                                         }
                                     }
 

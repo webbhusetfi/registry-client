@@ -19,6 +19,9 @@
                     ng-show="invoice_models.length"
                     name="invoice_model">
                 </select>
+                <p ng-show="!invoice_models" class="help-block alert alert-danger">
+                    Fakturamallar saknas.
+                </p>
                 <p ng-show="assignInvoiceForm.invoice_model.$invalid && assignInvoiceForm.invoice_model.$touched" class="help-block">
                     Välj fakturamall.
                 </p>
