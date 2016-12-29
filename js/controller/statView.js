@@ -2,6 +2,72 @@ angular.module('RegistryClient')
 .controller('statController', function ($scope, $http, globalParams, dbHandler) {
     $scope.globalParams = globalParams;
     
+    $scope.doCsvMemberCount = function () {
+        var oquery = {
+            "suborgs": {
+                "service": "entry/search",
+                "arguments": {
+                    "filter": {
+                        "type": "ASSOCIATION",
+                        "registry": Number(globalParams.get('user').registry)
+                    }, "order": {
+                        "name":"asc"
+                    }
+                }
+            }
+        };
+
+        return dbHandler
+        .setUrl('')
+        .setQuery(oquery)
+        .parse(false)
+        .runQuery()
+        .then(function(response) {
+            qry = {};
+            suborgs = response.suborgs.data.items;
+            angular.forEach(suborgs, function (value, key) {
+                qry_id = 'count' + value.id;
+                qry[qry_id] = {
+                    "service": "entry/statistics",
+                    "arguments": {
+                        "select": "count",
+                        "filter": {
+                            "type": "MEMBER_PERSON",
+                            "registry": Number(globalParams.get('user').registry),
+                            "parentEntry":value.id
+                        }
+                    }
+                };
+            });
+            
+            return dbHandler
+            .setUrl('')
+            .setQuery(qry)
+            .parse(false)
+            .runQuery()
+            .then(function(response) {
+                var ret = [];
+                angular.forEach(suborgs, function (value, key) {
+                    if (response['count' + value.id].status == 'success') {
+                        value.count = response['count' + value.id].data[0].found; 
+                    }
+                    ret.push([
+                        value.id, 
+                        value.name,
+                        value.count
+                    ]);
+                });
+                return ret;
+            })
+            .catch(function(response) {
+                console.log('err' + JSON.stringify(response));
+            });  
+        })
+        .catch(function(response) {
+            console.log('err' + JSON.stringify(response));
+        });        
+    }
+    
     $scope.init = function () {
         $scope.registry_msg = !!globalParams.get('user').registry;
         $scope.stat_panel = false;

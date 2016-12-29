@@ -15,6 +15,15 @@
                         <option ng-repeat="org in suborgs" value="{{ org.id }}">{{ org.name }}</option>
                     </optgroup>
                 </select>
+                <a ng-csv="doCsvMemberCount();"
+                    csv-header="['ID', 'Namn', 'Antal']"
+                    quote-strings="true"
+                    filename="föreningars_medlemsantal.csv"
+                    uib-tooltip="Ladda ner; medlemsantal per förening"
+                    ng-show="role_admin"
+                    class="btn btn-default">
+                    <i class="fa fa-download"></i>
+                </a>
             </form>
             <div ng-show="selected_org!=null">
                 <h3>{{ view_org.name }} har {{ view_org_members_count }} st. medlemmar.</h3>
