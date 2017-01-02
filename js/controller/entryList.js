@@ -105,7 +105,8 @@ angular.module('RegistryClient')
                     "entry": {
                         "service":"entry/delete",
                         "arguments": [
-                            "id"
+                            "id",
+                            "type"
                         ]
                     }
                 }
