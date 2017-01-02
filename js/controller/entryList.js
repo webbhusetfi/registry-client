@@ -174,6 +174,8 @@ angular.module('RegistryClient')
                 "offset":0,
                 "limit":25,
                 "order": {
+                    "lastName":"asc",
+                    "firstName":"asc",
                     "name":"asc"
                 }
             }
