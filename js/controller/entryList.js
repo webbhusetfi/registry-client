@@ -1,13 +1,74 @@
 angular.module('RegistryClient')
 .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $timeout, globalParams, dialogHandler, dbHandler) {
     var userLevel = globalParams.get('user').role;
+    $scope.globalParams = globalParams;
     $scope.config = {};
     
     // base configuration
     $scope.config.typeselect = {
         "types": globalParams.static.types
     };
+    
+    if (globalParams.get('user').role == 'USER') {
+        _.unset($scope.config.typeselect.types, 'UNION');
+    }
+    
     $scope.config.include = null;
+
+    $scope.config.list = {
+        "pagination":1,
+        "functions":{
+            /*
+            added in case of admin below
+            "deleteDialog": {
+                "postAction": {
+                    "entry": {
+                        "service":"entry/delete",
+                        "arguments": [
+                            "id",
+                            "type"
+                        ]
+                    }
+                }
+            },*/
+            "custom":[
+                {
+                    "function": function(item) {
+                        globalParams.set('entryList.query', $scope.config.query);
+                        globalParams.set('entryList.include', $scope.config.include);
+                        $location.path('/entry/edit/' + item.id);
+                    },
+                    "icon":"fa fa-pencil",
+                    "btnclass":"btn-primary"
+                },
+                {
+                    "function": function(item) {
+                        $location.path('/entry/list/' + item.id);
+                    },
+                    "if": function(item) {
+                        if(item.type == 'MEMBER_PERSON')
+                            return false;
+                        else
+                            return true;
+                    },
+                    "icon":"fa fa-sign-in"
+                }]
+        }
+    };
+    
+    if (globalParams.get('user').role != 'USER') {
+        $scope.config.list.functions.deleteDialog = {
+            "postAction": {
+                "entry": {
+                    "service":"entry/delete",
+                    "arguments": [
+                        "id",
+                        "type"
+                    ]
+                }
+            }
+        }
+    }
 
     $scope.config.sendMail = function() {
         var qry = {};
@@ -97,44 +158,6 @@ angular.module('RegistryClient')
         });
     };
 
-    $scope.config.list = {
-        "pagination":1,
-        "functions":{
-            "deleteDialog": {
-                "postAction": {
-                    "entry": {
-                        "service":"entry/delete",
-                        "arguments": [
-                            "id",
-                            "type"
-                        ]
-                    }
-                }
-            },
-            "custom":[
-                {
-                    "function": function(item) {
-                        globalParams.set('entryList.query', $scope.config.query);
-                        globalParams.set('entryList.include', $scope.config.include);
-                        $location.path('/entry/edit/' + item.id);
-                    },
-                    "icon":"fa fa-pencil",
-                    "btnclass":"btn-primary"
-                },
-                {
-                    "function": function(item) {
-                        $location.path('/entry/list/' + item.id);
-                    },
-                    "if": function(item) {
-                        if(item.type == 'MEMBER_PERSON')
-                            return false;
-                        else
-                            return true;
-                    },
-                    "icon":"fa fa-sign-in"
-                }]
-        }
-    };
     
     // set include columns (separate from query, separate handler)
     $scope.setInclude = function(include) {

@@ -399,12 +399,12 @@
                     <div class="col-sm-6">
                         <div ng-show="entry.id !== undefined">
                             <a
-                                ng-show="entry.type == 'ASSOCIATION'"
+                                ng-show="entry.type == 'ASSOCIATION' && globalParams.get('user').role != 'USER'"
                                 class="btn btn-default"
                                 ng-click="deleteEntry({'id':entry.id,'name':entry.name, 'type':entry.type, 'post':{'action':'back'}})"
                             ><i class="fa fa-times"></i> Radera</a>
                             <a
-                                ng-show="entry.type == 'MEMBER_PERSON'"
+                                ng-show="entry.type == 'MEMBER_PERSON' && globalParams.get('user').role != 'USER'"
                                 class="btn btn-default"
                                 ng-click="deleteEntry({'id':entry.id,'name':entry.firstName + ' ' + entry.lastName, 'type':entry.type, 'post':{'action':'back'}})"
                             ><i class="fa fa-times"></i> Radera</a>
