@@ -6,6 +6,11 @@
             </div>
             <div class="col-sm-2 text-right">
                 <a
+                    ng-show="routeParams.id"
+                    class="btn btn-default"
+                    href="/entry/edit/{{ routeParams.id }}"><i class="fa fa-pencil"></i> Föreningen
+                </a>
+                <a
                     ng-show="user.role !== 'USER' || (user.role == 'USER' && config.query.arguments.filter.type == 'MEMBER_PERSON')"
                     class="btn btn-default"
                     xg-href="/entry/edit/-1"><i class="fa fa-pencil"></i> Skapa

@@ -1,5 +1,6 @@
 angular.module('RegistryClient')
 .controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $timeout, globalParams, dialogHandler, dbHandler) {
+    $scope.routeParams = $routeParams;
     $scope.user = globalParams.get('user');
     $scope.globalParams = globalParams;
     $scope.config = {};
