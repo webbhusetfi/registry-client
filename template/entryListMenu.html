@@ -6,7 +6,7 @@
             </div>
             <div class="col-sm-2 text-right">
                 <a
-                    ng-show="!user.registry && (globalParams.get('user').role != 'USER' || (globalParams.get('user').role == 'USER' && params.type == 'MEMBER_PERSON'))"
+                    ng-show="user.role !== 'USER' || (user.role == 'USER' && config.query.arguments.filter.type == 'MEMBER_PERSON')"
                     class="btn btn-default"
                     xg-href="/entry/edit/-1"><i class="fa fa-pencil"></i> Skapa
                 </a>
