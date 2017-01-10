@@ -30,12 +30,12 @@ angular.module('RegistryClient')
     })
     .runQuery()
     .then(function(response) {
-        console.log(JSON.stringify(response));
+        //console.log(JSON.stringify(response));
         $scope.list = { "items": response.list, "foundCount": response.foundCount.list };
     })
     .catch(function(response) {
         $log.error(response);
-        //$location.path('/user/logout');
+        $location.path('/user/logout');
     });
 
 });
