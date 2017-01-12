@@ -54,16 +54,30 @@
                         </a>
                         
                         <a
-                            ng-show="item.invoices.length && item.invoices.length <= 1000"
+                            ng-show="item.invoices.length && item.invoices.length <= limit"
                             ng-click="exportInvoices(item.id, 'pdf');"
                             class="btn btn-xs btn-default"
                             uib-tooltip="Exportera fakturor i PDF">
                             <i class="fa fa-download"></i>
                             PDF
                         </a>
-                        <span class="alert alert-warning" ng-show="item.invoices.length && item.invoices.length > 1000">
-                            Max 1000 fakturor kan tas ut som pdf
-                        </span>
+                        
+                        <span ng-show="item.invoices.length && item.invoices.length > limit">
+                            PDF: 
+                            <div class="btn-group">
+                                <a
+                                    ng-repeat="page in _.range(_.ceil(item.invoices.length/limit))"
+                                    ng-click="exportInvoices(item.id, 'pdf', page*limit );"
+                                    class="btn btn-xs btn-default"
+                                    uib-tooltip="Exportera fakturor i PDF; {{ (limit*page)+1 }}-{{ limit*(page+1) }}">
+                                    {{ page+1 }}
+                                </a>
+                            </div>
+                        </span>                        
+                        
+                        <div class="alert alert-warning" ng-show="item.invoices.length && item.invoices.length > limit">
+                            Max {{ limit }} fakturor kan tas ut åt gången som pdf
+                        </div>
                     </td>
                     <td class="functions">
                         <a

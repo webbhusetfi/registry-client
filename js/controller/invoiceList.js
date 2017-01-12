@@ -1,6 +1,8 @@
 angular.module('RegistryClient')
 .controller('invoiceList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter, referenceNumberCalculator) {
 
+    $scope.limit = 1000;
+    
     query = {};
     query.list = {
             "service":"invoice/search",
@@ -31,14 +33,19 @@ angular.module('RegistryClient')
             $location.path('/user/logout');
         });
 
-    $scope.exportInvoices = function(id, type) {
+    $scope.exportInvoices = function(id, type, pdfoffset) {
         var outquery = {};
+        var offset = ((pdfoffset) ? pdfoffset : 0);
+        
         outquery.entryinvoice = {
                         "service": "entryInvoice/search",
                         "arguments" :{
                             "include": ["entry", "primaryAddress"],
                             "filter": {
                                 "invoice": id,
+                            },
+                            "order": {
+                                "id": "asc"
                             }
                         }
                     };
@@ -51,6 +58,8 @@ angular.module('RegistryClient')
         
         if (type == 'pdf') {
             // do pdf
+            outquery.entryinvoice.arguments.offset = offset;
+            outquery.entryinvoice.arguments.limit = $scope.limit;
             invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice);
         } else if (type == 'csv') {
             // do csv
