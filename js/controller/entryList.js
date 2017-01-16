@@ -12,6 +12,12 @@ angular.module('RegistryClient')
     
     if (globalParams.get('user').role == 'USER') {
         _.unset($scope.config.typeselect.types, 'UNION');
+        if (globalParams.get('user').entry != $routeParams.id) {
+            //console.log($routeParams.id + '-' + globalParams.get('user').entry);
+            //alert('warning');
+            $location.path('/entry/list/' + globalParams.get('user').entry);
+            return false;
+        }
     }
     
     $scope.config.include = null;
@@ -74,7 +80,6 @@ angular.module('RegistryClient')
     $scope.config.sendMail = function() {
         var qry = {};
         if ($routeParams.id || globalParams.get('user').entry) {
-            console.log($routeParams.id +'-'+ globalParams.get('user').entry);
             entry = (($routeParams.id) ? $routeParams.id : globalParams.get('user').entry);
             qry = {
                 "sender": {
@@ -277,19 +282,45 @@ angular.module('RegistryClient')
                 }
             break;
         }
+        
+        if (globalParams.get('user').role == 'USER' && $scope.config.query.arguments.filter.type == 'ASSOCIATION') {
+            typeCols.name.filter = false;
+            baseCols.id.filter = false;
+        }
+        
         return _.merge(baseCols, typeCols, addCols);
     }
     
     // default to MEMBER_PERSON when ASSOCIATION open and set parentEntry filter
-    if($routeParams.id) {
-        $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
-        $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
-    }    
+    if (globalParams.get('user').role == 'USER') {
+        if (globalParams.get('user').entry) {
+            $scope.config.query.arguments.filter.parentEntry = globalParams.get('user').entry;
+            $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
+        }
+    } else {
+        if ($routeParams.id) {
+            $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
+            $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
+        }
+    }
     
     // zero timeout for first load
     var time = 0;
     // watch query parameters and update
     $scope.$watch('config.query', function(newQuery, oldQuery) {
+        if (globalParams.get('user').role == 'USER') {
+            if ($scope.config.query.arguments.filter.type == 'ASSOCIATION') {
+                // allow view of own association in list
+                $scope.config.query.arguments.filter.id = globalParams.get('user').entry;
+                $scope.config.query.arguments.filter.parentEntry = null;
+            }
+            if ($scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
+                // add back parentEntry of own association when viewing members in list
+                delete $scope.config.query.arguments.filter.id;
+                $scope.config.query.arguments.filter.parentEntry = globalParams.get('user').entry;
+            }
+        }
+                        
         // reset some parameters in case of type change
         if(oldQuery.arguments.filter.type) {
             if(oldQuery.arguments.filter.type !== newQuery.arguments.filter.type) {

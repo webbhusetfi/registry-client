@@ -410,6 +410,7 @@ angular.module('RegistryClient')
                         {
                             address['contactsheet' + key].service = 'address/update';
                             address['contactsheet' + key].arguments.id = values.id;
+                            address['contactsheet' + key].arguments.entry = values.entry;
                         }else{
                             address['contactsheet' + key].service = 'address/create';
                             address['contactsheet' + key].arguments.entry = parentId;
