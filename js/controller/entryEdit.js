@@ -325,6 +325,8 @@ angular.module('RegistryClient')
                             "birthYear": $scope.entry.birthYear,
                             "birthMonth": $scope.entry.birthMonth,
                             "birthDay": $scope.entry.birthDate,
+                            "bank": $scope.entry.bank,
+                            "account": $scope.entry.account,
                             "notes": $scope.entry.notes,
                             "description": $scope.entry.description,
                             "properties": $scope.entry.properties
