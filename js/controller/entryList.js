@@ -275,7 +275,7 @@ angular.module('RegistryClient')
                         "label":"Epost",
                         "filter":true
                     },
-                    "address.phone": {
+                    "address.mobile": {
                         "label":"Mobil",
                         "filter":true
                     }
