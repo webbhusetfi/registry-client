@@ -91,8 +91,12 @@ angular.module('RegistryClient')
                     if (response.suborg) {
                          if (response.suborg.data.items[0]) {
                             $scope.suborg = response.suborg.data.items[0];
-                            $scope.invoice.bank = $scope.suborg.bank;
-                            $scope.invoice.bankAccount = $scope.suborg.account;
+                            if ($scope.suborg.bank) {
+                                $scope.invoice.bank = $scope.suborg.bank;
+                            }
+                            if ($scope.suborg.account) {
+                                $scope.invoice.bankAccount = $scope.suborg.account;
+                            }
                          }
                     }
                 }
@@ -170,8 +174,6 @@ angular.module('RegistryClient')
             if ($routeParams.id !== '-1') {
                 queryObject.invoice.arguments.id = $scope.invoice.id;
             }
-
-            //console.log(queryObject);
 
             dbHandler
                 .setQuery(queryObject)

@@ -29,14 +29,14 @@
                                 ng-options="org.id as org.name group by org.type for org in orgs" 
                                 ng-model="invoice.entry" 
                                 class="form-control" 
-                                ng-required="true" 
+                                ng-required="role_admin" 
                                 ng-show="orgs.length"
                                 name="entry"
                                 ng-change="addBankInfo()">
                         </select>
                         <p ng-show="invoiceForm.entry.$invalid && invoiceForm.entry.$touched" class="help-block">Ange fakturerare</p>
                         <p class="alert alert-info help-block">Bank och kontonr. förifylls baserat på fakturerare.</p>
-                        <div ng-show="!orgs.length">
+                        <div ng-show="(!orgs.length && role_admin) || !suborg.id">
                             <br />
                             <div class="alert alert-danger">
                                 Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
@@ -48,7 +48,7 @@
                     <label class="control-label col-sm-4">Fakturerare</label>
                     <div class="col-sm-8">
                         {{ suborg.name }} ({{ suborg.id }})
-                        <div ng-show="!orgs.length">
+                        <div ng-show="(!orgs.length && role_admin) || !suborg.id">
                             <br />
                             <div class="alert alert-danger">
                                 Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
