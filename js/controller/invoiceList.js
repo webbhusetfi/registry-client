@@ -2,20 +2,9 @@ angular.module('RegistryClient')
 .controller('invoiceList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter, referenceNumberCalculator) {
 
     $scope.limit = 1000;
-    
-    query = {};
-    query.list = {
-            "service":"invoice/search",
-            "arguments": {
-                "filter": {
-                    "registry":globalParams.get('user').registry,
-                },
-                "order": {
-                    "name":"asc"
-                }
-            }
-        };
-    dbHandler
+        
+    $scope.init = function(query) {
+        dbHandler
         .setQuery(query)
         .setJoin({
             "resource":"list",
@@ -31,7 +20,55 @@ angular.module('RegistryClient')
         .catch(function(response) {
             $log.error(response);
             $location.path('/user/logout');
+        });    
+    }
+    
+    query = {};
+    query.list = {
+        "service":"invoice/search",
+        "arguments": {
+            "filter": {
+                "registry":globalParams.get('user').registry
+            },
+            "order": {
+                "name":"asc"
+            }
+        }
+    };
+    
+    // Add entry filter for user or admin
+    if(globalParams.get('user.entry')) {
+        _.assign(query.list.arguments.filter, {
+            "entry": globalParams.get('user.entry')
         });
+        $scope.init(query);
+    } else {
+        qry = {
+            "owner": {
+                "service":"entry/search",
+                "arguments": {
+                    "filter": {
+                        "registry":globalParams.get('user.registry'),
+                        "type":"UNION"
+                    }
+                }
+            }
+        };
+        dbHandler
+        .setQuery(qry)
+        .runQuery()
+        .then(function(response) {
+            if(_.isNumber(response.owner[0].id)) {
+                _.assign(query.list.arguments.filter, {
+                    "entry": response.owner[0].id
+                });
+                $scope.init(query);
+            }
+        }).catch(function(response) {
+            $log.error('query failed');
+            $log.log(response);
+        });
+    }
 
     $scope.exportInvoices = function(id, type, pdfoffset) {
         var outquery = {};

@@ -8,41 +8,44 @@ angular.module('RegistryClient')
                     var modalInstance = $uibModal.open({
                         templateUrl: 'js/directive/template/assignInvoiceButton.html',
                         controller: function($scope, $uibModalInstance, $log) {
-                            $scope.to_be_invoiced_foundcount = 0;
-                            $scope.to_be_invoiced_type = scope.config.typeselect.types[scope.config.query.arguments.filter.type];
-                            var query = {};
-                            query.summary = {
-                                "service":"entry/search",
-                                "arguments":{
-                                    "filter": {
-                                        "registry": globalParams.get('user').registry,
-                                        "withProperty":scope.config.query.arguments.filter.withProperty,
-                                        "withoutProperty":scope.config.query.arguments.filter.withoutProperty,
-                                        "class":scope.config.query.arguments.filter.class,
-                                        "type":scope.config.query.arguments.filter.type,
-                                        "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry)
-                                    },
-                                    "order": {
-                                        "lastName":"asc",
-                                        "name":"asc"
-                                    }
-                                }
-                            };
-                            query.summary.arguments.filter = angular.merge(query.summary.arguments.filter, scope.config.query.arguments.filter);
                             
-                            query.invoice_models = {
-                                "service":"invoice/search",
-                                "arguments": {
-                                    "filter": {
-                                        "registry":globalParams.get('user').registry,
-                                    },
-                                    "order": {
-                                        "name":"asc"
+                            $scope.init = function(invoice_model_entry) {
+                                $scope.to_be_invoiced_foundcount = 0;
+                                $scope.to_be_invoiced_type = scope.config.typeselect.types[scope.config.query.arguments.filter.type];
+                                var query = {};
+                                query.summary = {
+                                    "service":"entry/search",
+                                    "arguments":{
+                                        "filter": {
+                                            "registry": globalParams.get('user').registry,
+                                            "withProperty":scope.config.query.arguments.filter.withProperty,
+                                            "withoutProperty":scope.config.query.arguments.filter.withoutProperty,
+                                            "class":scope.config.query.arguments.filter.class,
+                                            "type":scope.config.query.arguments.filter.type,
+                                            "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry)
+                                        },
+                                        "order": {
+                                            "lastName":"asc",
+                                            "name":"asc"
+                                        }
                                     }
-                                }
-                            };
-        
-                            dbHandler
+                                };
+                                query.summary.arguments.filter = angular.merge(query.summary.arguments.filter, scope.config.query.arguments.filter);
+                                
+                                query.invoice_models = {
+                                    "service":"invoice/search",
+                                    "arguments": {
+                                        "filter": {
+                                            "registry":globalParams.get('user').registry,
+                                            "entry": invoice_model_entry
+                                        },
+                                        "order": {
+                                            "name":"asc"
+                                        }
+                                    }
+                                };
+            
+                                dbHandler
                                 .parse(true)
                                 .setQuery(query)
                                 .runQuery()
@@ -57,6 +60,35 @@ angular.module('RegistryClient')
                                     $scope.invoice_models = response.invoice_models;
                                     $scope.invoice_model = '';
                                 });
+                            }
+                            
+                            // start
+                            if(globalParams.get('user.entry')) {
+                                $scope.init(globalParams.get('user.entry'));
+                            } else {
+                                qry = {
+                                    "owner": {
+                                        "service":"entry/search",
+                                        "arguments": {
+                                            "filter": {
+                                                "registry":globalParams.get('user.registry'),
+                                                "type":"UNION"
+                                            }
+                                        }
+                                    }
+                                };
+                                dbHandler
+                                .setQuery(qry)
+                                .runQuery()
+                                .then(function(response) {
+                                    if(_.isNumber(response.owner[0].id)) {
+                                        $scope.init(response.owner[0].id);
+                                    }
+                                }).catch(function(response) {
+                                    $log.error('query failed');
+                                    $log.log(response);
+                                });
+                            }
                     
                             $scope.dismiss = function() {
                                 $uibModalInstance.dismiss();

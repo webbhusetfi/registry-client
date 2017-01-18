@@ -36,10 +36,10 @@
                         </select>
                         <p ng-show="invoiceForm.entry.$invalid && invoiceForm.entry.$touched" class="help-block">Ange fakturerare</p>
                         <p class="alert alert-info help-block">Bank och kontonr. förifylls baserat på fakturerare.</p>
-                        <div ng-show="(!orgs.length && role_admin) || !suborg.id">
+                        <div ng-show="(!orgs.length && role_admin) || (!suborg.id && !role_admin)">
                             <br />
                             <div class="alert alert-danger">
-                                Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
+                                1 Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                     <label class="control-label col-sm-4">Fakturerare</label>
                     <div class="col-sm-8">
                         {{ suborg.name }} ({{ suborg.id }})
-                        <div ng-show="(!orgs.length && role_admin) || !suborg.id">
+                        <div ng-show="(!orgs.length && role_admin) || (!suborg.id && !role_admin)">
                             <br />
                             <div class="alert alert-danger">
                                 Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
