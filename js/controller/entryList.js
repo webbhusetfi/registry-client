@@ -312,7 +312,8 @@ angular.module('RegistryClient')
             if ($scope.config.query.arguments.filter.type == 'ASSOCIATION') {
                 // allow view of own association in list
                 $scope.config.query.arguments.filter.id = globalParams.get('user').entry;
-                $scope.config.query.arguments.filter.parentEntry = null;
+                delete $scope.config.query.arguments.filter.parentEntry;
+                //$scope.config.query.arguments.filter.parentEntry = null;
             }
             if ($scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
                 // add back parentEntry of own association when viewing members in list
