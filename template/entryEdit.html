@@ -1,17 +1,22 @@
 <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
+    <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
         <div class="inner-form">
-            <div class="functions"><xg-back/></div>
+            <div class="functions"><xg-back></div>
             <form class="form-horizontal">
                 <div class="form-group">
                     <label class="control-label col-sm-4">Posttyp</label>
                     <div class="col-sm-8">
-                        <select class="form-control" ng-model="entry.type" ng-show="routeParams.id == '-1' && globalParams.get('user').role !== 'USER'" ng-change="switchType(this.value);">
+                        <select
+                            class="form-control"
+                            ng-model="entry.type"
+                            ng-show="routeParams.id == '-1' && globalParams.get('user').role !== 'USER'"
+                            ng-change="switchType();"
+                        >
                             <option ng-repeat="(key, type) in entryTypes" ng-selected="entry.type == key" value="{{ key }}">{{ type }}</option>
                         </select>
                         <p class="form-text" ng-show="routeParams.id !== '-1' || globalParams.get('user').role === 'USER'">{{ entryTypes[entry.type] }}</p>
                     </div>
-                </div>
+                </div>dsadas
                 <div ng-show="entry.type == 'ASSOCIATION' || entry.type == 'UNION'">
                     <div class="form-group">
                         <label class="control-label col-sm-4">Namn</label>
@@ -136,25 +141,33 @@
                     </div>
                 </div>
                 <hr>
-                <div>
+                <div ng-show="entry.type !== 'UNION'">
                     <h2>Tillhörighet</h2>
                     <div class="membership-list" ng-show="entry.connection !== undefined">
                         <div ng-form="connection" ng-repeat="(key, connection) in entry.connection">
                             <div class="form-group">
-                                <label class="control-label col-xs-12 col-sm-4">Typ</label>
+                                <label
+                                    class="control-label col-xs-12 col-sm-4"
+                                >
+                                    <span
+                                        ng-if="connectionTypes[entry.type]"
+                                    >Typ</span>
+                                </label>
                                 <div class="col-xs-8 col-sm-6">
                                     <select
                                         class="form-control" 
                                         ng-show="globalParams.get('user').role !== 'USER'"
                                         ng-model="entry.connection[key].connectionType"
-                                        ng-change="resetOrg(key);"
-                                        ng-options="connection.id as connection.name for connection in connectionTypes[entry.type]">
+                                        ng-change="switchConnectionType(key)"
+                                        ng-options="connection.id as connection.name for connection in connectionTypes[entry.type]"
+                                        ng-if="connectionTypes[entry.type]"
+                                    >
                                     </select>
                                     <p class="form-text" ng-show="globalParams.get('user').role === 'USER'">{{ connectionTypes[entry.type][entry.connection[key].connectionType].name }}</p>
                                 </div>
                                 <div class="col-xs-4 col-sm-2 text-right">
                                     <button class="btn btn-default" ng-click="removeMembership(key);"><i class="fa fa-times"></i> Radera</button>
-                                </div>                                        
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-xs-12 col-sm-4">Organisation</label>

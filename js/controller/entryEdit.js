@@ -14,6 +14,29 @@ angular.module('RegistryClient')
         value.name = connectionNames[value.parentType];
         $scope.connectionTypes[value.childType][value.id] = value;
     });
+    
+    $scope.switchType = function() {
+        if($scope.entry.type == 'UNION') {
+            $scope.entry.connection = [];
+        }else{
+            if($scope.connectionTypes[$scope.entry.type]) {
+                angular.forEach($scope.entry.connection, function(connection, key) {
+                    _.assign($scope.entry.connection[key], {
+                        "connectionType":Number(Object.keys($scope.connectionTypes[$scope.entry.type])[0]),
+                        "parentEntry":"-"
+                    });
+                });
+            }
+        }
+    }
+    
+    $scope.switchConnectionType = function(key) {
+        if($scope.connectionTypes[$scope.entry.type][$scope.entry.connection[key].connectionType].parentType) {
+            $scope.entry.connection[key].parentType = $scope.connectionTypes[$scope.entry.type][$scope.entry.connection[key].connectionType].parentType;
+        }else{
+            $scope.entry.connection[key].parentEntry = '-';
+        }
+    }
 
     $scope.age = function(year, month, day) {
         if (year !== null && year !== undefined) {
@@ -167,11 +190,6 @@ angular.module('RegistryClient')
         };
         $scope.entry.address[id].class = type;
     };
-
-    $scope.resetOrg = function(id) {
-        $scope.entry.connection[id].parentEntry = '-';
-        $scope.entry.connection[id].parentType = $scope.connectionTypes[$scope.entry.type][$scope.entry.connection[id].connectionType].parentType;
-    }
     
     $scope.deleteEntry = function(item) {
         dialogHandler.deleteConfirm(item, {
@@ -199,7 +217,21 @@ angular.module('RegistryClient')
             }
         })
         .getProperties({"all":"true"});
-
+    
+    $scope.initOrganizations = function(response) {
+        $scope.organizations = {};
+        _.assign($scope.organizations, {
+            "UNION": {"0":{"id":"-", "name":"-"}},
+            "ASSOCIATION": {"0":{"id":"-", "name":"-"}}
+        });
+        angular.forEach(response.associations, function(org, key) {
+            $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
+        });
+        angular.forEach(response.unions, function(org, key) {
+            $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
+        });
+    }
+    
     $scope.init = function() {
         if($routeParams.id == '-1')
         {
@@ -208,15 +240,7 @@ angular.module('RegistryClient')
                 .then(function(response) {
                     $scope.connectionType = response.connectionType;
                     // fix organizations
-                    $scope.organizations = {}
-                    $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
-                    $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};
-                    angular.forEach(response.associations, function(org, key) {
-                        $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
-                    });
-                    angular.forEach(response.unions, function(org, key) {
-                        $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
-                    });
+                    $scope.initOrganizations(response);
                     $scope.propertyGroups = response.properties;
 
                     $scope.entry = {
@@ -259,16 +283,7 @@ angular.module('RegistryClient')
                     $scope.propertyGroups = response.properties;
 
                     // fix organizations
-                    $scope.organizations = {}
-                    $scope.organizations['UNION'] = {"0":{"id":"-", "name":"-"}};
-                    $scope.organizations['ASSOCIATION'] = {"0":{"id":"-", "name":"-"}};                        
-                    angular.forEach(response.associations, function(org, key) {
-                        $scope.organizations['ASSOCIATION'][Object.keys($scope.organizations['ASSOCIATION']).length] = org;
-                    });
-                    angular.forEach(response.unions, function(org, key) {
-                        $scope.organizations['UNION'][Object.keys($scope.organizations['UNION']).length] = org;
-                    });
-
+                    $scope.initOrganizations(response);
                     if(angular.isObject(response.entry) && angular.isObject(response.entry[0]))
                         $scope.entry = response.entry[0];
                     else
