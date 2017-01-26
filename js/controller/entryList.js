@@ -13,8 +13,6 @@ angular.module('RegistryClient')
     if (globalParams.get('user').role == 'USER') {
         _.unset($scope.config.typeselect.types, 'UNION');
         if (globalParams.get('user').entry != $routeParams.id) {
-            //console.log($routeParams.id + '-' + globalParams.get('user').entry);
-            //alert('warning');
             $location.path('/entry/list/' + globalParams.get('user').entry);
             return false;
         }

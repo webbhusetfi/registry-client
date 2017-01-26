@@ -31,10 +31,11 @@ angular.module('RegistryClient')
                                     var user = globalParams.get('user');
                                     globalParams.set('connectionTypes', response.connectionType);
                                     globalParams.set('registry', response.registry[0]);
-                                    if(user.role == 'USER')
-                                        $window.location.href = 'entry/list/' + user.entry;
-                                    else
-                                        $window.location.href = 'entry/list'
+                                    if (user.role == 'USER') {
+                                        $window.location.href = '/entry/list/' + user.entry;
+                                    } else {
+                                        $window.location.href = '/entry/list';
+                                    }
                                 }else{
                                     $scope.message = 'Fatal error.';
                                 }
