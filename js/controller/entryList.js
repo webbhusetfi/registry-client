@@ -184,8 +184,6 @@ angular.module('RegistryClient')
                             .setQuery({"mail":query})
                             .runQuery()
                             .then(function(response) {
-                                $log.log(response);
-                                //console.log(response);
                                 // $route.reload();
                             })
                             .catch(function(response) {
@@ -451,7 +449,6 @@ angular.module('RegistryClient')
         if($scope.timeout)
             $timeout.cancel($scope.timeout);
         $scope.timeout = $timeout(function() {
-            console.log(JSON.stringify($scope.config.query));
             dbHandler
                 .setQuery({"base":$scope.config.query})
                 .getProperties({"all":true})

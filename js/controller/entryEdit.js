@@ -5,6 +5,19 @@ angular.module('RegistryClient')
     $scope.globalParams = globalParams;
     $scope.entryTypes = globalParams.static.types;
     $scope.meta = {};
+    $scope.validation = {
+        "entry":{},
+        "connection":{},
+        "address":{}
+    }
+    $scope.historyState = function(value) {
+        var tr = {
+            "Address modified":"Adresser ändrade",
+            "Entry modified":"Basuppgifter ändrade",
+            "Connection modified":"Tillhörigheter ändrade"
+        };
+        return tr[value];
+    }
 
     $scope.connectionTypes = {}
     var connectionNames = angular.merge({}, globalParams.static.types, {"UNION":"Förbund"});
@@ -384,7 +397,8 @@ angular.module('RegistryClient')
                     var connections = {};
 
                     angular.forEach($scope.entry.connection, function(values, key) {
-                        if(values.organization !== '-') {
+                        if(values.organization !== '-' && $scope.validation.connection[key].$dirty) {
+                            $log.log('connection was dirty');
                             connections['connection' + key] = {};
                             connections['connection' + key].arguments = {
                                     "notes" : values.notes,
@@ -427,28 +441,30 @@ angular.module('RegistryClient')
 
                     var address = {}
                     angular.forEach($scope.entry.address, function(values, key) {
-                        address['contactsheet' + key] = {};
-                        address['contactsheet' + key].arguments = {
-                            "class": values.class,
-                            "name": values.name,
-                            "street": values.street,
-                            "postalCode": values.postalCode,
-                            "town": values.town,
-                            "country": values.country,
-                            "email": values.email,
-                            "phone": values.phone,
-                            "mobile": values.mobile,
-                            "notes": values.notes
-                        }
+                        if($scope.validation.address[key].$dirty) {
+                            address['contactsheet' + key] = {};
+                            address['contactsheet' + key].arguments = {
+                                "class": values.class,
+                                "name": values.name,
+                                "street": values.street,
+                                "postalCode": values.postalCode,
+                                "town": values.town,
+                                "country": values.country,
+                                "email": values.email,
+                                "phone": values.phone,
+                                "mobile": values.mobile,
+                                "notes": values.notes
+                            }
 
-                        if(values.id !== undefined)
-                        {
-                            address['contactsheet' + key].service = 'address/update';
-                            address['contactsheet' + key].arguments.id = values.id;
-                            address['contactsheet' + key].arguments.entry = values.entry;
-                        }else{
-                            address['contactsheet' + key].service = 'address/create';
-                            address['contactsheet' + key].arguments.entry = parentId;
+                            if(values.id !== undefined)
+                            {
+                                address['contactsheet' + key].service = 'address/update';
+                                address['contactsheet' + key].arguments.id = values.id;
+                                address['contactsheet' + key].arguments.entry = values.entry;
+                            }else{
+                                address['contactsheet' + key].service = 'address/create';
+                                address['contactsheet' + key].arguments.entry = parentId;
+                            }
                         }
                     });
                     

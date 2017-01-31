@@ -2,7 +2,7 @@
     <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
         <div class="inner-form">
             <div class="functions"><xg-back></div>
-            <form class="form-horizontal">
+            <div class="form-horizontal" ng-form="validation.entry">
                 <div class="form-group">
                     <label class="control-label col-sm-4">Posttyp</label>
                     <div class="col-sm-8">
@@ -144,7 +144,7 @@
                 <div ng-show="entry.type !== 'UNION'">
                     <h2>Tillhörighet</h2>
                     <div class="membership-list" ng-show="entry.connection !== undefined">
-                        <div ng-form="connection" ng-repeat="(key, connection) in entry.connection">
+                        <div ng-form="validation.connection[key]" ng-repeat="(key, connection) in entry.connection">
                             <div class="form-group">
                                 <label
                                     class="control-label col-xs-12 col-sm-4"
@@ -267,6 +267,7 @@
                     <hr>
                     <div
                         class="contact-sheet"
+                        ng-form="validation.address[key]" 
                         ng-repeat="(key, address) in entry.address"
                         ng-show="meta.addressActive == key"
                     >
@@ -405,7 +406,7 @@
                     <label class="control-label col-sm-4">Historik</label>
                     <div class="col-sm-8" style="padding-top:0.7rem;">
                         <div ng-repeat="history in entry.history"
-                        >{{ history.modifiedAt | date:'d.M.yy HH:mm' }}</div>
+                        >{{ history.modifiedAt | date:'d.M.yy HH:mm' }}, {{ historyState(history.description) }}</div>
                     </div>
                 </div>
                 <div class="form-group" ng-show="entry.createdAt !== undefined">
@@ -437,7 +438,7 @@
                         ><i class="fa fa-save"></i> Spara</a>
                     </div>
                 </div>            
-            </form>
+            </div>
         </div>
     </div>
 </div>
