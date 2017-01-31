@@ -1,37 +1,95 @@
-<div class="row">
-    <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+<div class="modal-header">
+    <h3>Skicka e-post</h3>
+</div>
+<div class="modal-body form-horizontal">
+    <form name="entrySendMail">
         <div class="form-group">
             <div class="col-xs-12">
                 <p class="alert alert-info">
-                    Gör utskick till {{ data.foundCount }} poster, av dessa skickas endast till de som har en e-postadress. 
+                    Gör utskick till {{ foundCount }} poster, av dessa skickas endast till de som har en e-postadress. 
                     Funktionen startar e-postjobben, statusen på dessa kan ses på utskick-sidan.
-                    Epostfunktionen är litet beta.
+                    Avsändarens namn och e-postadress förifylls baserat på avsändarens kontaktkort.
+                    Epostfunktionen är <span class="label label-primary">beta</span>.
                 </p>
             </div>
         </div>
         <div class="form-group">
             <label class="col-xs-4 control-label">Avsändare</label>
             <div class="col-xs-8">
-                <p class="form-control-static">{{ data.name }}</p>
-                <input type="hidden" ng-model="data.entry" />
+                <p class="form-control-static">{{ name }}</p>
+                <input type="hidden" ng-model="entry" />
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error' : entrySendMail.name.$invalid && entrySendMail.name.$touched }">
+            <label class="col-xs-4 control-label">Avsändarens namn</label>
+            <div class="col-xs-8">
+                <input 
+                    ng-model="name" 
+                    placeholder="Avsändarens namn" 
+                    type="text" 
+                    class="form-control"
+                    ng-required="true"
+                    name="name">
+                <p ng-show="entrySendMail.name.$invalid && entrySendMail.name.$touched" class="help-block">
+                    Ange avsändarens namn
+                </p>
+            </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : entrySendMail.senderEmail.$invalid && entrySendMail.senderEmail.$touched }">
+            <label class="col-xs-4 control-label">Avsändarens e-postadress</label>
+            <div class="col-xs-8">
+                <input 
+                    ng-model="senderEmail" 
+                    placeholder="Avsändarens e-postadress" 
+                    type="text" 
+                    class="form-control"
+                    ng-required="true"
+                    name="senderEmail">
+                <p ng-show="entrySendMail.senderEmail.$invalid && entrySendMail.senderEmail.$touched" class="help-block">
+                    Ange avsändarens e-postadress
+                </p>
+            </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : entrySendMail.subject.$invalid && entrySendMail.subject.$touched }">
             <label class="col-xs-4 control-label">Ärende</label>
             <div class="col-xs-8">
-                <input ng-model="data.subject" placeholder="Ärende" type="text" class="form-control">
+                <input 
+                    ng-model="subject" 
+                    placeholder="Ärende" 
+                    type="text" 
+                    class="form-control"
+                    ng-required="true"
+                    name="subject">
+                <p ng-show="entrySendMail.subject.$invalid && entrySendMail.subject.$touched" class="help-block">
+                    Ange ärende
+                </p>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error' : entrySendMail.message.$invalid && entrySendMail.message.$touched }">
             <label class="col-xs-4 control-label">Meddelande</label>
             <div class="col-xs-8">
                 <textarea
-                    ng-model="data.message"
+                    ng-model="message"
                     style="min-height:40rem;"
                     placeholder="Meddelande"
                     class="form-control"
+                    name="message"
+                    ng-required="true"
                 ></textarea>
+                <p ng-show="entrySendMail.message.$invalid && entrySendMail.message.$touched" class="help-block">
+                    Ange meddelande
+                </p>
             </div>
-        </div>        
-    </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="dismiss();">
+        <i class="fa fa-times"></i> 
+        Avbryt
+    </button>
+    <button class="btn btn-primary" ng-click="go();">
+        <i class="fa fa-check"></i> 
+        Skicka
+    </button>
 </div>

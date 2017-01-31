@@ -72,7 +72,7 @@
                         <a
                             ng-click="setPaid(item, !item.paid);"
                             class="btn btn-xs"
-                            ng-class="((item.paid) ? 'btn-success' : 'btn-danger')">
+                            ng-class="((item.paid) ? 'btn-success' : 'btn-warning')">
                             <i class="fa" ng-class="((item.paid) ? 'fa-check' : 'fa-times')"></i>
                         </a>
                     </td>
@@ -84,7 +84,6 @@
                     </td>
                     <td class="functions">
                         <a
-                            ng-show="globalParams.get('user').role != 'USER'"
                             ng-click="deleteDialog(item);"
                             class="btn btn-xs btn-danger">
                             <i class="fa fa-times"></i>

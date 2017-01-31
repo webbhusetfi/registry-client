@@ -5,6 +5,7 @@ angular.module('RegistryClient')
     $scope.globalParams = globalParams;
     $scope.role_admin = (!globalParams.get('user').entry && globalParams.get('user').role != 'USER');
     $scope.orgs = [];
+    $scope.invoice = {};
     
     $scope.deleteInvoice = function(item) {
         dialogHandler.deleteConfirm(item, {
@@ -111,10 +112,7 @@ angular.module('RegistryClient')
                     copy.dueAt = new Date(copy.dueAt);
                     delete copy.id;
                     $scope.invoice = copy;
-                } else {
-                    $scope.invoice = {};
                 }
-                
             });
     }
 

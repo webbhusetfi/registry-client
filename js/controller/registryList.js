@@ -1,7 +1,8 @@
 angular.module('RegistryClient')
 .controller('registryList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams) {
-    if (globalParams.get('user').role != 'SUPER_ADMIN')
-        $location.path('entry/list');    
+    if (globalParams.get('user').role != 'SUPER_ADMIN') {
+        $location.path('/entry/list');    
+    }
     globalParams.set('user', angular.merge(globalParams.get('user'), {"registry":null}));
     
     $scope.config = {

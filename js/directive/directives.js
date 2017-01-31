@@ -75,7 +75,7 @@ angular.module('RegistryClient')
                             globalParams.set('user', user);
                             globalParams.set('connectionTypes', response.connectionType);
                             globalParams.set('registry', response.registry[0]);
-                            $location.path('entry/list');
+                            $location.path('/entry/list');
                         });
                 });
             }

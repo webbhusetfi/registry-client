@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $timeout, globalParams, dialogHandler, dbHandler) {
+.controller('entryList', function($scope, $window, $route, $routeParams, $http, $location, $log, $timeout, $uibModal, globalParams, dialogHandler, dbHandler, loadOverlay) {
     $scope.routeParams = $routeParams;
     $scope.user = globalParams.get('user');
     $scope.globalParams = globalParams;
@@ -13,8 +13,6 @@ angular.module('RegistryClient')
     if (globalParams.get('user').role == 'USER') {
         _.unset($scope.config.typeselect.types, 'UNION');
         if (globalParams.get('user').entry != $routeParams.id) {
-            //console.log($routeParams.id + '-' + globalParams.get('user').entry);
-            //alert('warning');
             $location.path('/entry/list/' + globalParams.get('user').entry);
             return false;
         }
@@ -78,43 +76,153 @@ angular.module('RegistryClient')
     }
 
     $scope.config.sendMail = function() {
-        var qry = {};
-        if ($routeParams.id || globalParams.get('user').entry) {
-            entry = (($routeParams.id) ? $routeParams.id : globalParams.get('user').entry);
-            qry = {
-                "sender": {
-                    "service":"entry/read",
-                    "arguments": {
-                        "id":entry,
-                        "registry":globalParams.get('user.registry')
-                    }
+        var modalInstance = $uibModal.open({
+            title: "Skicka epost",
+            templateUrl: 'template/entrySendMail.html',
+            scope: $scope,
+            controller: function($scope, $uibModalInstance, $log) {
+                // console.log(JSON.stringify($scope.config));
+                // console.log('rp: ' + $routeParams.id);
+                // console.log('entry: ' + globalParams.get('user').entry);
+                // console.log("registry: " + globalParams.get('user.registry'));
+                
+                $scope.foundCount = $scope.resource.foundCount;
+                
+                var qry = {};
+                if ($routeParams.id || globalParams.get('user').entry) {
+                    entry = (($routeParams.id) ? $routeParams.id : globalParams.get('user').entry);
+                    qry = {
+                        "sender": {
+                            "service":"entry/read",
+                            "arguments": {
+                                "id":entry,
+                                "include": ['addresses'],
+                                "registry":globalParams.get('user.registry')
+                            }
+                        }
+                    };
+                } else {
+                    qry = {
+                        "sender": {
+                            "service":"entry/search",
+                            "arguments": {
+                                "filter": {
+                                    "registry":globalParams.get('user.registry'),
+                                    "type":"UNION"
+                                },
+                                "include": ['address']
+                            }
+                        }
+                    };
                 }
-            };
-        } else {
-            qry = {
-                "sender": {
-                    "service":"entry/search",
-                    "arguments": {
-                        "filter": {
-                            "registry":globalParams.get('user.registry'),
-                            "type":"UNION"
+               
+                //console.log(JSON.stringify(qry));
+                dbHandler
+                .setQuery(qry)
+                .runQuery()
+                .then(function(response) {
+                    //console.log(JSON.stringify(response));
+                    if(_.isNumber(response.sender[0].id)) {
+                        $scope.entry = response.sender[0].id;
+                    }
+                    if(_.isString(response.sender[0].name)) {
+                        $scope.name = response.sender[0].name;
+                    }
+                    $scope.senderEmail = null;
+                    if ($routeParams.id || globalParams.get('user').entry) {
+                        // addresses
+                        if (_.isObject(response.sender[0].addresses)) {
+                            angular.forEach(response.sender[0].addresses, function(adr) {
+                                if (adr.class == 'PRIMARY' && _.isString(adr.email)) {
+                                    $scope.senderEmail = adr.email;
+                                }
+                            });
+                        }
+                    } else {
+                        // address
+                        if (_.isObject(response.sender[0].address)) {
+                            if (response.sender[0].address.class == 'PRIMARY' && _.isString(response.sender[0].address.email)) {
+                                $scope.senderEmail = response.sender[0].address.email;
+                            }
                         }
                     }
-                }
-            };
-        }
-       
-        dbHandler
-        .setQuery(qry)
-        .runQuery()
-        .then(function(response) {
-            if(_.isNumber(response.sender[0].id)) {
-                entry = response.sender[0].id;
-            }
-            if(_.isString(response.sender[0].name)) {
-                name = response.sender[0].name;
-            }
+                    // console.log('fc: ' + $scope.resource.foundCount.base);
+                    // console.log('sender entry: ' + entry);
+                    // console.log('sender name: ' + name);
+      
+                    $scope.dismiss = function() {
+                        $uibModalInstance.dismiss();
+                    }
 
+                    $scope.go = function() {
+                         if ($scope.entrySendMail.$valid) {
+                            loadOverlay.enable();
+                            
+                            //console.log('running email...');
+                                 
+                            // fluff query object for mail
+                            var query = _.cloneDeep($scope.config.query);
+                            query.service = 'mail/create';
+                            _.unset(query, 'arguments.offset');
+                            _.unset(query, 'arguments.limit');
+                            _.unset(query, 'arguments.order');
+                            _.unset(query, 'arguments.include');
+                            _.assign(query.arguments, {
+                                "subject":$scope.subject,
+                                "message":$scope.message,
+                                "entry":$scope.entry,
+                                "senderName":$scope.name,
+                                "senderEmail":$scope.senderEmail
+                            });
+                            
+                            //console.log(JSON.stringify(query));
+                            // save state
+                            globalParams.set('entryList.query', $scope.config.query);
+                            globalParams.set('entryList.include', $scope.config.include);
+                            
+                            dbHandler
+                            .setQuery({"mail":query})
+                            .runQuery()
+                            .then(function(response) {
+                                $log.log(response);
+                                //console.log(response);
+                                // $route.reload();
+                            })
+                            .catch(function(response) {
+                                $log.error('sending failed');
+                                $log.log(response);
+                            });
+
+                            loadOverlay.disable();
+                            $uibModalInstance.close();
+                         } else {
+                            angular.forEach($scope.entrySendMail.$error, function (field) {
+                                angular.forEach(field, function(errorField){
+                                    errorField.$setTouched();
+                                })
+                            });
+                         }
+                    }
+                    
+                }).catch(function(response) {
+                    $log.error('query failed');
+                    $log.log(response);
+                });
+
+
+                
+
+            },
+            size: 'md'
+        });
+
+        modalInstance.result.then(function() {
+
+        }); 
+        
+            
+            
+/*
             dialogHandler.form({
                 args: {
                     title: "Skicka epost",
@@ -158,10 +266,8 @@ angular.module('RegistryClient')
                 "entry": entry,
                 "name": name
             });
-        }).catch(function(response) {
-            $log.error('query failed');
-            $log.log(response);
-        });
+*/
+
     };
 
     
@@ -345,6 +451,7 @@ angular.module('RegistryClient')
         if($scope.timeout)
             $timeout.cancel($scope.timeout);
         $scope.timeout = $timeout(function() {
+            console.log(JSON.stringify($scope.config.query));
             dbHandler
                 .setQuery({"base":$scope.config.query})
                 .getProperties({"all":true})
