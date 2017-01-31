@@ -270,6 +270,20 @@ angular.module('RegistryClient')
                     "equals":"childEntry",
                     "name":"connection"
                 })
+                .setQuery({
+                    "history": {
+                        "service":"history/search",
+                        "arguments": {
+                            "filter": {
+                                "entry":$routeParams.id
+                            },
+                            "order": {
+                                "modifiedAt":"desc"
+                            },
+                            "limit":5
+                        }
+                    }
+                })
                 .setJoin({
                     "resource":"entry",
                     "service":"address/search",
@@ -288,6 +302,10 @@ angular.module('RegistryClient')
                         $scope.entry = response.entry[0];
                     else
                         $scope.entry = {};
+
+                    if(response.history) {
+                        $scope.entry.history = response.history;
+                    }
 
                     if($scope.entry.type == 'MEMBER_PERSON')
                     {
