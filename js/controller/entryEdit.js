@@ -162,6 +162,9 @@ angular.module('RegistryClient')
             "createdAt": $scope.today,
             "fromOpen":false
         });
+        $scope.$watch('validation.connection[' + String($scope.entry.connection.length - 1) + ']', function(value) {
+            value.$dirty = true;
+        });
     };
 
     $scope.addAddress = function() {
@@ -175,6 +178,9 @@ angular.module('RegistryClient')
         
         $scope.entry.address.push({"class":newClass,"country":"Finland"});
         $scope.meta.addressActive = $scope.entry.address.length - 1;
+        $scope.$watch('validation.address[' + String($scope.entry.address.length - 1) + ']', function(value) {
+            value.$dirty = true;
+        });
     }
     
     $scope.removeAddress = function(key) {
@@ -398,7 +404,6 @@ angular.module('RegistryClient')
 
                     angular.forEach($scope.entry.connection, function(values, key) {
                         if(values.organization !== '-' && $scope.validation.connection[key].$dirty) {
-                            $log.log('connection was dirty');
                             connections['connection' + key] = {};
                             connections['connection' + key].arguments = {
                                     "notes" : values.notes,
