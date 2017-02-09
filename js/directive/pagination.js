@@ -22,13 +22,13 @@ angular.module('RegistryClient')
                     if(total < 2) {
                         $scope.hide = true;
                     }
-                    if(Number($scope.active) < 5 && total > 9) {
+                    if(Number($scope.active) < 5 && total >= 9) {
                         var i = 0;
                         var count = 9;
                     }else if(Number($scope.active) > 4 && total > (Number($scope.active)+4)){
                         var i = Number($scope.active)-4;
                         var count = Number($scope.active)+5;
-                    }else if(Number($scope.active) > total-5 && total > 9) {
+                    }else if(Number($scope.active) > total-5 && total >= 9) {
                         var i = total-9;
                         var count = total;
                     }else if(total < 9) {
