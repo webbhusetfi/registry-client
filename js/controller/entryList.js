@@ -218,6 +218,7 @@ angular.module('RegistryClient')
             delete $scope.config.query.arguments.include;
         }else{
             $scope.config.include = include;
+            $scope.config.query.force_refresh = Math.random();       // Force watch to trigger else columns will not update
             $scope.config.query.arguments.include = ['address'];
         }
     }
@@ -352,6 +353,9 @@ angular.module('RegistryClient')
     var time = 0;
     // watch query parameters and update
     $scope.$watch('config.query', function(newQuery, oldQuery) {
+        
+        delete $scope.config.query.force_refresh;      // remove forcerer 
+        
         if (globalParams.get('user').role == 'USER') {
             if ($scope.config.query.arguments.filter.type == 'ASSOCIATION') {
                 // allow view of own association in list
