@@ -23,19 +23,6 @@ angular.module('RegistryClient')
     $scope.config.list = {
         "pagination":1,
         "functions":{
-            /*
-            added in case of admin below
-            "deleteDialog": {
-                "postAction": {
-                    "entry": {
-                        "service":"entry/delete",
-                        "arguments": [
-                            "id",
-                            "type"
-                        ]
-                    }
-                }
-            },*/
             "custom":[
                 {
                     "function": function(item) {
@@ -51,10 +38,15 @@ angular.module('RegistryClient')
                         $location.path('/entry/list/' + item.id);
                     },
                     "if": function(item) {
-                        if(item.type == 'MEMBER_PERSON')
+                        if (globalParams.get('user').role == 'USER') {
                             return false;
-                        else
-                            return true;
+                        } else {
+                            if (item.type == 'MEMBER_PERSON') {
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        }
                     },
                     "icon":"fa fa-sign-in"
                 }]
@@ -116,7 +108,6 @@ angular.module('RegistryClient')
                     };
                 }
                
-                //console.log(JSON.stringify(qry));
                 dbHandler
                 .setQuery(qry)
                 .runQuery()
@@ -217,57 +208,8 @@ angular.module('RegistryClient')
         modalInstance.result.then(function() {
 
         }); 
-        
-            
-            
-/*
-            dialogHandler.form({
-                args: {
-                    title: "Skicka epost",
-                    templateUrl:'template/entrySendMail.html',
-                    buttons: {
-                        cancel:true,
-                        save: function(data) {
-                            // validation would be nice...
-                            // fluff query object for mail
-                            var query = _.cloneDeep($scope.config.query);
-                            query.service = 'mail/create';
-                            _.unset(query, 'arguments.offset');
-                            _.unset(query, 'arguments.limit');
-                            _.unset(query, 'arguments.order');
-                            _.assign(query.arguments, {
-                                "subject":data.subject,
-                                "message":data.message,
-                                "entry":data.entry
-                            });
-                            
-                            // save state
-                            globalParams.set('entryList.query', $scope.config.query);
-                            globalParams.set('entryList.include', $scope.config.include);
-                            
-                            dbHandler
-                            .setQuery({"mail":query})
-                            .runQuery()
-                            .then(function(response) {
-                                $log.log(response);
-                                // $route.reload();
-                            })
-                            .catch(function(response) {
-                                $log.error('sending failed');
-                                $log.log(response);
-                            });
-                        }
-                    }
-                }
-            }, { 
-                "foundCount":$scope.resource.foundCount,
-                "entry": entry,
-                "name": name
-            });
-*/
 
     };
-
     
     // set include columns (separate from query, separate handler)
     $scope.setInclude = function(include) {
@@ -289,14 +231,12 @@ angular.module('RegistryClient')
     }
     
     // main query object
-    if(globalParams.get('entryList')) {
-        if(globalParams.get('entryList')) {
-            $scope.config.query = globalParams.get('entryList.query');
-            $scope.setInclude(globalParams.get('entryList.include'));
-            $scope.config.query.arguments.filter.registry = globalParams.get('user.registry');
-            globalParams.unset('entryList');
-        }
-    }else{
+    if (globalParams.get('entryList')) {
+        $scope.config.query = globalParams.get('entryList.query');
+        $scope.setInclude(globalParams.get('entryList.include'));
+        $scope.config.query.arguments.filter.registry = globalParams.get('user.registry');
+        globalParams.unset('entryList');
+    } else { 
         $scope.config.query = {
             "service":"entry/search",
             "arguments": {
@@ -313,6 +253,19 @@ angular.module('RegistryClient')
                 }
             }
         };
+        
+        // default to MEMBER_PERSON when ASSOCIATION open and set parentEntry filter
+        if (globalParams.get('user').role == 'USER') {
+            if (globalParams.get('user').entry) {
+                $scope.config.query.arguments.filter.parentEntry = globalParams.get('user').entry;
+                $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
+            }
+        } else {
+            if ($routeParams.id) {
+                $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
+                $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
+            }
+        }
     }
     
     // function for dynamic columns
@@ -393,19 +346,6 @@ angular.module('RegistryClient')
         }
         
         return _.merge(baseCols, typeCols, addCols);
-    }
-    
-    // default to MEMBER_PERSON when ASSOCIATION open and set parentEntry filter
-    if (globalParams.get('user').role == 'USER') {
-        if (globalParams.get('user').entry) {
-            $scope.config.query.arguments.filter.parentEntry = globalParams.get('user').entry;
-            $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
-        }
-    } else {
-        if ($routeParams.id) {
-            $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
-            $scope.config.query.arguments.filter.type = "MEMBER_PERSON";
-        }
     }
     
     // zero timeout for first load
