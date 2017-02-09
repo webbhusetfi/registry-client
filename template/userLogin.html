@@ -40,6 +40,7 @@
                         ng-minlength="4"
                         type="password"
                         placeholder="Lösenord"
+                        ng-keyup="$event.keyCode == 13 && submit()"
                     >
                 </div>
             </div>
@@ -49,7 +50,7 @@
             <div class="form-group">
                 <div class="col-sm-6"><a onclick="return false;" style="padding-top:0.7rem; display:block;">Glömt lösenord?</a></div>
                 <div class="col-sm-6 text-right">
-                    <input class="btn btn-default" ng-click="submit()" ng-disabled="loginform.$invalid || loginform.$pristine" type="submit" value="Skicka">
+                    <input class="btn btn-default" ng-click="submit()" ng-disabled="loginform.$invalid || loginform.$pristine" type="submit" value="Logga in">
                 </div>
             </div>
         </div>
