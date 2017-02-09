@@ -40,16 +40,16 @@ angular.module('RegistryClient')
                 // filters 
                 "order": {
                     "name":"asc"
-                }
+                },
+                "offset":0,
+                "limit":25
             }
         }
     }
     
     if (globalParams.get('user').registry !== null) {
-        $scope.config.query.arguments = {
-            "filter": {
-                "registry":globalParams.get('user').registry
-            }
+        $scope.config.query.arguments.filter = {
+            "registry":globalParams.get('user').registry
         };
     } 
     if (globalParams.get('user').role === 'USER') {
