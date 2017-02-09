@@ -320,12 +320,14 @@ angular.module('RegistryClient')
                                     document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
                                     current += row;
                                     document.text(invoicer.name, margin, current, {'width': halfpage, 'height': row});
-                                    document.text("Telefon: " + invoicer_adr.phone, col_2_1, current, {'width': halfpage, 'height': row});
+                                    document.text("Telefon: " + ((invoicer_adr.phone) ? invoicer_adr.phone : '-'), col_2_1, current, {'width': halfpage, 'height': row});
                                     current += row;
-                                    document.text(invoicer_adr.street, margin, current, {'width': halfpage, 'height': row});
-                                    document.text("E-post: " + invoicer_adr.email, col_2_1, current, {'width': halfpage, 'height': row});
+                                    document.text("Mobil: " + ((invoicer_adr.mobile) ? invoicer_adr.mobile : '-'), col_2_1, current, {'width': halfpage, 'height': row});
                                     current += row;
-                                    document.text(invoicer_adr.postalCode + ' ' + invoicer_adr.town, margin, current, {'width': halfpage, 'height': row});
+                                    document.text( ((invoicer_adr.street) ? invoicer_adr.street : '-'), margin, current, {'width': halfpage, 'height': row});
+                                    document.text("E-post: " + ((invoicer_adr.email) ? invoicer_adr.email : '-'), col_2_1, current, {'width': halfpage, 'height': row});
+                                    current += row;
+                                    document.text(((invoicer_adr.postalCode) ? invoicer_adr.postalCode : '') + ' ' + ((invoicer_adr.town) ? invoicer_adr.town : ''), margin, current, {'width': halfpage, 'height': row});
                                 
                                 });
                                 // page end

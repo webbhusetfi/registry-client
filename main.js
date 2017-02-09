@@ -46,6 +46,10 @@ var regApp = angular
                 templateUrl: '/template/invoiceEdit.html',
                 controller: 'invoiceEdit'
             })
+            .when('/invoice/view/:id?', {
+                templateUrl: '/template/invoiceView.html',
+                controller: 'invoiceEdit'
+            })
             .when('/invoice/edit/:id?/:copy?', {
                 templateUrl: '/template/invoiceEdit.html',
                 controller: 'invoiceEdit'
