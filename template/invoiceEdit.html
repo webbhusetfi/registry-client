@@ -13,12 +13,12 @@
                     <label class="control-label col-sm-4">Fakturans rubrik</label>
                     <div class="col-sm-8">
                         <input 
-                               class="form-control" 
-                               name="name" 
-                               ng-model="invoice.name" 
-                               placeholder="Namn" 
-                               type="text" 
-                               ng-required="true">
+                            class="form-control" 
+                            name="name" 
+                            ng-model="invoice.name" 
+                            placeholder="Namn" 
+                            type="text" 
+                            ng-required="true">
                         <p ng-show="invoiceForm.name.$invalid && invoiceForm.name.$touched" class="help-block">Ett namn är obligatoriskt</p>
                     </div>
                 </div>
@@ -26,20 +26,20 @@
                     <label class="control-label col-sm-4">Fakturerare</label>
                     <div class="col-sm-8">
                         <select 
-                                ng-options="org.id as org.name group by org.type for org in orgs" 
-                                ng-model="invoice.entry" 
-                                class="form-control" 
-                                ng-required="role_admin" 
-                                ng-show="orgs.length"
-                                name="entry"
-                                ng-change="addBankInfo()">
+                            ng-options="org.id as org.name group by org.type for org in orgs" 
+                            ng-model="invoice.entry" 
+                            class="form-control" 
+                            ng-required="role_admin" 
+                            ng-show="orgs.length"
+                            name="entry"
+                            ng-change="addBankInfo()">
                         </select>
                         <p ng-show="invoiceForm.entry.$invalid && invoiceForm.entry.$touched" class="help-block">Ange fakturerare</p>
                         <p class="alert alert-info help-block">Bank och kontonr. förifylls baserat på fakturerare.</p>
                         <div ng-show="(!orgs.length && role_admin) || (!suborg.id && !role_admin)">
                             <br />
                             <div class="alert alert-danger">
-                                1 Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
+                                Skapa ett förbund eller en förening för att kunna ange en fakturerare till din fakturamall.
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                                 init-date="today"
                                 ng-model="invoice.dueAt"
                                 is-open="form.dueAtOpen"
-                               ng-required="true"
+                                ng-required="true"
                                 close-text="Stäng" />
                             <span class="input-group-btn">
                                 <button
@@ -87,12 +87,12 @@
                     <label class="control-label col-sm-4">Summa</label>
                     <div class="col-sm-8">
                         <input 
-                               class="form-control" 
-                               ng-required="true" 
-                               ng-model="invoice.amount" 
-                               placeholder="Summa" 
-                               type="text" 
-                               name="amount">
+                            class="form-control" 
+                            ng-required="true" 
+                            ng-model="invoice.amount" 
+                            placeholder="Summa" 
+                            type="text" 
+                            name="amount">
                         <p ng-show="invoiceForm.amount.$invalid && invoiceForm.amount.$touched" class="help-block">Summan är obligatorisk</p>
                     </div>
                 </div>
@@ -100,12 +100,12 @@
                     <label class="control-label col-sm-4">Bank</label>
                     <div class="col-sm-8">
                         <input 
-                               class="form-control" 
-                               ng-required="true" 
-                               ng-model="invoice.bank" 
-                               placeholder="Bank" 
-                               type="text" 
-                               name="bank">
+                            class="form-control" 
+                            ng-required="true" 
+                            ng-model="invoice.bank" 
+                            placeholder="Bank" 
+                            type="text" 
+                            name="bank">
                         <p ng-show="invoiceForm.bank.$invalid && invoiceForm.bank.$touched" class="help-block">Bank är obligatorisk</p>
                     </div>
                 </div>
@@ -113,12 +113,12 @@
                     <label class="control-label col-sm-4">Bankkonto (IBAN)</label>
                     <div class="col-sm-8">
                         <input 
-                               class="form-control" 
-                               ng-model="invoice.bankAccount" 
-                               placeholder="Bankkonto" 
-                               type="text" 
-                               ng-required="true"
-                               name="bankAccount">
+                            class="form-control" 
+                            ng-model="invoice.bankAccount" 
+                            placeholder="Bankkonto" 
+                            type="text" 
+                            ng-required="true"
+                            name="bankAccount">
                         <p ng-show="invoiceForm.bankAccount.$invalid && invoiceForm.bankAccount.$touched" class="help-block">Bankkonto är obligatorisk</p>
                     </div>
                 </div>
@@ -126,11 +126,11 @@
                     <label class="control-label col-sm-4">FO-nummer</label>
                     <div class="col-sm-8">
                         <input 
-                               class="form-control" 
-                               ng-model="invoice.vat" 
-                               placeholder="VAT" 
-                               type="text" 
-                               name="vat">
+                            class="form-control" 
+                            ng-model="invoice.vat" 
+                            placeholder="VAT" 
+                            type="text" 
+                            name="vat">
                     </div>
                 </div>
                 <div class="form-group">
@@ -151,11 +151,11 @@
                     <label class="control-label col-sm-4">Info</label>
                     <div class="col-sm-8">
                         <textarea 
-                                  class="form-control" 
-                                  placeholder="Meddelande" 
-                                  ng-model="invoice.message" 
-                                  rows="15"
-                                  name="message">
+                            class="form-control" 
+                            placeholder="Meddelande" 
+                            ng-model="invoice.message" 
+                            rows="15"
+                            name="message">
                         </textarea>
                         <p class="help-block">Längre meddelande på fakturan. Maximal synlig längd är ca. 25 rader (ca. en halv A4).</p>
                     </div>

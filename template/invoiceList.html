@@ -28,7 +28,7 @@
                         {{ item.id }}
                     </td>
                     <td>
-                        <a href="/invoice/edit/{{ item.id }}">{{ item.name }}</a>
+                        <a href="/invoice/view/{{ item.id }}"><i class="fa fa-search"></i> {{ item.name }}</a>
                     </td>
                     <td>
                         <strong>
@@ -82,6 +82,7 @@
                     <td class="functions">
                         <a
                             ng-click="deleteDialog(item);"
+                            ng-disabled="item.invoices.length"
                             class="btn btn-xs btn-danger">
                             <i class="fa fa-times"></i>
                         </a>

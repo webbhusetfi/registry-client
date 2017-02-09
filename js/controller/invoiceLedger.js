@@ -3,6 +3,7 @@ angular.module('RegistryClient')
     $scope.routeParams = $routeParams;
     $scope.globalParams = globalParams;
     $scope.config = {
+        "pagination":1,
         "query":{
             "service":"entryInvoice/search",
             "arguments": {
@@ -10,8 +11,11 @@ angular.module('RegistryClient')
                 "filter": {
                     "invoice": $routeParams.id
                 },
+                "order": {
+                    "id": "asc"
+                },
                 "offset":0,
-                "limit":25
+                "limit":50
             }
         }
     };

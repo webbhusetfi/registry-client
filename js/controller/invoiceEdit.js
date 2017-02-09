@@ -116,6 +116,18 @@ angular.module('RegistryClient')
             });
     }
 
+    $scope.orgName = function(entry) {
+        var name;
+        name = '';
+        angular.forEach($scope.orgs, function (org) {
+            if (org.id == entry) {
+                name = org.name;
+            }
+        });
+        
+        return name;
+    }
+    
     $scope.addBankInfo = function() {
         if ($scope.invoice.entry) {
             var query = {};
@@ -210,6 +222,19 @@ angular.module('RegistryClient')
                     errorField.$setTouched();
                 })
             });
+        }
+    };
+    
+    $scope.previewById = function(invoiceId) {        
+        if (invoiceId) {
+            var query = {};
+            query.invoiceModel = {
+                "service": "invoice/read",
+                "arguments": {
+                    "id": invoiceId
+                }
+            };
+            invoicePdfWriter.run(query.invoiceModel, null /* null defaults to example data */);
         }
     };
     
