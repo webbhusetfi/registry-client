@@ -197,10 +197,6 @@ angular.module('RegistryClient')
                     $log.error('query failed');
                     $log.log(response);
                 });
-
-
-                
-
             },
             size: 'md'
         });
@@ -275,7 +271,8 @@ angular.module('RegistryClient')
             "id": {
                 "label":"Id",
                 "width":"5%",
-                "filter":true
+                "filter":false,
+                "sorter":true
             }
         }
         
@@ -286,7 +283,8 @@ angular.module('RegistryClient')
                     "name": {
                         "label":"Namn",
                         "link":"/entry/edit/[id]",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     }
                 }
             break;
@@ -296,12 +294,14 @@ angular.module('RegistryClient')
                     "firstName": {
                         "label":"Förnamn",
                         "link":"/entry/edit/[id]",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     },
                     "lastName": {
                         "label":"Efternamn",
                         "link":"/entry/edit/[id]",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     }
                 }
             break;
@@ -314,15 +314,18 @@ angular.module('RegistryClient')
                 var addCols = {
                     "address.street": {
                         "label":"Adress",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     },
                     "address.postalCode": {
                         "label":"Postnummer",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     },
                     "address.town": {
                         "label":"Postort",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     }
                 }
             break;
@@ -331,11 +334,13 @@ angular.module('RegistryClient')
                 var addCols = {
                     "address.email": {
                         "label":"Epost",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     },
                     "address.mobile": {
                         "label":"Mobil",
-                        "filter":true
+                        "filter":true,
+                        "sorter":true
                     }
                 }
             break;
@@ -393,6 +398,7 @@ angular.module('RegistryClient')
         if($scope.timeout)
             $timeout.cancel($scope.timeout);
         $scope.timeout = $timeout(function() {
+            //console.log(JSON.stringify($scope.config.query));
             dbHandler
                 .setQuery({"base":$scope.config.query})
                 .getProperties({"all":true})
