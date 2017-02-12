@@ -92,20 +92,23 @@ angular.module('RegistryClient')
                 }
                 
                 scope.currentSortField = function() {
-                    field = !!scope.query.arguments.order.hasOwnProperty(scope.target);
-                    if (!field) {
-                        var parts = scope.target.split('.');
-                        if(parts[1]){
-                            if (scope.query.arguments.order.hasOwnProperty(parts[0]) && scope.query.arguments.order[parts[0]].hasOwnProperty(parts[1])) {
-                                field = true;
+                    if (scope.query.arguments.order) {
+                        field = !!scope.query.arguments.order.hasOwnProperty(scope.target);
+                        if (!field) {
+                            var parts = scope.target.split('.');
+                            if(parts[1]){
+                                if (scope.query.arguments.order.hasOwnProperty(parts[0]) && scope.query.arguments.order[parts[0]].hasOwnProperty(parts[1])) {
+                                    field = true;
+                                } else {
+                                    field = false;
+                                }
                             } else {
                                 field = false;
                             }
-                        } else {
-                            field = false;
-                        }
-                    }                    
-                    return field;
+                        }                    
+                        return field;
+                    }
+                    return false;
                 }
             }
         }
