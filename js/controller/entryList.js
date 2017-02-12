@@ -66,130 +66,6 @@ angular.module('RegistryClient')
             }
         }
     }
-
-    $scope.config.sendMail = function() {
-        var modalInstance = $uibModal.open({
-            title: "Skicka epost",
-            templateUrl: 'template/entrySendMail.html',
-            scope: $scope,
-            controller: function($scope, $uibModalInstance, $log) {
-                $scope.foundCount = $scope.resource.foundCount;
-                
-                var qry = {};
-                if ($routeParams.id || globalParams.get('user').entry) {
-                    entry = (($routeParams.id) ? $routeParams.id : globalParams.get('user').entry);
-                    qry = {
-                        "sender": {
-                            "service":"entry/read",
-                            "arguments": {
-                                "id":entry,
-                                "include": ['addresses'],
-                                "registry":globalParams.get('user.registry')
-                            }
-                        }
-                    };
-                } else {
-                    qry = {
-                        "sender": {
-                            "service":"entry/search",
-                            "arguments": {
-                                "filter": {
-                                    "registry":globalParams.get('user.registry'),
-                                    "type":"UNION"
-                                },
-                                "include": ['address']
-                            }
-                        }
-                    };
-                }
-               
-                dbHandler
-                .setQuery(qry)
-                .runQuery()
-                .then(function(response) {
-                    if(_.isNumber(response.sender[0].id)) {
-                        $scope.entry = response.sender[0].id;
-                    }
-                    if(_.isString(response.sender[0].name)) {
-                        $scope.name = response.sender[0].name;
-                    }
-                    $scope.senderEmail = null;
-                    if ($routeParams.id || globalParams.get('user').entry) {
-                        // addresses
-                        if (_.isObject(response.sender[0].addresses)) {
-                            angular.forEach(response.sender[0].addresses, function(adr) {
-                                if (adr.class == 'PRIMARY' && _.isString(adr.email)) {
-                                    $scope.senderEmail = adr.email;
-                                }
-                            });
-                        }
-                    } else {
-                        // address
-                        if (_.isObject(response.sender[0].address)) {
-                            if (response.sender[0].address.class == 'PRIMARY' && _.isString(response.sender[0].address.email)) {
-                                $scope.senderEmail = response.sender[0].address.email;
-                            }
-                        }
-                    }
-
-                    $scope.go = function() {
-                         if ($scope.entrySendMail.$valid) {
-                            loadOverlay.enable();
-                                 
-                            // fluff query object for mail
-                            var query = _.cloneDeep($scope.config.query);
-                            query.service = 'mail/create';
-                            _.unset(query, 'arguments.offset');
-                            _.unset(query, 'arguments.limit');
-                            _.unset(query, 'arguments.order');
-                            _.unset(query, 'arguments.include');
-                            _.assign(query.arguments, {
-                                "subject":$scope.subject,
-                                "message":$scope.message,
-                                "entry":$scope.entry,
-                                "senderName":$scope.name,
-                                "senderEmail":$scope.senderEmail
-                            });
-                            
-                            // save state
-                            globalParams.set('entryList.query', $scope.config.query);
-                            globalParams.set('entryList.include', $scope.config.include);
-                            
-                            dbHandler
-                            .setQuery({"mail":query})
-                            .runQuery()
-                            .then(function(response) {
-                                // $route.reload();
-                            })
-                            .catch(function(response) {
-                                $log.error('sending failed');
-                                $log.log(response);
-                            });
-
-                            loadOverlay.disable();
-                            $uibModalInstance.close();
-                         } else {
-                            angular.forEach($scope.entrySendMail.$error, function (field) {
-                                angular.forEach(field, function(errorField){
-                                    errorField.$setTouched();
-                                })
-                            });
-                         }
-                    }
-                    
-                }).catch(function(response) {
-                    $log.error('query failed');
-                    $log.log(response);
-                });
-            },
-            size: 'md'
-        });
-
-        modalInstance.result.then(function() {
-
-        }); 
-
-    };
     
     // set include columns (separate from query, separate handler)
     $scope.setInclude = function(include) {
@@ -399,4 +275,128 @@ angular.module('RegistryClient')
         }, time);
         time = 300;
     }, true);
+
+    $scope.config.sendMail = function() {
+        var modalInstance = $uibModal.open({
+            title: "Skicka epost",
+            templateUrl: 'template/entrySendMail.html',
+            scope: $scope,
+            controller: function($scope, $uibModalInstance, $log) {
+                $scope.foundCount = $scope.resource.foundCount;
+                
+                var qry = {};
+                if ($routeParams.id || globalParams.get('user').entry) {
+                    entry = (($routeParams.id) ? $routeParams.id : globalParams.get('user').entry);
+                    qry = {
+                        "sender": {
+                            "service":"entry/read",
+                            "arguments": {
+                                "id":entry,
+                                "include": ['addresses'],
+                                "registry":globalParams.get('user.registry')
+                            }
+                        }
+                    };
+                } else {
+                    qry = {
+                        "sender": {
+                            "service":"entry/search",
+                            "arguments": {
+                                "filter": {
+                                    "registry":globalParams.get('user.registry'),
+                                    "type":"UNION"
+                                },
+                                "include": ['address']
+                            }
+                        }
+                    };
+                }
+               
+                dbHandler
+                .setQuery(qry)
+                .runQuery()
+                .then(function(response) {
+                    if(_.isNumber(response.sender[0].id)) {
+                        $scope.entry = response.sender[0].id;
+                    }
+                    if(_.isString(response.sender[0].name)) {
+                        $scope.name = response.sender[0].name;
+                    }
+                    $scope.senderEmail = null;
+                    if ($routeParams.id || globalParams.get('user').entry) {
+                        // addresses
+                        if (_.isObject(response.sender[0].addresses)) {
+                            angular.forEach(response.sender[0].addresses, function(adr) {
+                                if (adr.class == 'PRIMARY' && _.isString(adr.email)) {
+                                    $scope.senderEmail = adr.email;
+                                }
+                            });
+                        }
+                    } else {
+                        // address
+                        if (_.isObject(response.sender[0].address)) {
+                            if (response.sender[0].address.class == 'PRIMARY' && _.isString(response.sender[0].address.email)) {
+                                $scope.senderEmail = response.sender[0].address.email;
+                            }
+                        }
+                    }
+
+                    $scope.go = function() {
+                         if ($scope.entrySendMail.$valid) {
+                            loadOverlay.enable();
+                                 
+                            // fluff query object for mail
+                            var query = _.cloneDeep($scope.config.query);
+                            query.service = 'mail/create';
+                            _.unset(query, 'arguments.offset');
+                            _.unset(query, 'arguments.limit');
+                            _.unset(query, 'arguments.order');
+                            _.unset(query, 'arguments.include');
+                            _.assign(query.arguments, {
+                                "subject":$scope.subject,
+                                "message":$scope.message,
+                                "entry":$scope.entry,
+                                "senderName":$scope.name,
+                                "senderEmail":$scope.senderEmail
+                            });
+                            
+                            // save state
+                            globalParams.set('entryList.query', $scope.config.query);
+                            globalParams.set('entryList.include', $scope.config.include);
+                            
+                            dbHandler
+                            .setQuery({"mail":query})
+                            .runQuery()
+                            .then(function(response) {
+                                // $route.reload();
+                            })
+                            .catch(function(response) {
+                                $log.error('sending failed');
+                                $log.log(response);
+                            });
+
+                            loadOverlay.disable();
+                            $uibModalInstance.close();
+                         } else {
+                            angular.forEach($scope.entrySendMail.$error, function (field) {
+                                angular.forEach(field, function(errorField){
+                                    errorField.$setTouched();
+                                })
+                            });
+                         }
+                    }
+                    
+                }).catch(function(response) {
+                    $log.error('query failed');
+                    $log.log(response);
+                });
+            },
+            size: 'md'
+        });
+
+        modalInstance.result.then(function() {
+
+        }); 
+
+    };    
 });
