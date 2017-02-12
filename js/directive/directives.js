@@ -62,9 +62,9 @@ angular.module('RegistryClient')
                 target:'='
             },
             replace:true,
-            template:'<span><a ng-click="swapSort();" uib-tooltip="Sortera"><i class="fa fa-sort"></i></a></span>',
+            template:'<span><a ng-click="swapSort();" uib-tooltip="Sortera"><i class="fa fa-sort"></i><span ng-show="currentSortField()" style="color:red;">*</span></a></span>',
             controller: function($scope) {
-                $scope.value = _.get($scope.query.arguments.order, $scope.target);
+                
             },
             link: function(scope, elem, attr) {
                 scope.swapSort = function() {
@@ -89,6 +89,23 @@ angular.module('RegistryClient')
                         }
                     }                    
                     return order;
+                }
+                
+                scope.currentSortField = function() {
+                    field = scope.query.arguments.order.hasOwnProperty(scope.target);
+                    if (!field) {
+                        var parts = scope.target.split('.');
+                        if(parts[1]){
+                            if (scope.query.arguments.order.hasOwnProperty(parts[0]) && scope.query.arguments.order[parts[0]].hasOwnProperty(parts[1])) {
+                                field = true;
+                            } else {
+                                field = false;
+                            }
+                        } else {
+                            field = false;
+                        }
+                    }                    
+                    return field;
                 }
             }
         }
