@@ -73,11 +73,6 @@ angular.module('RegistryClient')
             templateUrl: 'template/entrySendMail.html',
             scope: $scope,
             controller: function($scope, $uibModalInstance, $log) {
-                // console.log(JSON.stringify($scope.config));
-                // console.log('rp: ' + $routeParams.id);
-                // console.log('entry: ' + globalParams.get('user').entry);
-                // console.log("registry: " + globalParams.get('user.registry'));
-                
                 $scope.foundCount = $scope.resource.foundCount;
                 
                 var qry = {};
@@ -112,7 +107,6 @@ angular.module('RegistryClient')
                 .setQuery(qry)
                 .runQuery()
                 .then(function(response) {
-                    //console.log(JSON.stringify(response));
                     if(_.isNumber(response.sender[0].id)) {
                         $scope.entry = response.sender[0].id;
                     }
@@ -137,19 +131,10 @@ angular.module('RegistryClient')
                             }
                         }
                     }
-                    // console.log('fc: ' + $scope.resource.foundCount.base);
-                    // console.log('sender entry: ' + entry);
-                    // console.log('sender name: ' + name);
-      
-                    $scope.dismiss = function() {
-                        $uibModalInstance.dismiss();
-                    }
 
                     $scope.go = function() {
                          if ($scope.entrySendMail.$valid) {
                             loadOverlay.enable();
-                            
-                            //console.log('running email...');
                                  
                             // fluff query object for mail
                             var query = _.cloneDeep($scope.config.query);
@@ -166,7 +151,6 @@ angular.module('RegistryClient')
                                 "senderEmail":$scope.senderEmail
                             });
                             
-                            //console.log(JSON.stringify(query));
                             // save state
                             globalParams.set('entryList.query', $scope.config.query);
                             globalParams.set('entryList.include', $scope.config.include);
