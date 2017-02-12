@@ -92,7 +92,7 @@ angular.module('RegistryClient')
                 }
                 
                 scope.currentSortField = function() {
-                    field = scope.query.arguments.order.hasOwnProperty(scope.target);
+                    field = !!scope.query.arguments.order.hasOwnProperty(scope.target);
                     if (!field) {
                         var parts = scope.target.split('.');
                         if(parts[1]){
