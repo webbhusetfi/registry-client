@@ -2,10 +2,10 @@
     <div class="row" style="margin-bottom:2rem;">
         <div class="col-xs-8">
             <h2>Medlemsregister</h2>
-            <h3 ng-show="organization.name !== undefined">{{ organization.name }}</h3>
+            <h3 ng-show="currentEntry.id">{{ currentEntry.name }}</h3>
         </div>
         <div class="col-xs-4 text-right" ng-controller="navigation">
-            <div ng-show="globalParams.get('user').role == 'SUPER_ADMIN' || routeParams.id !== undefined">
+            <div ng-show="(globalParams.get('user').role == 'SUPER_ADMIN' || globalParams.get('user').role == 'ADMIN') && routeParams.id !== undefined">
                 <xg-back/>
             </div>
         </div>

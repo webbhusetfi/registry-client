@@ -4,12 +4,17 @@ angular.module('RegistryClient')
     $scope.user = globalParams.get('user');
     $scope.globalParams = globalParams;
     $scope.config = {};
-    
+
+    $scope.currentEntry = {};
+    if (!$routeParams.id && $scope.currentEntry.hasOwnProperty('id')) {
+        $scope.currentEntry = {};
+    }
+
     // base configuration
     $scope.config.typeselect = {
         "types": globalParams.static.types
     };
-    
+
     if (globalParams.get('user').role == 'USER') {
         _.unset($scope.config.typeselect.types, 'UNION');
         if (globalParams.get('user').entry != $routeParams.id) {
@@ -218,7 +223,7 @@ angular.module('RegistryClient')
     var time = 0;
     // watch query parameters and update
     $scope.$watch('config.query', function(newQuery, oldQuery) {
-        
+    
         delete $scope.config.query.force_refresh;      // remove forcerer 
         
         if (globalParams.get('user').role == 'USER') {
@@ -259,19 +264,32 @@ angular.module('RegistryClient')
             $timeout.cancel($scope.timeout);
         $scope.timeout = $timeout(function() {
             //console.log(JSON.stringify($scope.config.query));
+            
             dbHandler
-                .setQuery({"base":$scope.config.query})
-                .getProperties({"all":true})
-                .runQuery()
-                .then(function(response) {
-                    $scope.config.list.cols = $scope.getCols();
-                    $scope.properties = response.properties;
-                    $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
-                })
-                .catch(function(response) {
-                    $log.error(response);
-                    $location.path('/user/logout');
-                });
+            .setQuery({"base":$scope.config.query})
+            .getProperties({"all":true});
+            
+            if ($routeParams.id && !$scope.currentEntry.hasOwnProperty('id')) {
+                dbHandler
+                .getEntry({"id": $routeParams.id});
+            }
+            
+            dbHandler
+            .runQuery()
+            .then(function(response) {
+                $scope.config.list.cols = $scope.getCols();
+                $scope.properties = response.properties;
+                $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
+                if ($routeParams.id && !$scope.currentEntry.hasOwnProperty('id')) {
+                    if(_.isNumber(response.entry[0].id)) {
+                        $scope.currentEntry = response.entry[0];
+                    }
+                }
+            })
+            .catch(function(response) {
+                $log.error(response);
+                $location.path('/user/logout');
+            });
         }, time);
         time = 300;
     }, true);
