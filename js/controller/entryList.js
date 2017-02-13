@@ -12,9 +12,13 @@ angular.module('RegistryClient')
 
     // base configuration
     $scope.config.typeselect = {
-        "types": globalParams.static.types
+        "types": _.cloneDeep(globalParams.static.types)
     };
-
+    
+    if ($routeParams.id) {
+        _.unset($scope.config.typeselect.types, 'UNION');        
+    }
+    
     if (globalParams.get('user').role == 'USER') {
         _.unset($scope.config.typeselect.types, 'UNION');
         if (globalParams.get('user').entry != $routeParams.id) {
@@ -43,14 +47,11 @@ angular.module('RegistryClient')
                         $location.path('/entry/list/' + item.id);
                     },
                     "if": function(item) {
-                        if (globalParams.get('user').role == 'USER') {
+                        // allow "login" only for associations and admins
+                        if (globalParams.get('user').role == 'USER' || item.type != 'ASSOCIATION') {
                             return false;
                         } else {
-                            if (item.type == 'MEMBER_PERSON') {
-                                return false;
-                            } else {
-                                return true;
-                            }
+                            return true;
                         }
                     },
                     "icon":"fa fa-sign-in"
@@ -215,6 +216,10 @@ angular.module('RegistryClient')
             typeCols.name.filter = false;
             baseCols.id.filter = false;
         }
+        if (globalParams.get('user').role == 'ADMIN' && $routeParams.id && $scope.config.query.arguments.filter.type == 'ASSOCIATION') {
+            typeCols.name.filter = false;
+            baseCols.id.filter = false;
+        }
         
         return _.merge(baseCols, typeCols, addCols);
     }
@@ -239,6 +244,20 @@ angular.module('RegistryClient')
                 $scope.config.query.arguments.filter.parentEntry = globalParams.get('user').entry;
             }
         }
+        if (globalParams.get('user').role == 'ADMIN' && $routeParams.id) {
+            if ($scope.config.query.arguments.filter.type == 'ASSOCIATION') {
+                // allow view of own association in list
+                $scope.config.query.arguments.filter.id = $routeParams.id;
+                delete $scope.config.query.arguments.filter.parentEntry;
+                //$scope.config.query.arguments.filter.parentEntry = null;
+            }
+            if ($scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
+                // add back parentEntry of own association when viewing members in list
+                delete $scope.config.query.arguments.filter.id;
+                $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
+            }
+        }
+        
                         
         // reset some parameters in case of type change
         if(oldQuery.arguments.filter.type) {
@@ -262,6 +281,7 @@ angular.module('RegistryClient')
         }
         if($scope.timeout)
             $timeout.cancel($scope.timeout);
+        
         $scope.timeout = $timeout(function() {
             //console.log(JSON.stringify($scope.config.query));
             
