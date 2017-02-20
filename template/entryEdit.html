@@ -2,7 +2,7 @@
     <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
         <div class="inner-form">
             <div class="functions"><xg-back></div>
-            <div class="form-horizontal" ng-form="validation.entry">
+            <div class="form-horizontal">
                 <div class="form-group">
                     <label class="control-label col-sm-4">Posttyp</label>
                     <div class="col-sm-8">
@@ -147,7 +147,7 @@
                 <div ng-show="entry.type !== 'UNION'">
                     <h2>Tillhörighet</h2>
                     <div class="membership-list" ng-show="entry.connection !== undefined">
-                        <div ng-form="validation.connection[key]" ng-repeat="(key, connection) in entry.connection">
+                        <div ng-repeat="(key, connection) in entry.connection">
                             <div class="form-group">
                                 <label
                                     class="control-label col-xs-12 col-sm-4"
@@ -271,7 +271,6 @@
                     <hr>
                     <div
                         class="contact-sheet"
-                        ng-form="validation.address[key]" 
                         ng-repeat="(key, address) in entry.address"
                         ng-show="meta.addressActive == key"
                     >

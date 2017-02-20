@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler, dialogHandler) {
+.controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler, dialogHandler, translation) {
     $scope.today = new Date();
     $scope.routeParams = $routeParams;
     $scope.globalParams = globalParams;
@@ -11,13 +11,7 @@ angular.module('RegistryClient')
         "address":{}
     }
     $scope.translate = function(value) {
-        var tr = {
-            "Address modified":"Adresser ändrade",
-            "Entry modified":"Basuppgifter ändrade",
-            "Connection modified":"Tillhörigheter ändrade",
-            "This value should not be blank.":"Detta värde måste vara ifyllt."
-        };
-        return tr[value];
+        return translation.tr(value);
     }
 
     $scope.connectionTypes = {}
@@ -399,9 +393,9 @@ angular.module('RegistryClient')
                 .setQuery(queryObject)
                 .runQuery()
                 .then(function(response) {
+                    $log.log(JSON.stringify($scope.validation));
                     if (response.entry.status && response.entry.status == 'fail') {
                         $scope.validation.entry = response.entry.data;
-                        $log.log('entry: ' + JSON.stringify(response));
                         return false;
                     }
                     

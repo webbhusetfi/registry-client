@@ -81,6 +81,8 @@ angular.module('RegistryClient')
                 $http
                     .post(config.apiurl + config.url, queryData)
                     .then(function(response) {
+                        // "hardcoded" language sv
+                        response.data.language = 'sv';
                         globalParams.set('user', response.data);
                         dbHandler.reset();
                         defer.resolve(response.data);
