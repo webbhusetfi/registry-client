@@ -1,7 +1,10 @@
 var regApp = angular
     .module('RegistryClient', ['ngRoute', 'ngResource', 'ui.bootstrap', 'xeditable', 'chart.js', 'ngSanitize', 'ngCsv', 'ngPDFKit', 'ngFileSaver'])
     .constant('_', window._)
-    .run(function($window, $log, $rootScope, loadOverlay, editableOptions, globalParams) {
+    .run(function($window, $log, $rootScope, loadOverlay, editableOptions, globalParams, translation) {
+        $rootScope.translate = function(string) {
+            return translation.tr(string);
+        }
         if(typeof($window._) == 'function')
             $rootScope._ = $window._;
         else

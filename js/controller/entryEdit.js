@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler, dialogHandler, translation) {
+.controller('entryEdit',  function ($scope, $routeParams, $http, $log, $location, $window, globalParams, dbHandler, dialogHandler) {
     $scope.today = new Date();
     $scope.routeParams = $routeParams;
     $scope.globalParams = globalParams;
@@ -10,10 +10,6 @@ angular.module('RegistryClient')
         "connection":{},
         "address":{}
     }
-    $scope.translate = function(value) {
-        return translation.tr(value);
-    }
-
     $scope.connectionTypes = {}
     var connectionNames = angular.merge({}, globalParams.static.types, {"UNION":"Förbund"});
     angular.forEach(globalParams.get('connectionTypes'), function(value, key) {

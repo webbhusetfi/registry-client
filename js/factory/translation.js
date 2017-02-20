@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.factory('translation', function($window, $location, $log, $routeParams, globalParams) {
+.factory('translation', function($window, $location, $rootScope, $log, $routeParams, globalParams) {
     var translations = {
         "Connection added":{
             "sv":"Tillhörigheter insatta"
