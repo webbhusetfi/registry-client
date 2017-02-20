@@ -10,11 +10,12 @@ angular.module('RegistryClient')
         "connection":{},
         "address":{}
     }
-    $scope.historyState = function(value) {
+    $scope.translate = function(value) {
         var tr = {
             "Address modified":"Adresser ändrade",
             "Entry modified":"Basuppgifter ändrade",
-            "Connection modified":"Tillhörigheter ändrade"
+            "Connection modified":"Tillhörigheter ändrade",
+            "This value should not be blank.":"Detta värde måste vara ifyllt."
         };
         return tr[value];
     }
