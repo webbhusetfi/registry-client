@@ -63,6 +63,18 @@ angular.module('RegistryClient')
             return null;
         }
     }
+    
+    var types = function() {
+        var typeobj = {};
+        if(this.get('user.role') == 'ADMIN' || this.get('user.role') == 'SUPER_ADMIN') {
+            typeobj = _.assign(typeobj, {
+                "UNION":"Förbund",
+                "ASSOCIATION":"Förening"
+            });
+        }
+        typeobj = _.assign(typeobj, {"MEMBER_PERSON":"Medlem"});
+        return typeobj;
+    }
 
     return {
         static: {
@@ -79,6 +91,7 @@ angular.module('RegistryClient')
                 "on-open-focus":false
             }
         },
+        types: types,
         get: get,
         set: set,
         sendParams: sendParams,
