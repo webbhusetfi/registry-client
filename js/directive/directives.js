@@ -54,32 +54,33 @@ angular.module('RegistryClient')
             }
         }
     })
-    .directive('xgSorter', function($log) {
+    .directive('xgSorter', function($log, $rootScope) {
         return {
             restrict: 'E',
             scope: {
                 query:'=',
                 target:'='
             },
-            replace:true,
-            templateUrl:'js/directive/template/sorter.html',
-            link: function(scope, elem, attr) {
-                scope.swapSort = function() {
-                    switch(_.get(scope.query.arguments.order, scope.target)) {
+            controller: function($scope, $rootScope) {
+                $scope._ = $rootScope._;
+                $scope.swapSort = function() {
+                    switch(_.get($scope.query.arguments.order, $scope.target)) {
                         case 'asc':
-                            _.set(scope.query.arguments.order, scope.target, 'desc');
+                            _.set($scope.query.arguments.order, $scope.target, 'desc');
                         break;
                         
                         case 'desc':
-                            _.unset(scope.query.arguments.order, scope.target);
+                            _.unset($scope.query.arguments.order, $scope.target);
                         break;
                         
                         default:
-                            _.set(scope.query.arguments.order, scope.target, 'asc');
+                            _.set($scope.query.arguments.order, $scope.target, 'asc');
                         break;
                     }
                 };
-            }
+            },
+            replace:true,
+            templateUrl:'js/directive/template/sorter.html'
         }
     })
     .directive('xgOpenRegistry', function($log, $location, dbHandler, globalParams) {
