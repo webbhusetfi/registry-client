@@ -254,6 +254,13 @@ pre.debug {
     position:absolute; left:10px; top:10px; width:400px; z-index:10;
 }
 
+.fa.sorter {
+    color:$grayscale-black;
+    &.fa-sort {
+        color:$grayscale-mid;
+    }
+}
+
 .editable-click, a.editable-click { border-bottom:none; }
 a.editable-click { padding-top:0.4rem; padding-bottom:0.4rem; display:inline-block; }
 .editable-controls input.form-control, .editable-controls button { padding-top:0.3rem!important; padding-bottom:0.3rem!important; height:28px; }

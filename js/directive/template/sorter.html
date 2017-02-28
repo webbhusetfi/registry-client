@@ -1,0 +1,13 @@
+<span>
+    <a ng-click="swapSort();" uib-tooltip="Sortera">
+        <i
+            class="fa sorter"
+            ng-class="{
+                'fa-sort': query.arguments.order[target] == undefined,
+                'fa-sort-alpha-asc': query.arguments.order[target] == 'asc',
+                'fa-sort-alpha-desc': query.arguments.order[target] == 'desc'
+            }
+            "
+        ></i>
+    </a>
+</span>
