@@ -59,7 +59,7 @@ angular.module('RegistryClient')
             restrict: 'E',
             scope: {
                 query:'=',
-                target:'=',
+                target:'='
             },
             replace:true,
             templateUrl:'js/directive/template/sorter.html',
