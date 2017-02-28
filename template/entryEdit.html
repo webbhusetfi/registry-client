@@ -2,7 +2,7 @@
     <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
         <div class="inner-form">
             <div class="functions"><xg-back></div>
-            <div class="form-horizontal">
+            <div class="form-horizontal" ng-form="ngvalidation.entry">
                 <div class="form-group">
                     <label class="control-label col-sm-4">Posttyp</label>
                     <div class="col-sm-8">
@@ -63,6 +63,7 @@
                                             min-mode="'year'"
                                             ng-required="false"
                                             ng-change="setCalTime('YYYY', meta.birthYear, entry.birthYear);"
+                                            novalidate
                                             close-text="Stäng" />
                                         <span class="input-group-btn">
                                             <button
@@ -87,6 +88,7 @@
                                             max-mode="'month'"
                                             min-mode="'month'"
                                             ng-required="false"
+                                            novalidate
                                             ng-change="setCalTime('MM', meta.birthMonth, entry.birthMonth);"
                                             close-text="Stäng" />
                                         <span class="input-group-btn">
@@ -113,6 +115,7 @@
                                             min-mode="'day'"
                                             ng-required="false"
                                             ng-change="setCalTime('DD', meta.birthDate, entry.birthDate);"
+                                            novalidate
                                             close-text="Stäng" />
                                         <span class="input-group-btn">
                                             <button
@@ -147,7 +150,7 @@
                 <div ng-show="entry.type !== 'UNION'">
                     <h2>Tillhörighet</h2>
                     <div class="membership-list" ng-show="entry.connection !== undefined">
-                        <div ng-repeat="(key, connection) in entry.connection">
+                        <div ng-repeat="(key, connection) in entry.connection" ng-form="ngvalidation.connection[key]">
                             <div class="form-group">
                                 <label
                                     class="control-label col-xs-12 col-sm-4"
@@ -172,7 +175,7 @@
                                     <button class="btn btn-default" ng-click="removeMembership(key);"><i class="fa fa-times"></i> Radera</button>
                                 </div>
                             </div>
-                            <div class="form-group" ng-class="{ 'has-error' : validation['connection' + key].parentEntry }">
+                            <div class="form-group" ng-class="{ 'has-error' : validation.connection[key].parentEntry }">
                                 <label class="control-label col-xs-12 col-sm-4">Organisation</label>
                                 <div class="col-xs-12 col-sm-8">
                                     <select
@@ -180,7 +183,7 @@
                                         ng-options="org.id as org.name for org in organizations[entry.connection[key].parentType]"
                                         ng-model="entry.connection[key].parentEntry">
                                     </select>
-                                    <p ng-show="validation['connection' + key].parentEntry" class="help-block">{{ translate(validation['connection' + key].parentEntry) }}</p>
+                                    <p ng-show="validation.connection[key].parentEntry" class="help-block">{{ translate(validation.connection[key].parentEntry) }}</p>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -220,6 +223,7 @@
                             <a class="btn btn-default" ng-click="addMembership()"><i class="fa fa-plus"></i> Lägg till medlemskap</a>
                         </div>
                     </div>
+                    <hr/>
                 </div>
                 <h2>Kontaktuppgifter</h2>
                 <div class="contact-toolbar row">
@@ -271,6 +275,7 @@
                     <hr>
                     <div
                         class="contact-sheet"
+                        ng-form="ngvalidation.address[key]"
                         ng-repeat="(key, address) in entry.address"
                         ng-show="meta.addressActive == key"
                     >
