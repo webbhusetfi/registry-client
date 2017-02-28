@@ -16,8 +16,14 @@ angular.module('RegistryClient')
         "Connection modified":{
             "sv":"Tillhörigheter ändrade"
         },
+        "Connection removed":{
+            "sv":"Tillhörighet raderad"
+        },
         "This value should not be blank.":{
             "sv":"Detta värde måste vara ifyllt."
+        },
+        "Invalid entity":{
+            "sv":"Ogiltigt värde"
         }
     };
     
