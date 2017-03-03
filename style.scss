@@ -257,7 +257,7 @@ pre.debug {
 .fa.sorter {
     color:$grayscale-black;
     &.fa-sort {
-        color:$grayscale-mid;
+        color:lighten($grayscale-black, 60%);
     }
 }
 

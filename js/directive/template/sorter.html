@@ -4,8 +4,8 @@
             class="fa sorter"
             ng-class="{
                 'fa-sort': _.get(query.arguments.order, target) == undefined,
-                'fa-sort-alpha-asc': _.get(query.arguments.order, target) == 'asc',
-                'fa-sort-alpha-desc': _.get(query.arguments.order, target) == 'desc'
+                'fa-chevron-circle-down': _.get(query.arguments.order, target) == 'asc',
+                'fa-chevron-circle-up': _.get(query.arguments.order, target) == 'desc'
             }
             "
         ></i>
