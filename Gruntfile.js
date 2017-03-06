@@ -11,7 +11,7 @@ module.exports = function(grunt) {
                     'node_modules/angular-sanitize/angular-sanitize.min.js',
                     'node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js',
                     'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
-                    'node_modules/angular-chart.js/node_modules/chart.js/Chart.min.js',
+                    'node_modules/angular-chart.js/node_modules/chart.js/dist/Chart.min.js',
                     'node_modules/angular-chart.js/dist/angular-chart.min.js',
                     'node_modules/ng-csv/build/ng-csv.min.js',
                     'node_modules/angular-xeditable/dist/js/xeditable.min.js',
