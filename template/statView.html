@@ -32,17 +32,14 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-sm-12 col-lg-6">
             <strong>Åldersfördelning</strong><br />
             <small><em>{{ (view_org_age_included_count/view_org_members_count)*100 | number:0 }}% är inkluderade i statistiken.</em></small>
             <canvas id="line" class="chart chart-line" ng-show="view_org_age_show" chart-data="view_org_age.data" 
                 chart-labels="view_org_age.labels">
-            </canvas> 
+            </canvas>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
+        <div class="col-sm-12 col-lg-6">
             <strong>Könsfördelning</strong><br />
             <small><em>
                 <span ng-repeat="g in view_org_gender.data track by $index">

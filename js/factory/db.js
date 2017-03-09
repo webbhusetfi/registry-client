@@ -81,6 +81,8 @@ angular.module('RegistryClient')
                 $http
                     .post(config.apiurl + config.url, queryData)
                     .then(function(response) {
+                        // "hardcoded" language sv
+                        response.data.language = 'sv';
                         globalParams.set('user', response.data);
                         dbHandler.reset();
                         defer.resolve(response.data);
@@ -240,10 +242,10 @@ angular.module('RegistryClient')
             return this;
         },
         runQuery: function() {
-            if(overlay) { loadOverlay.enable(); };
             var result = $q.defer();
-            if(Object.keys(query).length > 0)
+            if(_.size(query) > 0)
             {
+                if(overlay) { loadOverlay.enable(); };
                 dbInternals.getConfig().then(function(config) {
                     $http
                         .post(config.apiurl + url, query)
@@ -310,7 +312,7 @@ angular.module('RegistryClient')
                 });
             }else{
                 // query empty, blank resolve
-                $log.log('query empty');
+                // $log.log('query empty');
                 result.resolve();
             }
             return result.promise;
@@ -330,7 +332,7 @@ angular.module('RegistryClient')
         parseResult: function(result) {
             var parsedResult = {};
             if (!parse) {
-                tmp = result;
+                var tmp = result;
                 dbHandler.reset();
                 return tmp;
             }

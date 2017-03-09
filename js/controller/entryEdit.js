@@ -5,22 +5,16 @@ angular.module('RegistryClient')
     $scope.globalParams = globalParams;
     $scope.entryTypes = globalParams.static.types;
     $scope.meta = {};
+    // ng-form
+    $scope.ngvalidation = {}
+    // server
     $scope.validation = {
         "entry":{},
         "connection":{},
         "address":{}
     }
-    $scope.historyState = function(value) {
-        var tr = {
-            "Address modified":"Adresser ändrade",
-            "Entry modified":"Basuppgifter ändrade",
-            "Connection modified":"Tillhörigheter ändrade"
-        };
-        return tr[value];
-    }
-
     $scope.connectionTypes = {}
-    var connectionNames = angular.merge({}, globalParams.static.types, {"UNION":"Förbund"});
+    var connectionNames = globalParams.types();
     angular.forEach(globalParams.get('connectionTypes'), function(value, key) {
         if($scope.connectionTypes[value.childType] === undefined)
             $scope.connectionTypes[value.childType] = {};
@@ -74,10 +68,11 @@ angular.module('RegistryClient')
     };
 
     $scope.setCalTime = function(format, date, target) {
+        console.log(date);
         switch(format)
         {
             case 'YYYY':
-                if(date !== null)
+                if(date !== undefined)
                 {
                     $scope.meta.birthMonth = date;
                     $scope.entry.birthYear = date.getFullYear();
@@ -91,7 +86,7 @@ angular.module('RegistryClient')
             break;
 
             case 'MM':
-                if(date !== null)
+                if(date !== undefined)
                 {
                     $scope.meta.birthDate = date;
                     $scope.entry.birthMonth = date.getMonth()+1;
@@ -101,7 +96,7 @@ angular.module('RegistryClient')
                 }
             break;
             case 'DD':
-                if(date !== null)
+                if(date !== undefined)
                     $scope.entry.birthDate = date.getDate();
                 else
                     $scope.entry.birthDate = null;
@@ -162,8 +157,10 @@ angular.module('RegistryClient')
             "createdAt": $scope.today,
             "fromOpen":false
         });
-        $scope.$watch('validation.connection[' + String($scope.entry.connection.length - 1) + ']', function(value) {
-            value.$dirty = true;
+        $scope.$watch('ngvalidation.connection[' + String($scope.entry.connection.length - 1) + ']', function(value) {
+            if (value) {
+                value.$dirty = true;
+            }
         });
     };
 
@@ -178,8 +175,10 @@ angular.module('RegistryClient')
         
         $scope.entry.address.push({"class":newClass,"country":"Finland"});
         $scope.meta.addressActive = $scope.entry.address.length - 1;
-        $scope.$watch('validation.address[' + String($scope.entry.address.length - 1) + ']', function(value) {
-            value.$dirty = true;
+        $scope.$watch('ngvalidation.address[' + String($scope.entry.address.length - 1) + ']', function(value) {
+            if (value) {
+                value.$dirty = true;
+            }
         });
     }
     
@@ -362,6 +361,12 @@ angular.module('RegistryClient')
         }
 
         $scope.submit = function() {
+            $scope.validation = {
+                "entry":{},
+                "connection":{},
+                "address":{}
+            }
+            
             var queryObject = {
                     "entry": {
                         "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
@@ -393,17 +398,20 @@ angular.module('RegistryClient')
                 .setQuery(queryObject)
                 .runQuery()
                 .then(function(response) {
-                    if($routeParams.id == '-1')
-                    {
+                    if (response.entry.status == 'fail') {
+                        $scope.validation.entry = response.entry.data;
+                    }
+                    
+                    if ($routeParams.id == '-1') {
                         var parentId = response.entry.data.item.id;
-                    }else{
+                    } else {
                         var parentId = $routeParams.id;
                     }
 
                     var connections = {};
 
                     angular.forEach($scope.entry.connection, function(values, key) {
-                        if(values.organization !== '-' && $scope.validation.connection[key].$dirty) {
+                        if($scope.ngvalidation.connection && $scope.ngvalidation.connection[key] && $scope.ngvalidation.connection[key].$dirty) {
                             connections['connection' + key] = {};
                             connections['connection' + key].arguments = {
                                     "notes" : values.notes,
@@ -424,11 +432,8 @@ angular.module('RegistryClient')
                             }
                         }
                     });
-                    if(Object.keys(connections).length > 0)
-                    {
-                        dbHandler
-                            .setQuery(connections);
-                    }
+                    if(_.size(connections) > 0)
+                        dbHandler.setQuery(connections);
                     
                     if($scope.meta.membershipDelete) {
                         var membershipDelete = {};
@@ -440,15 +445,15 @@ angular.module('RegistryClient')
                                 }
                             }
                         });
-                        dbHandler
-                            .setQuery(membershipDelete); 
-                    }                    
+                        if(_.size(membershipDelete) > 0)
+                            dbHandler.setQuery(membershipDelete); 
+                    }
 
                     var address = {}
                     angular.forEach($scope.entry.address, function(values, key) {
-                        if($scope.validation.address[key].$dirty) {
-                            address['contactsheet' + key] = {};
-                            address['contactsheet' + key].arguments = {
+                        if($scope.ngvalidation.address && $scope.ngvalidation.address[key] && $scope.ngvalidation.address[key].$dirty) {
+                            address['address' + key] = {};
+                            address['address' + key].arguments = {
                                 "class": values.class,
                                 "name": values.name,
                                 "street": values.street,
@@ -457,27 +462,23 @@ angular.module('RegistryClient')
                                 "country": values.country,
                                 "email": values.email,
                                 "phone": values.phone,
-                                "mobile": values.mobile,
-                                "notes": values.notes
+                                "mobile": values.mobile
                             }
 
                             if(values.id !== undefined)
                             {
-                                address['contactsheet' + key].service = 'address/update';
-                                address['contactsheet' + key].arguments.id = values.id;
-                                address['contactsheet' + key].arguments.entry = values.entry;
+                                address['address' + key].service = 'address/update';
+                                address['address' + key].arguments.id = values.id;
+                                address['address' + key].arguments.entry = values.entry;
                             }else{
-                                address['contactsheet' + key].service = 'address/create';
-                                address['contactsheet' + key].arguments.entry = parentId;
+                                address['address' + key].service = 'address/create';
+                                address['address' + key].arguments.entry = parentId;
                             }
                         }
                     });
                     
-                    if(Object.keys(address).length > 0)
-                    {
-                        dbHandler
-                            .setQuery(address);
-                    }
+                    if(_.size(address) > 0)
+                        dbHandler.setQuery(address);
                     
                     if($scope.meta.addressDelete) {
                         var addressDelete = {};
@@ -489,14 +490,24 @@ angular.module('RegistryClient')
                                 }
                             }
                         });
-                        dbHandler
-                            .setQuery(addressDelete); 
+                        if(_.size(addressDelete) > 0)
+                            dbHandler.setQuery(addressDelete);
                     }
 
                     dbHandler
                         .runQuery()
                         .then(function(response) {
-                            $window.history.back();
+                            _.each(response, function(val, key) {
+                                if(val.status == 'fail') {
+                                    if(key.indexOf('connection') == 0) {
+                                        $scope.validation.connection[key.replace('connection', '')] = val.data;
+                                    }else if(key.indexOf('address') == 0) {
+                                        $scope.validation.address[key.replace('connection', '')] = val.data;
+                                    }
+                                }
+                            });
+                            if(_.size($scope.validation.entry) == 0 && _.size($scope.validation.connection) == 0 && _.size($scope.validation.address) == 0)
+                                $window.history.back();
                         });
                 })
                 .catch(function(response) {

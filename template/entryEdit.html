@@ -2,7 +2,7 @@
     <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
         <div class="inner-form">
             <div class="functions"><xg-back></div>
-            <div class="form-horizontal" ng-form="validation.entry">
+            <div class="form-horizontal" ng-form="ngvalidation.entry">
                 <div class="form-group">
                     <label class="control-label col-sm-4">Posttyp</label>
                     <div class="col-sm-8">
@@ -18,10 +18,11 @@
                     </div>
                 </div>
                 <div ng-show="entry.type == 'ASSOCIATION' || entry.type == 'UNION'">
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{ 'has-error' : validation.entry.name }">
                         <label class="control-label col-sm-4">Namn</label>
                         <div class="col-sm-8">
                             <input class="form-control" ng-model="entry.name" placeholder="Namn" type="text">
+                            <p ng-show="validation.entry.name" class="help-block">{{ translate(validation.entry.name) }}</p>
                         </div>
                     </div>
                 </div>
@@ -32,16 +33,18 @@
                             <p class="form-control-static">{{ entry.id }}</p>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{ 'has-error' : validation.entry.firstName }">
                         <label class="control-label col-sm-4">Förnamn</label>
                         <div class="col-sm-8">
                             <input class="form-control" ng-model="entry.firstName" placeholder="Förnamn" type="text">
+                            <p ng-show="validation.entry.firstName" class="help-block">{{ translate(validation.entry.firstName) }}</p>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{ 'has-error' : validation.entry.lastName }">
                         <label class="control-label col-sm-4">Efternamn</label>
                         <div class="col-sm-8">
                             <input class="form-control" ng-model="entry.lastName" placeholder="Efternamn" type="text">
+                            <p ng-show="validation.entry.lastName" class="help-block">{{ translate(validation.entry.lastName) }}</p>
                         </div>
                     </div>
                     <div class="form-group">
@@ -60,6 +63,7 @@
                                             min-mode="'year'"
                                             ng-required="false"
                                             ng-change="setCalTime('YYYY', meta.birthYear, entry.birthYear);"
+                                            novalidate
                                             close-text="Stäng" />
                                         <span class="input-group-btn">
                                             <button
@@ -84,6 +88,7 @@
                                             max-mode="'month'"
                                             min-mode="'month'"
                                             ng-required="false"
+                                            novalidate
                                             ng-change="setCalTime('MM', meta.birthMonth, entry.birthMonth);"
                                             close-text="Stäng" />
                                         <span class="input-group-btn">
@@ -110,6 +115,7 @@
                                             min-mode="'day'"
                                             ng-required="false"
                                             ng-change="setCalTime('DD', meta.birthDate, entry.birthDate);"
+                                            novalidate
                                             close-text="Stäng" />
                                         <span class="input-group-btn">
                                             <button
@@ -144,7 +150,7 @@
                 <div ng-show="entry.type !== 'UNION'">
                     <h2>Tillhörighet</h2>
                     <div class="membership-list" ng-show="entry.connection !== undefined">
-                        <div ng-form="validation.connection[key]" ng-repeat="(key, connection) in entry.connection">
+                        <div ng-repeat="(key, connection) in entry.connection" ng-form="ngvalidation.connection[key]">
                             <div class="form-group">
                                 <label
                                     class="control-label col-xs-12 col-sm-4"
@@ -169,7 +175,7 @@
                                     <button class="btn btn-default" ng-click="removeMembership(key);"><i class="fa fa-times"></i> Radera</button>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" ng-class="{ 'has-error' : validation.connection[key].parentEntry }">
                                 <label class="control-label col-xs-12 col-sm-4">Organisation</label>
                                 <div class="col-xs-12 col-sm-8">
                                     <select
@@ -177,6 +183,7 @@
                                         ng-options="org.id as org.name for org in organizations[entry.connection[key].parentType]"
                                         ng-model="entry.connection[key].parentEntry">
                                     </select>
+                                    <p ng-show="validation.connection[key].parentEntry" class="help-block">{{ translate(validation.connection[key].parentEntry) }}</p>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -216,6 +223,7 @@
                             <a class="btn btn-default" ng-click="addMembership()"><i class="fa fa-plus"></i> Lägg till medlemskap</a>
                         </div>
                     </div>
+                    <hr/>
                 </div>
                 <h2>Kontaktuppgifter</h2>
                 <div class="contact-toolbar row">
@@ -267,55 +275,62 @@
                     <hr>
                     <div
                         class="contact-sheet"
-                        ng-form="validation.address[key]" 
+                        ng-form="ngvalidation.address[key]"
                         ng-repeat="(key, address) in entry.address"
                         ng-show="meta.addressActive == key"
                     >
                         <input type="hidden" ng-model="address.id" value="{{ address.id }}">
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].email }">
                             <label class="control-label col-sm-4">E-postadress</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="E-postadress" type="text" ng-model="address.email">
+                                <p ng-show="validation['contactsheet' + key].email" class="help-block">{{ translate(validation['contactsheet' + key].email) }}</p>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].mobile }">
                             <label class="control-label col-sm-4">Mobil</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="Mobil" type="text" ng-model="address.mobile">
+                                <p ng-show="validation['contactsheet' + key].mobile" class="help-block">{{ translate(validation['contactsheet' + key].mobile) }}</p>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].phone }">
                             <label class="control-label col-sm-4">Telefon</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="Telefon" type="text" ng-model="address.phone">
+                                <p ng-show="validation['contactsheet' + key].phone" class="help-block">{{ translate(validation['contactsheet' + key].phone) }}</p>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].name }">
                             <label class="control-label col-sm-4">c/o</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="c/o" type="text" ng-model="address.name">
+                                <p ng-show="validation['contactsheet' + key].name" class="help-block">{{ translate(validation['contactsheet' + key].name) }}</p>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].street }">
                             <label class="control-label col-sm-4">Postadress</label>
                             <div class="col-sm-8">
                                 <textarea class="form-control" placeholder="Postadress" ng-model="address.street"></textarea>
+                                <p ng-show="validation['contactsheet' + key].street" class="help-block">{{ translate(validation['contactsheet' + key].street) }}</p>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].postalCode || validation['contactsheet' + key].town }">
                             <label class="control-label col-sm-4">Postnummer och ort</label>
                             <div class="col-sm-8">
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <input class="form-control" type="text" placeholder="Postnummer" ng-model="address.postalCode">
+                                        <p ng-show="validation['contactsheet' + key].postalCode" class="help-block">{{ translate(validation['contactsheet' + key].postalCode) }}</p>
                                     </div>
                                     <div class="col-sm-8">
                                         <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
+                                        <p ng-show="validation['contactsheet' + key].town" class="help-block">{{ translate(validation['contactsheet' + key].town) }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].country }">
                             <label class="control-label col-sm-4">Land</label>
                             <div class="col-sm-8">
                                 <input 
@@ -323,12 +338,7 @@
                                     placeholder="Land" 
                                     class="form-control" 
                                     ng-model="address.country">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-4">Anteckningar</label>
-                            <div class="col-sm-8">
-                                <textarea class="form-control" placeholder="Anteckningar" ng-model="address.notes"></textarea>
+                                    <p ng-show="validation['contactsheet' + key].country" class="help-block">{{ translate(validation['contactsheet' + key].country) }}</p>
                             </div>
                         </div>
                         <div class="form-group">
@@ -371,28 +381,32 @@
                     <hr>
                 </div>
                 <h2>Övrigt</h2>
-                <div class="form-group" ng-show="entry.type != 'MEMBER_PERSON'">
+                <div class="form-group" ng-show="entry.type != 'MEMBER_PERSON'" ng-class="{ 'has-error' : validation.entry.description }">
                     <label class="control-label col-sm-4">Beskrivning</label>
                     <div class="col-sm-8">
                         <textarea placeholder="Beskrivning" class="form-control" ng-model="entry.description"></textarea>
+                        <p ng-show="validation.entry.description" class="help-block">{{ translate(validation.entry.description) }}</p>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-class="{ 'has-error' : validation.entry.notes }">
                     <label class="control-label col-sm-4">Anteckningar</label>
                     <div class="col-sm-8">
                         <textarea placeholder="Anteckningar" class="form-control" ng-model="entry.notes"></textarea>
+                        <p ng-show="validation.entry.notes" class="help-block">{{ translate(validation.entry.notes) }}</p>
                     </div>
                 </div>
-                <div class="form-group" ng-show="entry.type != 'MEMBER_PERSON'">
+                <div class="form-group" ng-show="entry.type != 'MEMBER_PERSON'" ng-class="{ 'has-error' : validation.entry.bank }">
                     <label class="control-label col-sm-4">Bank</label>
                     <div class="col-sm-8">
                         <input placeholder="Bank" class="form-control" ng-model="entry.bank" type="text" />
+                        <p ng-show="validation.entry.bank" class="help-block">{{ translate(validation.entry.bank) }}</p>
                     </div>
                 </div>
-                <div class="form-group" ng-show="entry.type != 'MEMBER_PERSON'">
+                <div class="form-group" ng-show="entry.type != 'MEMBER_PERSON'" ng-class="{ 'has-error' : validation.entry.account }">
                     <label class="control-label col-sm-4">Bankkonto</label>
                     <div class="col-sm-8">
                         <input placeholder="Bankkonto" class="form-control" ng-model="entry.account" type="text" />
+                        <p ng-show="validation.entry.account" class="help-block">{{ translate(validation.entry.account) }}</p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -405,7 +419,7 @@
                     <label class="control-label col-sm-4">Historik</label>
                     <div class="col-sm-8" style="padding-top:0.7rem;">
                         <div ng-repeat="history in entry.history"
-                        >{{ history.modifiedAt | date:'d.M.yy HH:mm' }}, {{ historyState(history.description) }}</div>
+                        >{{ history.modifiedAt | date:'d.M.yy HH:mm' }}, {{ translate(history.description) }}</div>
                     </div>
                 </div>
                 <div class="form-group" ng-show="entry.createdAt !== undefined">

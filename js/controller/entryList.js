@@ -9,12 +9,11 @@ angular.module('RegistryClient')
     if (!$routeParams.id && $scope.currentEntry.hasOwnProperty('id')) {
         $scope.currentEntry = {};
     }
-
+    
     // base configuration
     $scope.config.typeselect = {
-        "types": _.cloneDeep(globalParams.static.types)
+        "types": globalParams.types()
     };
-    
     if ($routeParams.id) {
         _.unset($scope.config.typeselect.types, 'UNION');        
     }

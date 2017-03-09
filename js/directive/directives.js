@@ -54,63 +54,33 @@ angular.module('RegistryClient')
             }
         }
     })
-    .directive('xgSorter', function($log) {
+    .directive('xgSorter', function($log, $rootScope) {
         return {
             restrict: 'E',
             scope: {
                 query:'=',
                 target:'='
             },
-            replace:true,
-            template:'<span><a ng-click="swapSort();" uib-tooltip="Sortera"><i class="fa fa-sort"></i><span ng-show="currentSortField()" style="color:red;">*</span></a></span>',
-            controller: function($scope) {
-                
-            },
-            link: function(scope, elem, attr) {
-                scope.swapSort = function() {
-                    order = scope.currentSortOrder();
-                    delete scope.query.arguments.order;
-                    scope.query.arguments.order = {};
-                    scope.query.arguments.order = _.set(scope.query.arguments.order, scope.target, ((order == "asc") ? "desc" : "asc") );
-                };
-                
-                scope.currentSortOrder = function() {
-                    order = scope.query.arguments.order[scope.target];
-                    if (!order) {
-                        var parts = scope.target.split('.');
-                        if(parts[1]){
-                            if (scope.query.arguments.order.hasOwnProperty(parts[0]) && scope.query.arguments.order[parts[0]].hasOwnProperty(parts[1])) {
-                                order = scope.query.arguments.order[parts[0]][parts[1]];
-                            } else {
-                                order = "asc";
-                            }
-                        } else {
-                            order = "asc";
-                        }
-                    }                    
-                    return order;
-                }
-                
-                scope.currentSortField = function() {
-                    if (scope.query.arguments.order) {
-                        field = !!scope.query.arguments.order.hasOwnProperty(scope.target);
-                        if (!field) {
-                            var parts = scope.target.split('.');
-                            if(parts[1]){
-                                if (scope.query.arguments.order.hasOwnProperty(parts[0]) && scope.query.arguments.order[parts[0]].hasOwnProperty(parts[1])) {
-                                    field = true;
-                                } else {
-                                    field = false;
-                                }
-                            } else {
-                                field = false;
-                            }
-                        }                    
-                        return field;
+            controller: function($scope, $rootScope) {
+                $scope._ = $rootScope._;
+                $scope.swapSort = function() {
+                    switch(_.get($scope.query.arguments.order, $scope.target)) {
+                        case 'asc':
+                            _.set($scope.query.arguments.order, $scope.target, 'desc');
+                        break;
+                        
+                        case 'desc':
+                            _.unset($scope.query.arguments.order, $scope.target);
+                        break;
+                        
+                        default:
+                            _.set($scope.query.arguments.order, $scope.target, 'asc');
+                        break;
                     }
-                    return false;
-                }
-            }
+                };
+            },
+            replace:true,
+            templateUrl:'js/directive/template/sorter.html'
         }
     })
     .directive('xgOpenRegistry', function($log, $location, dbHandler, globalParams) {
