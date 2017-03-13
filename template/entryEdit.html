@@ -60,7 +60,7 @@
                                             uib-datepicker-popup="yyyy" 
                                             ng-model="meta.birthYear"
                                             is-open="meta.birthyearOpen"
-                                            min-mode="'year'"
+                                            datepicker-options="{'datepickerMode':'year','minMode':'year'}"
                                             ng-required="false"
                                             ng-change="setCalTime('YYYY', meta.birthYear, entry.birthYear);"
                                             novalidate
@@ -85,8 +85,7 @@
                                             ng-model="meta.birthMonth"
                                             init-date="meta.birthMonth" 
                                             is-open="meta.birthmonthOpen"
-                                            max-mode="'month'"
-                                            min-mode="'month'"
+                                            datepicker-options="{'datepickerMode':'month','minMode':'month','maxMode':'month'}"
                                             ng-required="false"
                                             novalidate
                                             ng-change="setCalTime('MM', meta.birthMonth, entry.birthMonth);"
