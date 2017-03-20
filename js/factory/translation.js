@@ -24,6 +24,9 @@ angular.module('RegistryClient')
         },
         "Invalid entity":{
             "sv":"Ogiltigt värde"
+        },
+        "This value is not a valid email address.":{
+            "sv":"Detta värde är inte en giltig e-postaddress."
         }
     };
     
