@@ -1,3 +1,4 @@
+<pre class="debug">{{ ngvalidation | json }}</pre>
 <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
         <div class="inner-form">
@@ -324,12 +325,12 @@
                                     </div>
                                     <div class="col-sm-8">
                                         <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
-                                        <p ng-show="validation['contactsheet'][key].town" class="help-block">{{ translate(validation['contactsheet'][key].town) }}</p>
+                                        <p ng-show="validation['address'][key].town" class="help-block">{{ translate(validation['address'][key].town) }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet'][key].country }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].country }">
                             <label class="control-label col-sm-4">Land</label>
                             <div class="col-sm-8">
                                 <input 
@@ -337,7 +338,7 @@
                                     placeholder="Land" 
                                     class="form-control" 
                                     ng-model="address.country">
-                                    <p ng-show="validation['contactsheet'][key].country" class="help-block">{{ translate(validation['contactsheet'][key].country) }}</p>
+                                    <p ng-show="validation['address'][key].country" class="help-block">{{ translate(validation['address'][key].country) }}</p>
                             </div>
                         </div>
                         <div class="form-group">
