@@ -88,12 +88,31 @@ module.exports = function(grunt) {
                 options: {
                     match:[{
                         'dist.js':'dist.js',
-                        'style.css':'style.css'
+                        'style.css':'style.css',
+                        '/template/registryList.html':'template/registryList.html',
+                        '/template/registryEdit.html':'template/registryEdit.html',
+                        '/template/invoiceList.html':'template/invoiceList.html',
+                        '/template/invoiceLedger.html':'template/invoiceLedger.html',
+                        '/template/mailingList.html':'template/mailingList.html',
+                        '/template/mailingView.html':'template/mailingView.html',
+                        '/template/invoiceEdit.html':'template/invoiceEdit.html',
+                        '/template/invoiceView.html':'template/invoiceView.html',
+                        '/template/invoiceEdit.html':'template/invoiceEdit.html',
+                        '/template/statView.html':'template/statView.html',
+                        '/template/entryList.html':'template/entryList.html',
+                        '/template/entryEdit.html':'template/entryEdit.html',
+                        '/template/propertyList.html':'template/propertyList.html',
+                        '/template/userList.html':'template/userList.html',
+                        '/template/userEdit.html':'template/userEdit.html',
+                        '/template/userLogin.html':'template/userLogin.html'
                     }],
                     replacement: 'md5'
                 },
                 files: {
-                    src:['index.html']
+                    src:[
+                        'index.html',
+                        'dist.min.js'
+                    ]
                 }
             }
         }
@@ -103,5 +122,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-processhtml');
     grunt.loadNpmTasks('grunt-cache-breaker');
     grunt.registerTask('dev', ['uglify','concat','processhtml:dev']);
-    grunt.registerTask('default', ['uglify','concat','processhtml:dist','cachebreaker']);
+    grunt.registerTask('default', ['uglify','processhtml:dist','cachebreaker','concat']);
 };
