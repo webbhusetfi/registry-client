@@ -279,24 +279,47 @@
                         ng-show="meta.addressActive == key"
                     >
                         <input type="hidden" ng-model="address.id" value="{{ address.id }}">
-                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].email }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].email || ngvalidation['address'][key]['email'].$invalid }">
                             <label class="control-label col-sm-4">E-postadress</label>
                             <div class="col-sm-8">
-                                <input class="form-control" placeholder="E-postadress" type="text" ng-model="address.email">
+                                <input
+                                    class="form-control"
+                                    placeholder="E-postadress"
+                                    type="email"
+                                    ng-form="ngvalidation['address'][key]['email']"
+                                    ng-model-options="{ debounce:500 }"
+                                    ng-model="address.email"
+                                >
                                 <p ng-show="validation['address'][key].email" class="help-block">{{ translate(validation['address'][key].email) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].mobile }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].mobile || ngvalidation['address'][key]['mobile'].$invalid }">
                             <label class="control-label col-sm-4">Mobil</label>
                             <div class="col-sm-8">
-                                <input class="form-control" placeholder="Mobil" type="text" ng-model="address.mobile">
+                                <input
+                                    class="form-control"
+                                    placeholder="Mobil"
+                                    ng-maxlength="32"
+                                    type="text"
+                                    ng-form="ngvalidation['address'][key]['mobile']"
+                                    ng-model-options="{ debounce:500 }"
+                                    ng-model="address.mobile"
+                                >
                                 <p ng-show="validation['address'][key].mobile" class="help-block">{{ translate(validation['address'][key].mobile) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].phone }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].phone || ngvalidation['address'][key]['phone'].$invalid }">
                             <label class="control-label col-sm-4">Telefon</label>
                             <div class="col-sm-8">
-                                <input class="form-control" placeholder="Telefon" type="text" ng-model="address.phone">
+                                <input
+                                    class="form-control"
+                                    placeholder="Telefon"
+                                    ng-maxlength="32"
+                                    type="text"
+                                    ng-form="ngvalidation['address'][key]['phone']"
+                                    ng-model-options="{ debounce:500 }"
+                                    ng-model="address.phone"
+                                >
                                 <p ng-show="validation['address'][key].phone" class="help-block">{{ translate(validation['address'][key].phone) }}</p>
                             </div>
                         </div>
@@ -446,7 +469,8 @@
                         <xg-cancel></xg-cancel>
                         <a
                             class="btn btn-default"
-                            ng-click="submit()"
+                            ng-disabled="ngvalidation['entry'].$invalid;"
+                            ng-click="ngvalidation['entry'].$invalid ? null : submit();"
                         ><i class="fa fa-save"></i> Spara</a>
                     </div>
                 </div>            

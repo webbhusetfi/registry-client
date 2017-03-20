@@ -68,7 +68,6 @@ angular.module('RegistryClient')
     };
 
     $scope.setCalTime = function(format, date, target) {
-        console.log(date);
         switch(format)
         {
             case 'YYYY':
@@ -271,7 +270,7 @@ angular.module('RegistryClient')
                     $scope.meta = {
                         "addressActive": "0",
                         "address": {},
-                        "birthYear": $scope.today,
+                        "birthYear": null,
                         "activeProperty": "all"
                     }
 
