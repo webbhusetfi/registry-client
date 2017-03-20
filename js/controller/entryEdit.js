@@ -402,7 +402,7 @@ angular.module('RegistryClient')
                         $scope.validation.entry = response.entry.data;
                     }
                     
-                    if ($routeParams.id == '-1') {
+                    if ($routeParams.id == '-1' && response.entry.status !== 'fail') {
                         var parentId = response.entry.data.item.id;
                     } else {
                         var parentId = $routeParams.id;
@@ -506,7 +506,6 @@ angular.module('RegistryClient')
                                     }
                                 }
                             });
-                            $log.log($scope.validation);
                             if(_.size($scope.validation.entry) == 0 && _.size($scope.validation.connection) == 0 && _.size($scope.validation.address) == 0)
                                 $window.history.back();
                         });
