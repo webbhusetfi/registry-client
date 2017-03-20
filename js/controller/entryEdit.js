@@ -502,10 +502,11 @@ angular.module('RegistryClient')
                                     if(key.indexOf('connection') == 0) {
                                         $scope.validation.connection[key.replace('connection', '')] = val.data;
                                     }else if(key.indexOf('address') == 0) {
-                                        $scope.validation.address[key.replace('connection', '')] = val.data;
+                                        $scope.validation.address[key.replace('address', '')] = val.data;
                                     }
                                 }
                             });
+                            $log.log($scope.validation);
                             if(_.size($scope.validation.entry) == 0 && _.size($scope.validation.connection) == 0 && _.size($scope.validation.address) == 0)
                                 $window.history.back();
                         });

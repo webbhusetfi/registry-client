@@ -279,57 +279,57 @@
                         ng-show="meta.addressActive == key"
                     >
                         <input type="hidden" ng-model="address.id" value="{{ address.id }}">
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].email }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].email }">
                             <label class="control-label col-sm-4">E-postadress</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="E-postadress" type="text" ng-model="address.email">
-                                <p ng-show="validation['contactsheet' + key].email" class="help-block">{{ translate(validation['contactsheet' + key].email) }}</p>
+                                <p ng-show="validation['address'][key].email" class="help-block">{{ translate(validation['address'][key].email) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].mobile }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].mobile }">
                             <label class="control-label col-sm-4">Mobil</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="Mobil" type="text" ng-model="address.mobile">
-                                <p ng-show="validation['contactsheet' + key].mobile" class="help-block">{{ translate(validation['contactsheet' + key].mobile) }}</p>
+                                <p ng-show="validation['address'][key].mobile" class="help-block">{{ translate(validation['address'][key].mobile) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].phone }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].phone }">
                             <label class="control-label col-sm-4">Telefon</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="Telefon" type="text" ng-model="address.phone">
-                                <p ng-show="validation['contactsheet' + key].phone" class="help-block">{{ translate(validation['contactsheet' + key].phone) }}</p>
+                                <p ng-show="validation['address'][key].phone" class="help-block">{{ translate(validation['address'][key].phone) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].name }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].name }">
                             <label class="control-label col-sm-4">c/o</label>
                             <div class="col-sm-8">
                                 <input class="form-control" placeholder="c/o" type="text" ng-model="address.name">
-                                <p ng-show="validation['contactsheet' + key].name" class="help-block">{{ translate(validation['contactsheet' + key].name) }}</p>
+                                <p ng-show="validation['address'][key].name" class="help-block">{{ translate(validation['address'][key].name) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].street }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].street }">
                             <label class="control-label col-sm-4">Postadress</label>
                             <div class="col-sm-8">
                                 <textarea class="form-control" placeholder="Postadress" ng-model="address.street"></textarea>
-                                <p ng-show="validation['contactsheet' + key].street" class="help-block">{{ translate(validation['contactsheet' + key].street) }}</p>
+                                <p ng-show="validation['address'][key].street" class="help-block">{{ translate(validation['address'][key].street) }}</p>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].postalCode || validation['contactsheet' + key].town }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['address'][key].postalCode || validation['address'][key].town }">
                             <label class="control-label col-sm-4">Postnummer och ort</label>
                             <div class="col-sm-8">
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <input class="form-control" type="text" placeholder="Postnummer" ng-model="address.postalCode">
-                                        <p ng-show="validation['contactsheet' + key].postalCode" class="help-block">{{ translate(validation['contactsheet' + key].postalCode) }}</p>
+                                        <p ng-show="validation['address'][key].postalCode" class="help-block">{{ translate(validation['address'][key].postalCode) }}</p>
                                     </div>
                                     <div class="col-sm-8">
                                         <input class="form-control" type="text" placeholder="Postort" ng-model="address.town">
-                                        <p ng-show="validation['contactsheet' + key].town" class="help-block">{{ translate(validation['contactsheet' + key].town) }}</p>
+                                        <p ng-show="validation['contactsheet'][key].town" class="help-block">{{ translate(validation['contactsheet'][key].town) }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet' + key].country }">
+                        <div class="form-group" ng-class="{ 'has-error' : validation['contactsheet'][key].country }">
                             <label class="control-label col-sm-4">Land</label>
                             <div class="col-sm-8">
                                 <input 
@@ -337,7 +337,7 @@
                                     placeholder="Land" 
                                     class="form-control" 
                                     ng-model="address.country">
-                                    <p ng-show="validation['contactsheet' + key].country" class="help-block">{{ translate(validation['contactsheet' + key].country) }}</p>
+                                    <p ng-show="validation['contactsheet'][key].country" class="help-block">{{ translate(validation['contactsheet'][key].country) }}</p>
                             </div>
                         </div>
                         <div class="form-group">
