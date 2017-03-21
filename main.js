@@ -25,10 +25,6 @@ var regApp = angular
                 templateUrl: '/template/registryEdit.html',
                 controller: 'registryEdit'
             })
-            .when('/registry/:id', {
-                templateUrl: '/template/registryView.html',
-                controller: 'registryView'
-            })
             .when('/invoice/list', {
                 templateUrl: '/template/invoiceList.html',
                 controller: 'invoiceList'
