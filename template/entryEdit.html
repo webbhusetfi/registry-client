@@ -47,7 +47,7 @@
                             <p ng-show="validation.entry.lastName" class="help-block">{{ translate(validation.entry.lastName) }}</p>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" ng-if="entry.type == 'MEMBER_PERSON'">
                         <label class="control-label col-sm-4">Födelseår</label>
                         <div class="col-sm-8">
                             <div class="row">
