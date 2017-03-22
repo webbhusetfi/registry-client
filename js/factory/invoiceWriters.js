@@ -204,15 +204,17 @@ angular.module('RegistryClient')
                                     document.font('Helvetica');
                                     document.fontSize(15);
                                     current += margin;
+                                    
+                                    if (key != 0) {
+                                        document.addPage();
+                                    }
+                                    
                                     document.text(invoicemodel.name, margin, current, {'width': fullwidth, 'height': row});    
                                     document.fontSize(12);
                                     document.moveTo(margin, row*5).lineTo(fullwidth+margin, row*5).stroke();
                                     current += row;
                                     current += row;
                                     
-                                    if (key != 0) {
-                                        document.addPage();
-                                    }
                                     //console.log(invoicee);
                                     invoicee_adr = invoicee.primaryAddress; // allways entryInvoice/search
                                     /*
