@@ -70,8 +70,6 @@ angular.module('RegistryClient')
                             .setQuery(connectionQuery)
                             .runQuery()
                             .then(function(response) {
-                                $log.log(connectionQuery);
-                                $log.log(response);
                                 $location.path('/registry/list');
                             });
                     });
