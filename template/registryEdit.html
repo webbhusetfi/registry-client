@@ -1,35 +1,38 @@
 <div class="row">
     <div class="col-lg-6 col-lg-offset-3 col-sm-12 col-xs-12">
-        <div class="functions" style="margin-top:2rem;"><xg-back/></div>
-        <div class="form-horizontal" ng-form="post">
-            <h2>{{ routeParams.id === undefined ? 'Skapa' : 'Ändra' }} register</h2>
-            <div class="form-group"
-                ng-class="{
-                    'has-error' : regform.$invalid && regform.$dirty,
-                    'has-success' : regform.$valid && regform.$dirty,
-                }" 
-                ng-form="name"
-            >
-                <label class="control-label col-sm-4">Namn</label>
-                <div class="col-sm-8">
-                    <input
-                        class="form-control" 
-                        type="text" 
-                        ng-minlength="4" 
-                        ng-model="registry.name" 
-                        ng-model-options="{ debounce:100 }" 
-                        required 
-                        placeholder="Namn"
-                    >
+        <div class="inner-form">
+            <div class="functions" style="margin-top:2rem;"><xg-back/></div>
+            <div class="form-horizontal" ng-form="ngvalidation.registry">
+                <h2>{{ routeParams.id === undefined ? 'Skapa' : 'Ändra' }} register</h2>
+                <div class="form-group"
+                    ng-form="ngvalidation.registry.name"
+                    ng-class="{
+                        'has-error' : ngvalidation.registry.name.$invalid && ngvalidation.registry.name.$dirty,
+                        'has-success' : ngvalidation.registry.name.$valid && ngvalidation.registry.name.$dirty,
+                    }" 
+                    ng-form="name"
+                >
+                    <label class="control-label col-sm-4">Namn</label>
+                    <div class="col-sm-8">
+                        <input
+                            class="form-control" 
+                            type="text" 
+                            ng-minlength="4" 
+                            ng-model="registry.name" 
+                            ng-model-options="{ debounce:250 }" 
+                            required 
+                            placeholder="Namn"
+                        >
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 text-right">
-                    <a
-                        class="btn btn-default"
-                        ng-disabled="regform.$invalid || regform.$pristine"
-                        ng-click="submit()"
-                    ><i class="fa fa-save"></i> Spara</a>
+                <div class="row">
+                    <div class="col-sm-12 text-right">
+                        <a
+                            class="btn btn-default"
+                            ng-disabled="ngvalidation.registry.$invalid"
+                            ng-click="ngvalidation.registry.$invalid ? null : submit()"
+                        ><i class="fa fa-save"></i> Spara</a>
+                    </div>
                 </div>
             </div>
         </div>

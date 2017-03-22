@@ -1,8 +1,9 @@
 angular.module('RegistryClient')
 .controller('registryEdit', function($scope, $routeParams, $http, $location, $log, dbHandler, globalParams) {
     $scope.routeParams = $routeParams;
+    $scope.ngvalidation = {};
     $scope.registry = {};
-
+    
     if($routeParams.id)
     {
         dbHandler
@@ -41,6 +42,7 @@ angular.module('RegistryClient')
             .setQuery(request)
             .runQuery()
             .then(function(response) {
+                $log.log(response);
                 $location.path('/registry/list');
             })
             .catch(function(response) {
