@@ -24,6 +24,21 @@ angular.module('RegistryClient')
             });
     }
     $scope.submit = function() {
+        var connections = {
+            "conn1": {
+                "parentType":"UNION",
+                "childType":"ASSOCIATION"
+            },
+            "conn2": {
+                "parentType":"UNION",
+                "childType":"MEMBER_PERSON"
+            },
+            "conn3": {
+                "parentType":"ASSOCIATION",
+                "childType":"MEMBER_PERSON"
+            }
+        };
+        
         var request = {
             "registry": {
                 "service":"registry/" + ($routeParams.id ? 'update' : 'create'),
@@ -42,8 +57,27 @@ angular.module('RegistryClient')
             .setQuery(request)
             .runQuery()
             .then(function(response) {
-                $log.log(response);
-                $location.path('/registry/list');
+                if(_.isNumber(response.registry.data.item.id) && response.registry.status == 'success') {
+                    var connectionQuery = {};
+                    _.forEach(connections, function(value, key) {
+                        connectionQuery[key]= {
+                            "service":"connectionType/create",
+                            "arguments": _.merge(value, {
+                                "registry": response.registry.data.item.id
+                            })
+                        }
+                        dbHandler
+                            .setQuery(connectionQuery)
+                            .runQuery()
+                            .then(function(response) {
+                                $log.log(connectionQuery);
+                                $log.log(response);
+                                $location.path('/registry/list');
+                            });
+                    });
+                }else{
+                    $log.error('Failed to create registry');
+                }
             })
             .catch(function(response) {
                 $location.path('/logout');
