@@ -262,7 +262,9 @@ angular.module('RegistryClient')
 
                     $scope.entry = {
                         "type": "MEMBER_PERSON",
-                        "gender": "",
+                        "gender": undefined,
+                        "firstName":"",
+                        "lastName":"",
                         "connection": [],
                         "address": []
                     };
@@ -368,67 +370,36 @@ angular.module('RegistryClient')
             
             var queryObject = {
                     "entry": {
-                        "service":$routeParams.id == '-1' ? "entry/create" : "entry/update",
-                        "arguments":{
-                            "registry": globalParams.get('user').registry,
-                            "type": $scope.entry.type,
-                            "name": $scope.entry.name,
-                            "externalId": $scope.entry.externalId,
-                            "notes": $scope.entry.notes,
-                            "gender": $scope.entry.gender == '' ? undefined : $scope.entry.gender,
-                            "firstName": $scope.entry.firstName,
-                            "lastName": $scope.entry.lastName,
-                            "birthYear": $scope.entry.birthYear,
-                            "birthMonth": $scope.entry.birthMonth,
-                            "birthDay": $scope.entry.birthDate,
-                            "bank": $scope.entry.bank,
-                            "account": $scope.entry.account,
-                            "notes": $scope.entry.notes,
-                            "description": $scope.entry.description,
-                            "properties": $scope.entry.properties
+                        "service": _.isNumber($scope.entry.id) ? "entry/update" : "entry/create",
+                        "arguments": _.merge(
+                                { "registry": globalParams.get('user').registry },
+                                _.omit($scope.entry, ['address','connection'])
+                            )
                         }
-                    }
-                };
-
-            if($routeParams.id !== '-1')
-                queryObject.entry.arguments.id = $scope.entry.id;
-
+                    };
+                    
             dbHandler
                 .setQuery(queryObject)
                 .runQuery()
                 .then(function(response) {
                     if (response.entry.status == 'fail') {
                         $scope.validation.entry = response.entry.data;
-                    }
-                    
-                    if ($routeParams.id == '-1' && response.entry.status !== 'fail') {
-                        var parentId = response.entry.data.item.id;
-                    } else {
-                        var parentId = $routeParams.id;
+                        return false;
+                    }else{
+                        $scope.entry.id = response.entry.data.item.id;
                     }
 
                     var connections = {};
 
                     angular.forEach($scope.entry.connection, function(values, key) {
                         if($scope.ngvalidation.connection && $scope.ngvalidation.connection[key] && $scope.ngvalidation.connection[key].$dirty) {
-                            connections['connection' + key] = {};
-                            connections['connection' + key].arguments = {
-                                    "notes" : values.notes,
-                                    "createdAt" : values.createdAt,
-                                    "startNotes" : values.startNotes,
-                                    "endNotes" : values.endNotes,
-                                    "parentEntry": values.parentEntry,
-                                    "connectionType": values.connectionType
-                                };
+                            connections['connection' + key] = {
+                                "service": _.isNumber(values.id) ? 'connection/update' : 'connection/create',
+                                "arguments": _.merge({ "childEntry":$scope.entry.id }, values)
+                            };
 
-                            if(values.id !== undefined)
-                            {
-                                connections['connection' + key].service = 'connection/update';
+                            if(_.isNumber(values.id))
                                 connections['connection' + key].arguments.id = values.id;
-                            }else{
-                                connections['connection' + key].service = 'connection/create';
-                                connections['connection' + key].arguments.childEntry = parentId;
-                            }
                         }
                     });
                     if(_.size(connections) > 0)
@@ -451,28 +422,15 @@ angular.module('RegistryClient')
                     var address = {}
                     angular.forEach($scope.entry.address, function(values, key) {
                         if($scope.ngvalidation.address && $scope.ngvalidation.address[key] && $scope.ngvalidation.address[key].$dirty) {
-                            address['address' + key] = {};
-                            address['address' + key].arguments = {
-                                "class": values.class,
-                                "name": values.name,
-                                "street": values.street,
-                                "postalCode": values.postalCode,
-                                "town": values.town,
-                                "country": values.country,
-                                "email": values.email,
-                                "phone": values.phone,
-                                "mobile": values.mobile
-                            }
+                            address['address' + key] = {
+                                "service": _.isNumber(values.id) ? "address/update" : "address/create",
+                                "arguments": _.merge({
+                                    "entry": $scope.entry.id
+                                }, values)
+                            };
 
-                            if(values.id !== undefined)
-                            {
-                                address['address' + key].service = 'address/update';
+                            if(_.isNumber(values.id))
                                 address['address' + key].arguments.id = values.id;
-                                address['address' + key].arguments.entry = values.entry;
-                            }else{
-                                address['address' + key].service = 'address/create';
-                                address['address' + key].arguments.entry = parentId;
-                            }
                         }
                     });
                     
@@ -492,17 +450,22 @@ angular.module('RegistryClient')
                         if(_.size(addressDelete) > 0)
                             dbHandler.setQuery(addressDelete);
                     }
-
+                    
                     dbHandler
                         .runQuery()
                         .then(function(response) {
                             _.each(response, function(val, key) {
-                                if(val.status == 'fail') {
-                                    if(key.indexOf('connection') == 0) {
+                                if(key.indexOf('connection') == 0) {
+                                    if(val.status == 'fail')
                                         $scope.validation.connection[key.replace('connection', '')] = val.data;
-                                    }else if(key.indexOf('address') == 0) {
+                                    else
+                                        $scope.entry.connection[key.replace('connection', '')] = val.data.item;
+                                }
+                                if(key.indexOf('address') == 0) {
+                                    if(val.status == 'fail')
                                         $scope.validation.address[key.replace('address', '')] = val.data;
-                                    }
+                                    else
+                                        $scope.entry.address[key.replace('address', '')] = val.data.item;
                                 }
                             });
                             if(_.size($scope.validation.entry) == 0 && _.size($scope.validation.connection) == 0 && _.size($scope.validation.address) == 0)
