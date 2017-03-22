@@ -152,32 +152,9 @@ a { cursor:pointer; }
 .mainList-ct {
     padding-top:2rem;
     padding-bottom:2rem;
-    .contact-toolbar + hr { margin-top:1.6rem; }
     .dropdown-menu {
         a {
             cursor:pointer;
-        }
-    }
-    .contact-toolbar {
-        .btn { margin-bottom:0.4rem; margin-right:0.4rem; }
-        .contact-btn {
-            display:inline-block;
-            .class-marker {
-                cursor:pointer;
-                display:block;
-                height:1rem;
-                margin-right:0.4rem;
-                margin-bottom:0.4rem;
-                background:#ccc;
-                border-radius:0.2rem;
-                box-shadow:0 0 2px rgba(0,0,0,0.25);
-                &.class-primary {
-                    background:#5cb85c;
-                }
-                &.class-invoice {
-                    background:#337ab7;
-                }
-            }
         }
     }
 }
@@ -206,7 +183,32 @@ img.webbhuset { max-width:14rem; vertical-align:top; height:auto; margin-top:0.8
 
 .outer-section { background:#333333; }
 .mainList-ct { min-height:80rem; padding-bottom:2rem; background:#f9f9f9; box-shadow:0 0 2px rgba(0,0,0,0.05) inset }
-.inner-form { border:0.1rem solid #ccc; padding:2rem; background:#fff; width:100%; margin-top:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05); }
+.inner-form {
+    border:0.1rem solid #ccc; padding:2rem; background:#fff; width:100%; margin-top:2rem; box-shadow:0 0 2px rgba(0,0,0,0.05);
+    .contact-toolbar {
+        margin-bottom:2rem;
+        .btn { margin-bottom:0.4rem; margin-right:0.4rem; }
+        .contact-btn {
+            display:inline-block;
+            .class-marker {
+                cursor:pointer;
+                display:block;
+                height:1rem;
+                margin-right:0.4rem;
+                margin-bottom:0.4rem;
+                background:#ccc;
+                border-radius:0.2rem;
+                box-shadow:0 0 2px rgba(0,0,0,0.25);
+                &.class-primary {
+                    background:#5cb85c;
+                }
+                &.class-invoice {
+                    background:#337ab7;
+                }
+            }
+        }
+    }    
+}
 
 .mainList, .xg-list {
     border:0.1rem solid #ccc;
