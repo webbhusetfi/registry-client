@@ -70,7 +70,6 @@ var regApp = angular.module('RegistryClient')
                             // program flow
                             else if(_.isObject(args.completed))
                             {
-                                $log.log('object detected');
                                 switch(args.completed.action) {
                                     case 'back':
                                         $window.history.back();

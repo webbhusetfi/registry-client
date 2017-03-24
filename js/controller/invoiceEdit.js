@@ -189,7 +189,6 @@ angular.module('RegistryClient')
                 .setQuery(queryObject)
                 .runQuery()
                 .then(function(response) {
-                    $log.log(response);
                     $window.history.back();
                 })
                 .catch(function(response) {
