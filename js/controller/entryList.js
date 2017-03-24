@@ -15,11 +15,11 @@ angular.module('RegistryClient')
         "types": globalParams.types()
     };
     if ($routeParams.id) {
-        _.unset($scope.config.typeselect.types, 'UNION');        
+        //_.unset($scope.config.typeselect.types, 'UNION');        
     }
     
     if (globalParams.get('user').role == 'USER') {
-        _.unset($scope.config.typeselect.types, 'UNION');
+        //_.unset($scope.config.typeselect.types, 'UNION');
         if (globalParams.get('user').entry != $routeParams.id) {
             $location.path('/entry/list/' + globalParams.get('user').entry);
             return false;
@@ -139,8 +139,9 @@ angular.module('RegistryClient')
             "id": {
                 "label":"Id",
                 "width":"5%",
-                "filter":false,
-                "sorter":true
+                "filter":true,
+                "sorter":true,
+                "width":"120px"
             }
         }
         
