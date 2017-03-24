@@ -34,9 +34,9 @@ var regApp = angular.module('RegistryClient')
                 $log.error('no dialog template')
             }
         },
-        deleteConfirm: function(item, action)
+        deleteConfirm: function(args)
         {
-            if(item.id !== undefined)
+            if(args.item.id !== undefined)
             {
                 var modalInstance = $uibModal.open({
                     templateUrl: 'template/dialogDelete.html',
@@ -52,24 +52,31 @@ var regApp = angular.module('RegistryClient')
                     },
                     size: 'sm',
                     resolve: {
-                        item: item
+                        item: args.item,
+                        query: args.query,
+                        action: args.action
                     }
                 });
                 
                 modalInstance.result.then(function (id) {
                     dbHandler
-                        .setQuery(action)
+                        .setQuery(args.query)
                         .runQuery()
                         .then(function(response) {
+                            // custom
+                            if(_.isFunction(args.completed)) {
+                                _.invoke(args, 'completed');
+                            }
                             // program flow
-                            if(typeof(item.post) === 'object')
+                            else if(_.isObject(args.completed))
                             {
-                                switch(item.post.action) {
+                                $log.log('object detected');
+                                switch(args.completed.action) {
                                     case 'back':
                                         $window.history.back();
                                     break;
                                     case 'redirect':
-                                        $location.path(item.post.redirect);
+                                        $location.path(args.completed.redirect);
                                     break;
                                 }
                             }

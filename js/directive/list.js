@@ -46,18 +46,18 @@ angular.module('RegistryClient')
                 
                 if($scope.config.functions) {
                     if($scope.config.functions.deleteDialog) {
-                        $scope.deleteDialog = function(item) {
-                            var query = $scope.config.functions.deleteDialog.postAction;
+                        $scope.deleteDialog = function(args) {
+                            var query = $scope.config.functions.deleteDialog.query;
                             angular.forEach(query, function(val1, key1) {
-                                if(val1.arguments) {
+                                if(_.isArray(val1.arguments)) {
                                     var newArgs = {}
                                     angular.forEach(val1.arguments, function(val2, key2) {
-                                        newArgs[val2] = item[val2];
+                                        newArgs[val2] = args.item[val2];
                                     })
-                                    query[key1].arguments = newArgs;
+                                    args.query[key1].arguments = newArgs;
                                 }
                             });
-                            dialogHandler.deleteConfirm(item, query);
+                            dialogHandler.deleteConfirm(_.assign(args, $scope.config.functions.deleteDialog));
                         }
                     }
                 }

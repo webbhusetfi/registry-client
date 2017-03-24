@@ -29,7 +29,7 @@
             <td class="functions" ng-show="config.functions">
                 <a
                     ng-show="config.functions.deleteDialog"
-                    ng-click="deleteDialog(item);"
+                    ng-click="deleteDialog(_.assign({'item':item}, config.functions.deleteDialog));"
                     class="btn btn-xs btn-danger">
                     <i class="fa fa-times"></i>
                 </a>

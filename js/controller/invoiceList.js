@@ -23,7 +23,7 @@ angular.module('RegistryClient')
         });    
     }
     
-    query = {};
+    var query = {};
     query.list = {
         "service":"invoice/search",
         "arguments": {
@@ -43,7 +43,7 @@ angular.module('RegistryClient')
         });
         $scope.init(query);
     } else {
-        qry = {
+        var qry = {
             "owner": {
                 "service":"entry/search",
                 "arguments": {
@@ -131,6 +131,6 @@ angular.module('RegistryClient')
                             }
                         }
                     };
-        dialogHandler.deleteConfirm(item, query);
+        dialogHandler.deleteConfirm({"item":item,"query":query});
     }
 });

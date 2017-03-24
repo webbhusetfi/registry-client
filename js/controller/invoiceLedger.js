@@ -67,7 +67,7 @@ angular.module('RegistryClient')
                     }
                 }
             };
-            dialogHandler.deleteConfirm(item, query);
+            dialogHandler.deleteConfirm({"item":item,"query":query});
         //}
     }
     

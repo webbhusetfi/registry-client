@@ -22,7 +22,7 @@ angular.module('RegistryClient')
             "pagination":1,
             "functions":{
                 "deleteDialog": {
-                    "postAction": {
+                    "query": {
                         "entry": {
                             "service":"user/delete",
                             "arguments": [
@@ -67,7 +67,7 @@ angular.module('RegistryClient')
                 .then(function(response) {
                     angular.forEach(response.base, function (value, key) {
                         value.role_label = $scope.roles[value.role];
-                        value.name = value.username;  // add name for deleteDialog
+                        // value.name = value.username;  // add name for deleteDialog
                     });
                     //console.log($scope.config.query);
                     $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };

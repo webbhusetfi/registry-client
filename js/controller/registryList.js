@@ -17,7 +17,7 @@ angular.module('RegistryClient')
             "pagination":1,
             "functions":{
                 "deleteDialog": {
-                    "postAction": {
+                    "query": {
                         "entry": {
                             "service":"registry/delete",
                             "arguments": [

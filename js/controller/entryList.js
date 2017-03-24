@@ -60,7 +60,7 @@ angular.module('RegistryClient')
     
     if (globalParams.get('user').role != 'USER') {
         $scope.config.list.functions.deleteDialog = {
-            "postAction": {
+            "query": {
                 "entry": {
                     "service":"entry/delete",
                     "arguments": [
@@ -68,6 +68,9 @@ angular.module('RegistryClient')
                         "type"
                     ]
                 }
+            },
+            "completed": function() {
+                $scope.config.query.force_refresh = Math.random();
             }
         }
     }
