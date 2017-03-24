@@ -104,7 +104,15 @@ module.exports = function(grunt) {
                         '/template/propertyList.html':'template/propertyList.html',
                         '/template/userList.html':'template/userList.html',
                         '/template/userEdit.html':'template/userEdit.html',
-                        '/template/userLogin.html':'template/userLogin.html'
+                        '/template/userLogin.html':'template/userLogin.html',
+                        '/js/directive/template/assignInvoiceButton.html':'js/directive/template/assignInvoiceButton.html',
+                        '/js/directive/template/limiter.html':'js/directive/template/limiter.html',
+                        '/js/directive/template/list.html':'js/directive/template/list.html',
+                        '/js/directive/template/listCount.html':'js/directive/template/listCount.html',
+                        '/js/directive/template/pagination.html':'js/directive/template/pagination.html',
+                        '/js/directive/template/propertyControl.html':'js/directive/template/propertyControl.html',
+                        '/js/directive/template/sorter.html':'js/directive/template/sorter.html',
+                        '/js/factory/template/dialogForm.html':'js/factory/template/dialogForm.html'
                     }],
                     replacement: 'md5'
                 },
