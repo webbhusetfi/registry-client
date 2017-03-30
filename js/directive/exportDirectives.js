@@ -182,7 +182,7 @@ angular.module('RegistryClient')
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
-                        'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon', 'Skapad'],
+                        'MEMBER_PERSON': ['ID', 'Förnamn', 'Efternamn', 'Föd.dag', 'Föd.månad', 'Föd.år', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon', 'Kön', 'Skapad'],
                         'ASSOCIATION': ['ID', 'Namn', 'Beskrivning', 'Bank', 'Kontonr.', 'VAT-nr.', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land', 'E-post', 'Mobil', 'Telefon', 'Skapad']
                     };
                     return scope.headers[type];
@@ -233,6 +233,7 @@ angular.module('RegistryClient')
                                         ((value.address) ? value.address.email : null),
                                         ((value.address) ? value.address.mobile : null),
                                         ((value.address) ? value.address.phone : null),
+                                        ((value.gender) ? ((value.gender=='MALE') ? 'Man' : 'Kvinna') : null),
                                         $filter('date')(new Date(value.createdAt), "d.M.yyyy HH:mm")
                                     ];
                                 } else {
