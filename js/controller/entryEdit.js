@@ -96,9 +96,9 @@ angular.module('RegistryClient')
             break;
             case 'DD':
                 if(date !== undefined)
-                    $scope.entry.birthDate = date.getDate();
+                    $scope.entry.birthDay = date.getDate();
                 else
-                    $scope.entry.birthDate = null;
+                    $scope.entry.birthDay = null;
             break;
         }
     };
