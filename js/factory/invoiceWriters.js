@@ -297,8 +297,14 @@ angular.module('RegistryClient')
                                     current += row;
                                     current += row;
 
-                                    document.text("Mottagarens bank och kontonr.:", margin, current, {'width': halfpage, 'height': row});
-                                    document.text(invoicemodel.bank + ', ' + invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                    //document.text("Mottagarens bank och kontonr.:", margin, current, {'width': halfpage, 'height': row});
+                                    //document.text(invoicemodel.bank + ', ' + invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                    
+                                    document.text("Mottagarens bank:", margin, current, {'width': halfpage, 'height': row});
+                                    document.text(invoicemodel.bank, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                    current += row;
+                                    document.text("Mottagarens kontonr.:", margin, current, {'width': halfpage, 'height': row});
+                                    document.text(invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
                                     current += row;
                                     document.text("Mottagare:", margin, current, {'width': halfpage, 'height': row});
                                     document.text(invoicer.name, col_2_1, current, {'width': halfpage, 'height': row});
@@ -314,7 +320,7 @@ angular.module('RegistryClient')
                                     document.text(invoicemodel.amount, col_2_2, current, {'width': halfpage, 'height': row});
                                     document.font('Helvetica');
                                     current += row;
-                                    document.rect(margin-10, current-row*7, fullwidth+20, row*8).stroke()
+                                    document.rect(margin-10, current-row*8, fullwidth+20, row*9).stroke()
                                     current += row;
                                     current += row;
                                     current += row;
