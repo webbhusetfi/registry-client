@@ -74,6 +74,7 @@
                     placeholder="Meddelande"
                     class="form-control"
                     name="message"
+                    ng-trim="false"
                     ng-required="true"
                 ></textarea>
                 <p ng-show="entrySendMail.message.$invalid && entrySendMail.message.$touched" class="help-block">
