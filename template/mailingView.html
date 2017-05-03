@@ -88,7 +88,7 @@
                             <i class="fa fa-chevron-up"></i>
                         </a>
                         <div class="well" ng-show="failed" style="width: 100%; max-height:300px; overflow:auto;">
-                            <span ng-repeat="obj in mailstatus.job.failed">{{ obj.address }}{{$last ? '' : ', '}}</span>
+                            <span ng-repeat="obj in mailstatus.job.failed">{{ obj.address }} <i class="fa fa-question-circle text-danger" uib-tooltip="{{ obj.category }}; {{ obj.error }} ({{ obj.errorcode }})"></i>{{$last ? '' : ', '}}</span>
                         </div>
                     </p>
                     <p class="form-control-static">
