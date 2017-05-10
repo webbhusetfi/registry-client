@@ -43,7 +43,7 @@ angular.module('RegistryClient')
                     //console.log(JSON.stringify(response));
                     // entryInvoice/search tar emot "include": ["entry", "primaryAddress"]
                     var csv_options = {};
-                    csv_options.header = ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
+                    csv_options.header = ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Förnamn', 'Efternamn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
                     csv_options.quoteStrings = "true";
                     csv_options.txtDelim = '"';
 
@@ -56,14 +56,18 @@ angular.module('RegistryClient')
                         row.d = value.entry.id;
                         row.e = globalParams.static.types[value.entry.type];
                         if (value.entry.type == 'MEMBER_PERSON') {
-                            row.f = value.entry.firstName + ' ' + value.entry.lastName;
+                            row.f = '-';
+                            row.g = value.entry.firstName;
+                            row.h = value.entry.lastName;
                         } else {
                             row.f = value.entry.name;
+                            row.g = '-';
+                            row.h = '-';
                         }
-                        row.g = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
-                        row.h = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
-                        row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
-                        row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);
+                        row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
+                        row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
+                        row.k = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
+                        row.l = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);                        
                         ret.push(row);
                     });  
                     

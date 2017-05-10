@@ -19,6 +19,12 @@ angular.module('RegistryClient')
             }
         }
     };
+    $scope.invoicequery = {
+            "service": "invoice/read",
+            "arguments": {
+                "id": $routeParams.id
+            }
+        };
 
     $scope.ref = function(id) {
         return referenceNumberCalculator.calculate(id, true);
@@ -101,8 +107,19 @@ angular.module('RegistryClient')
                 value.type2 = globalParams.static.types[value.entry.type];
             });
             $scope.resource =  { "items": response.base, "foundCount": response.foundCount.base };
-        })
-        .catch(function(response) {
+            
+            dbHandler
+            .setQuery({"invoice":$scope.invoicequery})
+            .parse(false)
+            .runQuery()
+            .then(function(response) {
+                if (angular.isObject(response.invoice) && angular.isObject(response.invoice.data)) {
+                    $scope.invoice = response.invoice.data;
+                }
+            }).catch(function(response) {
+                $log.error(response);
+            });
+        }).catch(function(response) {
             $log.error(response);
             $location.path('/user/logout');
         });

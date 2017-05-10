@@ -439,13 +439,13 @@
                     <label class="control-label col-sm-4">Historik</label>
                     <div class="col-sm-8" style="padding-top:0.7rem;">
                         <div ng-repeat="history in entry.history"
-                        >{{ history.modifiedAt | date:'d.M.yy HH:mm' }}, {{ translate(history.description) }}</div>
+                        >{{ history.modifiedAt | date:'d.M.yyyy HH:mm' }}, {{ translate(history.description) }}</div>
                     </div>
                 </div>
                 <div class="form-group" ng-show="entry.createdAt !== undefined">
                     <label class="control-label col-sm-4">Uppgifter insatta</label>
                     <div class="col-sm-8">
-                        <p class="form-text">{{ entry.createdAt | date:'d.M.yy HH:mm' }}</p>
+                        <p class="form-text">{{ entry.createdAt | date:'d.M.yyyy HH:mm' }}</p>
                     </div>
                 </div>
                 <div class="row">

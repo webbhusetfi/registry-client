@@ -146,9 +146,9 @@ angular.module('RegistryClient')
             .setQuery(userQuery)
             .runQuery()
             .then(function(response) {
-                if(response.user.status === 'success')
+                if (response.user.status === 'success') {
                     $window.history.back();
-                else {
+                } else {
                     $scope.message = 'Det uppstod ett problem.'
                 }
             });

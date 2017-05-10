@@ -2,6 +2,7 @@
 <div class="alert alert-danger" ng-show="{{ routeParams.id == undefined }}">
     Ingen fakturamall har angetts
 </div>
+<h3 ng-show="{{ routeParams.id }}">{{ invoice.name }}</h3>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-10">
