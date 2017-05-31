@@ -233,34 +233,6 @@ angular.module('RegistryClient')
     $scope.$watch('config.query', function(newQuery, oldQuery) {
     
         delete $scope.config.query.force_refresh;      // remove forcerer 
-        
-        if (globalParams.get('user').role == 'USER') {
-            if ($scope.config.query.arguments.filter.type == 'ASSOCIATION') {
-                // allow view of own association in list
-                $scope.config.query.arguments.filter.id = globalParams.get('user').entry;
-                delete $scope.config.query.arguments.filter.parentEntry;
-                //$scope.config.query.arguments.filter.parentEntry = null;
-            }
-            if ($scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
-                // add back parentEntry of own association when viewing members in list
-                delete $scope.config.query.arguments.filter.id;
-                $scope.config.query.arguments.filter.parentEntry = globalParams.get('user').entry;
-            }
-        }
-        if (globalParams.get('user').role == 'ADMIN' && $routeParams.id) {
-            if ($scope.config.query.arguments.filter.type == 'ASSOCIATION') {
-                // allow view of own association in list
-                $scope.config.query.arguments.filter.id = $routeParams.id;
-                delete $scope.config.query.arguments.filter.parentEntry;
-                //$scope.config.query.arguments.filter.parentEntry = null;
-            }
-            if ($scope.config.query.arguments.filter.type == 'MEMBER_PERSON') {
-                // add back parentEntry of own association when viewing members in list
-                delete $scope.config.query.arguments.filter.id;
-                $scope.config.query.arguments.filter.parentEntry = $routeParams.id;
-            }
-        }
-        
                         
         // reset some parameters in case of type change
         if(oldQuery.arguments.filter.type) {
@@ -277,7 +249,7 @@ angular.module('RegistryClient')
                         $scope.config.query.arguments.order = {
                             "lastName":"asc",
                             "firstName":"asc"
-                        }
+                        };
                     break;
                 }
             }
@@ -286,8 +258,6 @@ angular.module('RegistryClient')
             $timeout.cancel($scope.timeout);
         
         $scope.timeout = $timeout(function() {
-            //console.log(JSON.stringify($scope.config.query));
-            
             dbHandler
             .setQuery({"base":$scope.config.query})
             .getProperties({"all":true});

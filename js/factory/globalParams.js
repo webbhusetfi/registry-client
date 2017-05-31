@@ -72,7 +72,7 @@ angular.module('RegistryClient')
                 "ASSOCIATION":"Förening"
             });
         }
-        typeobj = _.assign(typeobj, {"ASSOCIATION":"Förening", "MEMBER_PERSON":"Medlem"});
+        typeobj = _.assign(typeobj, {"MEMBER_PERSON":"Medlem"});
         return typeobj;
     }
 

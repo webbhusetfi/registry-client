@@ -30,10 +30,15 @@ angular.module('RegistryClient')
 .factory('invoiceCsvWriter', ['$log', '$filter', 'globalParams', 'dbHandler', 'FileSaver', 'loadOverlay', 'CSV', 'referenceNumberCalculator', function($log, $filter, globalParams, dbHandler, FileSaver, loadOverlay, CSV, referenceNumberCalculator) {
 
     var invoiceCsvWriter = {
-        run: function(outQry) {
-        
+        run: function(outQry, p) {
             var outquery = {};
             outquery.entryinvoice = outQry;
+            
+            if (angular.isUndefined(p) || p === null) {
+                paid = 'all';
+            } else {
+                paid = p;
+            }
             
             dbHandler
                 .parse(false)
@@ -49,26 +54,28 @@ angular.module('RegistryClient')
 
                     var ret = [];                                                            
                     angular.forEach(response.entryinvoice.data.items, function (value, key) {
-                        var row = {};
-                        row.a = referenceNumberCalculator.calculate(value.id);
-                        row.b = ((value.paid) ? 'Ja' : 'Nej');
-                        row.c = value.invoice;
-                        row.d = value.entry.id;
-                        row.e = globalParams.static.types[value.entry.type];
-                        if (value.entry.type == 'MEMBER_PERSON') {
-                            row.f = '-';
-                            row.g = value.entry.firstName;
-                            row.h = value.entry.lastName;
-                        } else {
-                            row.f = value.entry.name;
-                            row.g = '-';
-                            row.h = '-';
+                        if (paid == value.paid || paid == 'all') {
+                            var row = {};
+                            row.a = referenceNumberCalculator.calculate(value.id);
+                            row.b = ((value.paid) ? 'Ja' : 'Nej');
+                            row.c = value.invoice;
+                            row.d = value.entry.id;
+                            row.e = globalParams.static.types[value.entry.type];
+                            if (value.entry.type == 'MEMBER_PERSON') {
+                                row.f = '-';
+                                row.g = value.entry.firstName;
+                                row.h = value.entry.lastName;
+                            } else {
+                                row.f = value.entry.name;
+                                row.g = '-';
+                                row.h = '-';
+                            }
+                            row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
+                            row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
+                            row.k = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
+                            row.l = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);                        
+                            ret.push(row);
                         }
-                        row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
-                        row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
-                        row.k = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
-                        row.l = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);                        
-                        ret.push(row);
                     });  
                     
                     CSV.stringify(ret, csv_options).then(function(result){ 
@@ -91,7 +98,13 @@ angular.module('RegistryClient')
 .factory('invoicePdfWriter', ['$log', '$filter', 'globalParams', 'dbHandler', 'PDFKit', 'FileSaver', 'Blob', 'loadOverlay', 'referenceNumberCalculator', function($log, $filter, globalParams, dbHandler, PDFKit, FileSaver, Blob, loadOverlay, referenceNumberCalculator) {
 
     var invoicePdfWriter = {
-        run: function(invoiceModelQry, invoiceesQry) {
+        run: function(invoiceModelQry, invoiceesQry, p) {
+            // p = all | true | false
+            if (angular.isUndefined(p) || p === null) {
+                paid = 'all';
+            } else {
+                paid = p;
+            }
             var query = {};
             if (invoiceModelQry == undefined) {
                 $log.error('Queries missing');
@@ -199,148 +212,160 @@ angular.module('RegistryClient')
                                 // page loop
                                 loadOverlay.enable();
 
+                                addpage = false;
+                                
                                 angular.forEach(invoicees, function (value, key) {
-                                    var current = 0;
-                                    
-                                    invoicee = value.entry;
-                                    
-                                    document.fillColor('black');
-                                    document.font('Helvetica');
-                                    document.fontSize(15);
-                                    current += margin;
-                                    
-                                    if (key != 0) {
-                                        document.addPage();
-                                    }
-                                    
-                                    document.text(invoicemodel.name, margin, current, {'width': fullwidth, 'height': row});    
-                                    document.fontSize(12);
-                                    document.moveTo(margin, row*5).lineTo(fullwidth+margin, row*5).stroke();
-                                    current += row;
-                                    current += row;
-                                    
-                                    //console.log(invoicee);
-                                    invoicee_adr = invoicee.primaryAddress; // allways entryInvoice/search
-                                    /*
-                                    if (invoicee.primaryAddress !== undefined) {
-                                        invoicee_adr = invoicee.primaryAddress;
-                                    } else if (invoicee.address !== undefined) {
-                                        invoicee_adr = invoicee.address;
+                                    if (paid == value.paid || paid == 'all') {
+                                        var current = 0;
                                         
-                                        // - TODO - primary and invoice addresses
+                                        invoicee = value.entry;
                                         
-                                        // var invoicee_adr = {};
-                                        // var invoicee_adr_pri = {};
-                                        // var invoicee_adr_inv = {};
-                                        // angular.forEach(invoicee.addresses, function (value, key) {
-                                            // if (value.class == 'PRIMARY') {
-                                                // invoicee_adr_pri = value;
+                                        document.fillColor('black');
+                                        document.font('Helvetica');
+                                        document.fontSize(15);
+                                        current += margin;
+                                        
+                                        /*
+                                        if (key != 0) {
+                                            document.addPage();
+                                        }
+                                        */
+                                        if ((key != 0 && addpage)) {
+                                            document.addPage();
+                                        }
+                                        if (!addpage) {
+                                            addpage = true;
+                                        }
+                                        
+                                        
+                                        document.text(invoicemodel.name, margin, current, {'width': fullwidth, 'height': row});    
+                                        document.fontSize(12);
+                                        document.moveTo(margin, row*5).lineTo(fullwidth+margin, row*5).stroke();
+                                        current += row;
+                                        current += row;
+                                        
+                                        //console.log(invoicee);
+                                        invoicee_adr = invoicee.primaryAddress; // allways entryInvoice/search
+                                        /*
+                                        if (invoicee.primaryAddress !== undefined) {
+                                            invoicee_adr = invoicee.primaryAddress;
+                                        } else if (invoicee.address !== undefined) {
+                                            invoicee_adr = invoicee.address;
+                                            
+                                            // - TODO - primary and invoice addresses
+                                            
+                                            // var invoicee_adr = {};
+                                            // var invoicee_adr_pri = {};
+                                            // var invoicee_adr_inv = {};
+                                            // angular.forEach(invoicee.addresses, function (value, key) {
+                                                // if (value.class == 'PRIMARY') {
+                                                    // invoicee_adr_pri = value;
+                                                // }
+                                                // if (value.class == 'INVOICE') {
+                                                    // invoicee_adr_inv = value;
+                                                // }
+                                            // });
+                                            // if (Object.keys(invoicee_adr_inv).length) {
+                                                // invoicee_adr = invoicee_adr_inv;
+                                            // } else {
+                                                // invoicee_adr = invoicee_adr_pri;
                                             // }
-                                            // if (value.class == 'INVOICE') {
-                                                // invoicee_adr_inv = value;
-                                            // }
-                                        // });
-                                        // if (Object.keys(invoicee_adr_inv).length) {
-                                            // invoicee_adr = invoicee_adr_inv;
-                                        // } else {
-                                            // invoicee_adr = invoicee_adr_pri;
-                                        // }
-                                    }
-                                    */
-                                    
-                                    current += row;
-                                    // Namn
-                                    if (invoicee.type == 'MEMBER_PERSON') {
-                                        document.text(invoicee.firstName + ' ' + invoicee.lastName, margin, current, {'width': halfpage, 'height': row});
-                                    } else {    
-                                        document.text(invoicee.name, margin, current, {'width': halfpage, 'height': row});
-                                    }
+                                        }
+                                        */
+                                        
+                                        current += row;
+                                        // Namn
+                                        if (invoicee.type == 'MEMBER_PERSON') {
+                                            document.text(invoicee.firstName + ' ' + invoicee.lastName, margin, current, {'width': halfpage, 'height': row});
+                                        } else {    
+                                            document.text(invoicee.name, margin, current, {'width': halfpage, 'height': row});
+                                        }
 
-                                    // Datum 
-                                    document.text("Datum:", col_2_1, current, {'width': field, 'height': row});
-                                    document.text($filter('date')(new Date(invoicemodel.createdAt), "d.M.yyyy"), col_2_2, current, {'width': field, 'height': row});
-                                    current += row;
-                                    // Förfallodatum
-                                    document.text("Förfallodatum:", col_2_1, current, {'width': field, 'height': row});
-                                    document.text($filter('date')(new Date(invoicemodel.dueAt), "d.M.yyyy"), col_2_2, current, {'width': field, 'height': row});
+                                        // Datum 
+                                        document.text("Datum:", col_2_1, current, {'width': field, 'height': row});
+                                        document.text($filter('date')(new Date(invoicemodel.createdAt), "d.M.yyyy"), col_2_2, current, {'width': field, 'height': row});
+                                        current += row;
+                                        // Förfallodatum
+                                        document.text("Förfallodatum:", col_2_1, current, {'width': field, 'height': row});
+                                        document.text($filter('date')(new Date(invoicemodel.dueAt), "d.M.yyyy"), col_2_2, current, {'width': field, 'height': row});
 
-                                    // Adress
-                                    if (invoicee_adr) {
-                                        if (Object.keys(invoicee_adr).length) {
-                                            if (invoicee_adr.name) {
-                                                document.text(invoicee_adr.name, margin, current, {'width': halfpage, 'height': row});
-                                                current += row;
-                                            }
-                                            if (invoicee_adr.street) {
-                                                document.text(invoicee_adr.street, margin, current, {'width': halfpage, 'height': row});
-                                                current += row;
-                                            }
-                                            if (invoicee_adr.postalCode && invoicee_adr.town) {
-                                                document.text(invoicee_adr.postalCode + ' ' + invoicee_adr.town, margin, current, {'width': halfpage, 'height': row});
-                                                current += row;
-                                            }
-                                            if (invoicee_adr.country) {
-                                                document.text(invoicee_adr.country, margin, current, {'width': halfpage, 'height': row});
+                                        // Adress
+                                        if (invoicee_adr) {
+                                            if (Object.keys(invoicee_adr).length) {
+                                                if (invoicee_adr.name) {
+                                                    document.text(invoicee_adr.name, margin, current, {'width': halfpage, 'height': row});
+                                                    current += row;
+                                                }
+                                                if (invoicee_adr.street) {
+                                                    document.text(invoicee_adr.street, margin, current, {'width': halfpage, 'height': row});
+                                                    current += row;
+                                                }
+                                                if (invoicee_adr.postalCode && invoicee_adr.town) {
+                                                    document.text(invoicee_adr.postalCode + ' ' + invoicee_adr.town, margin, current, {'width': halfpage, 'height': row});
+                                                    current += row;
+                                                }
+                                                if (invoicee_adr.country) {
+                                                    document.text(invoicee_adr.country, margin, current, {'width': halfpage, 'height': row});
+                                                }
                                             }
                                         }
+
+                                        current += row;
+                                        current += row;
+                                        current += row;
+                                        document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
+                                        current += row;
+                                        current += row;
+                                        document.text(
+                                            invoicemodel.message,
+                                            margin, 
+                                            current, 
+                                            {'width':fullwidth, 'height': row * 28});
+                                        current += row*28;
+                                        //document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
+                                        current += row;
+                                        current += row;
+
+                                        //document.text("Mottagarens bank och kontonr.:", margin, current, {'width': halfpage, 'height': row});
+                                        //document.text(invoicemodel.bank + ', ' + invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                        
+                                        document.text("Mottagarens bank:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.bank, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                        current += row;
+                                        document.text("Mottagarens kontonr.:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                        current += row;
+                                        document.text("Mottagare:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicer.name, col_2_1, current, {'width': halfpage, 'height': row});
+                                        current += row;
+                                        document.text("Meddelande:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.description, col_2_1, current, {'width': halfpage, 'height': row*2});
+                                        current += row;
+                                        current += row;
+                                        current += row;
+                                        document.font('Helvetica-Bold');
+                                        document.text("Referensnummer: " + referenceNumberCalculator.calculate(value.id), margin, current).stroke();
+                                        document.text("Summa:", col_2_1, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.amount, col_2_2, current, {'width': halfpage, 'height': row});
+                                        document.font('Helvetica');
+                                        current += row;
+                                        document.rect(margin-10, current-row*8, fullwidth+20, row*9).stroke()
+                                        current += row;
+                                        current += row;
+                                        current += row;
+                                        document.fontSize(10);
+                                        document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
+                                        current += row;
+                                        document.text(invoicer.name, margin, current, {'width': halfpage, 'height': row});
+                                        document.text("Telefon: " + ((invoicer_adr.phone) ? invoicer_adr.phone : '-'), col_2_1, current, {'width': halfpage, 'height': row});
+                                        current += row;
+                                        document.text("Mobil: " + ((invoicer_adr.mobile) ? invoicer_adr.mobile : '-'), col_2_1, current, {'width': halfpage, 'height': row});
+                                        current += row;
+                                        document.text( ((invoicer_adr.street) ? invoicer_adr.street : '-'), margin, current, {'width': halfpage, 'height': row});
+                                        document.text("E-post: " + ((invoicer_adr.email) ? invoicer_adr.email : '-'), col_2_1, current, {'width': halfpage, 'height': row});
+                                        current += row;
+                                        document.text(((invoicer_adr.postalCode) ? invoicer_adr.postalCode : '') + ' ' + ((invoicer_adr.town) ? invoicer_adr.town : ''), margin, current, {'width': halfpage, 'height': row});
                                     }
-
-                                    current += row;
-                                    current += row;
-                                    current += row;
-                                    document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
-                                    current += row;
-                                    current += row;
-                                    document.text(
-                                        invoicemodel.message,
-                                        margin, 
-                                        current, 
-                                        {'width':fullwidth, 'height': row * 28});
-                                    current += row*28;
-                                    //document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
-                                    current += row;
-                                    current += row;
-
-                                    //document.text("Mottagarens bank och kontonr.:", margin, current, {'width': halfpage, 'height': row});
-                                    //document.text(invoicemodel.bank + ', ' + invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
-                                    
-                                    document.text("Mottagarens bank:", margin, current, {'width': halfpage, 'height': row});
-                                    document.text(invoicemodel.bank, col_2_1, current, {'width': halfpage, 'height': row}); 
-                                    current += row;
-                                    document.text("Mottagarens kontonr.:", margin, current, {'width': halfpage, 'height': row});
-                                    document.text(invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
-                                    current += row;
-                                    document.text("Mottagare:", margin, current, {'width': halfpage, 'height': row});
-                                    document.text(invoicer.name, col_2_1, current, {'width': halfpage, 'height': row});
-                                    current += row;
-                                    document.text("Meddelande:", margin, current, {'width': halfpage, 'height': row});
-                                    document.text(invoicemodel.description, col_2_1, current, {'width': halfpage, 'height': row*2});
-                                    current += row;
-                                    current += row;
-                                    current += row;
-                                    document.font('Helvetica-Bold');
-                                    document.text("Referensnummer: " + referenceNumberCalculator.calculate(value.id), margin, current).stroke();
-                                    document.text("Summa:", col_2_1, current, {'width': halfpage, 'height': row});
-                                    document.text(invoicemodel.amount, col_2_2, current, {'width': halfpage, 'height': row});
-                                    document.font('Helvetica');
-                                    current += row;
-                                    document.rect(margin-10, current-row*8, fullwidth+20, row*9).stroke()
-                                    current += row;
-                                    current += row;
-                                    current += row;
-                                    document.fontSize(10);
-                                    document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
-                                    current += row;
-                                    document.text(invoicer.name, margin, current, {'width': halfpage, 'height': row});
-                                    document.text("Telefon: " + ((invoicer_adr.phone) ? invoicer_adr.phone : '-'), col_2_1, current, {'width': halfpage, 'height': row});
-                                    current += row;
-                                    document.text("Mobil: " + ((invoicer_adr.mobile) ? invoicer_adr.mobile : '-'), col_2_1, current, {'width': halfpage, 'height': row});
-                                    current += row;
-                                    document.text( ((invoicer_adr.street) ? invoicer_adr.street : '-'), margin, current, {'width': halfpage, 'height': row});
-                                    document.text("E-post: " + ((invoicer_adr.email) ? invoicer_adr.email : '-'), col_2_1, current, {'width': halfpage, 'height': row});
-                                    current += row;
-                                    document.text(((invoicer_adr.postalCode) ? invoicer_adr.postalCode : '') + ' ' + ((invoicer_adr.town) ? invoicer_adr.town : ''), margin, current, {'width': halfpage, 'height': row});
-                                
                                 });
                                 // page end
 

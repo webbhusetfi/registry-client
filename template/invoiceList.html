@@ -17,6 +17,11 @@
                 </td>
                 <td>
                     <span class="col-label">Fakturor</span>
+                    <select ng-model="exportPaidValue" class="--form-control">
+                        <option value="all">alla</option>
+                        <option value="0">icke betalade</option>
+                        <option value="1">betalade</option>
+                    </select>
                 </td>
                 <td class="functions">
                     <span class="col-label">Funktioner</span>
@@ -52,7 +57,7 @@
                             <i class="fa fa-download"></i>
                             CSV
                         </a>
-                        
+                         
                         <a
                             ng-show="item.invoices.length && item.invoices.length <= limit"
                             ng-click="exportInvoices(item.id, 'pdf');"
@@ -76,7 +81,8 @@
                         </span>                        
                         
                         <div class="alert alert-warning" ng-show="item.invoices.length && item.invoices.length > limit">
-                            Max {{ limit }} fakturor kan tas ut åt gången som pdf
+                            Max {{ limit }} fakturor kan tas ut åt gången som pdf. 
+                            OBS! med filtreringen icke betalade och betalade sker filteringen per 1000 poster (t.ex. betalade tas bort från 1000).
                         </div>
                     </td>
                     <td class="functions">
