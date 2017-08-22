@@ -37,7 +37,7 @@ angular.module('RegistryClient')
                                 globalParams.set('user.registry', item.id);
                                 globalParams.set('connectionTypes', response.connectionType);
                                 globalParams.set('registry', response.registry[0]);
-                                $window.location.href = 'entry/list';
+                                $window.location.href = '/entry/list';
                             });
                     },
                     "icon":"fa fa-sign-in"
