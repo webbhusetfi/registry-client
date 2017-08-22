@@ -105,9 +105,9 @@ angular.module('RegistryClient')
             outquery.entryinvoice.arguments.offset = offset;
             outquery.entryinvoice.arguments.limit = $scope.limit;
             invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice, paid);
-        } else if (type == 'csv') {
+        } else {
             // do csv
-            invoiceCsvWriter.run(outquery.entryinvoice, paid);
+            invoiceCsvWriter.run(outquery.entryinvoice, paid, type);
         }
     }
     

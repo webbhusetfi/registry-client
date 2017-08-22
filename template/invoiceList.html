@@ -49,14 +49,33 @@
                             Reskontra
                         </a>
                         
-                        <a
-                            ng-show="item.invoices.length"
-                            ng-click="exportInvoices(item.id, 'csv');"
-                            class="btn btn-xs btn-default"
-                            uib-tooltip="Exportera fakturor i CSV">
-                            <i class="fa fa-download"></i>
-                            CSV
-                        </a>
+						<div class="btn-group" ng-show="item.invoices.length" uib-dropdown uib-tooltip="Exportera fakturor i CSV">
+							<button 
+								type="button" 
+								class="btn btn-xs btn-default dropdown-toggle" 
+								data-toggle="dropdown" 
+								aria-haspopup="true" 
+								aria-expanded="false"
+								uib-dropdown-toggle>
+								<i class="fa fa-download"></i> 
+								CSV
+								<span class="caret"></span>
+							</button>
+							<ul uib-dropdown-menu class="dropdown-menu" role="menu">
+								<li>
+									<a
+										ng-click="exportInvoices(item.id, 'standard_csv');">
+										Standard CSV
+									</a>
+								</li>
+								<li>
+									<a 
+										ng-click="exportInvoices(item.id, 'xl_csv');">
+										Excelvänlig CSV
+									</a>
+								</li>
+							</ul>
+						</div>
                          
                         <a
                             ng-show="item.invoices.length && item.invoices.length <= limit"

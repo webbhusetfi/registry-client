@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('mailingList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter, referenceNumberCalculator) {
+.controller('mailingList', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams) {
 
     query = {};
     query.list = {

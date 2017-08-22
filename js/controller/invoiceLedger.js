@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('invoiceLedger', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, invoiceCsvWriter, invoicePdfWriter, referenceNumberCalculator) {
+.controller('invoiceLedger', function ($scope, $routeParams, $http, $location, $timeout, $window, $log, dbHandler, dialogHandler, globalParams, referenceNumberCalculator) {
     $scope.routeParams = $routeParams;
     $scope.globalParams = globalParams;
     $scope.config = {

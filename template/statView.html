@@ -15,15 +15,41 @@
                         <option ng-repeat="org in suborgs" value="{{ org.id }}">{{ org.name }}</option>
                     </optgroup>
                 </select>
-                <a ng-csv="doCsvMemberCount();"
-                    csv-header="['ID', 'Namn', 'Antal']"
-                    quote-strings="true"
-                    filename="föreningars_medlemsantal.csv"
-                    uib-tooltip="Ladda ner; medlemsantal per förening"
-                    ng-show="role_admin"
-                    class="btn btn-default">
-                    <i class="fa fa-download"></i>
-                </a>
+				
+				<div class="btn-group" ng-show="role_admin" uib-dropdown uib-tooltip="Ladda ner; medlemsantal per förening">
+					<button 
+						type="button" 
+						class="btn btn-default dropdown-toggle" 
+						data-toggle="dropdown" 
+						aria-haspopup="true" 
+						aria-expanded="false"
+						uib-dropdown-toggle>
+						<i class="fa fa-download"></i> <span class="caret"></span>
+					</button>
+					<ul uib-dropdown-menu class="dropdown-menu" role="menu">
+						<li>
+							<a ng-csv="doCsvMemberCount();"
+								csv-header="['ID', 'Namn', 'Antal']"
+								quote-strings="true"
+								charset="utf-8" 
+								filename="föreningars_medlemsantal.csv">
+								Standard CSV
+							</a>
+						</li>
+						<li>
+							<a ng-csv="doCsvMemberCount();"
+								csv-header="['ID', 'Namn', 'Antal']"
+								quote-strings="true"
+								charset="utf-8" 
+								field-separator=";" 
+								add-bom="true"
+								filename="föreningars_medlemsantal.csv">
+								Excelvänlig CSV
+							</a>
+						</li>
+					</ul>
+				</div>
+				
             </form>
             <div ng-show="selected_org!=null">
                 <h3>{{ view_org.name }} har {{ view_org_members_count }} st. medlemmar.</h3>

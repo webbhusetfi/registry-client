@@ -41,8 +41,14 @@
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" ng-model="invoice_format" value="csv" />
-                        Som datafil i CSV-format.
+                        <input type="radio" ng-model="invoice_format" value="standard_csv" />
+                        Som datafil i standard CSV-format.
+                    </label>
+                </div>
+				<div class="radio">
+                    <label>
+                        <input type="radio" ng-model="invoice_format" value="xl_csv" />
+                        Som datafil i Excelvänligt CSV-format.
                     </label>
                 </div>
                 <div class="alert alert-info">

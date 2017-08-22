@@ -30,7 +30,8 @@ angular.module('RegistryClient')
 .factory('invoiceCsvWriter', ['$log', '$filter', 'globalParams', 'dbHandler', 'FileSaver', 'loadOverlay', 'CSV', 'referenceNumberCalculator', function($log, $filter, globalParams, dbHandler, FileSaver, loadOverlay, CSV, referenceNumberCalculator) {
 
     var invoiceCsvWriter = {
-        run: function(outQry, p) {
+        run: function(outQry, p, f) {
+			// input(query, paid(y/n), format(standard_csv/xl_csv)
             var outquery = {};
             outquery.entryinvoice = outQry;
             
@@ -38,6 +39,11 @@ angular.module('RegistryClient')
                 paid = 'all';
             } else {
                 paid = p;
+            }
+			if (angular.isUndefined(f) || f === null || f == 'standard_csv') {
+                format = 'standard_csv';
+            } else {
+                format = 'xl_csv';
             }
             
             dbHandler
@@ -51,6 +57,11 @@ angular.module('RegistryClient')
                     csv_options.header = ['Ref.nr.', 'Betalat', 'Fakturamall ID', 'ID', 'Typ', 'Namn', 'Förnamn', 'Efternamn', 'Gatuadress', 'Postnummer', 'Postanstalt', 'Land'];
                     csv_options.quoteStrings = "true";
                     csv_options.txtDelim = '"';
+					csv_options.charset = "utf-8";
+					if (format == 'xl_csv') {
+						csv_options.fieldSep = ";";
+						csv_options.addByteOrderMarker = "true";
+					}
 
                     var ret = [];                                                            
                     angular.forEach(response.entryinvoice.data.items, function (value, key) {

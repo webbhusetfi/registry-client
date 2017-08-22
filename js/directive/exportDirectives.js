@@ -54,7 +54,7 @@ angular.module('RegistryClient')
                                     if ($scope.to_be_invoiced_foundcount <= 1000) {
                                         $scope.invoice_format = 'pdf';
                                     } else {
-                                        $scope.invoice_format = 'csv';
+                                        $scope.invoice_format = 'xl_csv';
                                     }
                                     
                                     $scope.invoice_models = response.invoice_models;
@@ -146,8 +146,8 @@ angular.module('RegistryClient')
                                                 
                                                 if ($scope.invoice_format == 'pdf') {
                                                     invoicePdfWriter.run(outquery.invoiceModel, outquery.entryinvoice);
-                                                } else if ($scope.invoice_format == 'csv') {
-                                                    invoiceCsvWriter.run(outquery.entryinvoice);
+                                                } else {
+                                                    invoiceCsvWriter.run(outquery.entryinvoice, 'all', $scope.invoice_format);	// standrd_csv || xl_csv
                                                 }
                                                 
                                             }
@@ -178,7 +178,12 @@ angular.module('RegistryClient')
     })
     .directive('xgCsvExportButton', function($window, $log, $filter, $uibModal, globalParams, dbHandler, loadOverlay) {
         return {
-            template: '<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" uib-tooltip="Ladda ner"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+			/*
+			original:
+			<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8" field-separator=";" add-bom="true" uib-tooltip="Ladda ner"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>
+			*/
+
+            template: '<div class="btn-group" uib-dropdown uib-tooltip="Ladda ner" ng-hide="csvExportProcessing" ><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" uib-dropdown-toggle><i class="fa fa-download"></i> <span class="caret"></span></button><ul uib-dropdown-menu class="dropdown-menu" role="menu"><li><a ng-csv="doCsvExport();" quote-strings="true" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8">Standard CSV</a></li><li><a ng-csv="doCsvExport();" quote-strings="true" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8" field-separator=";" add-bom="true">Excelvänlig CSV</a></li></ul></div><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
