@@ -183,7 +183,7 @@ angular.module('RegistryClient')
 			<a class="btn btn-default" ng-csv="doCsvExport();" quote-strings="true" ng-hide="csvExportProcessing" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8" field-separator=";" add-bom="true" uib-tooltip="Ladda ner"><i class="fa fa-download"></i></a><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>
 			*/
 
-            template: '<div class="btn-group" uib-dropdown uib-tooltip="Ladda ner" ng-hide="csvExportProcessing" ><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" uib-dropdown-toggle><i class="fa fa-download"></i> <span class="caret"></span></button><ul uib-dropdown-menu class="dropdown-menu" role="menu"><li><a ng-csv="doCsvExport();" quote-strings="true" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8">Standard CSV</a></li><li><a ng-csv="doCsvExport();" quote-strings="true" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8" field-separator=";" add-bom="true">Excelvänlig CSV</a></li></ul></div><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
+            template: '<div class="btn-group" uib-dropdown uib-tooltip="Ladda ner" ng-hide="csvExportProcessing"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" uib-dropdown-toggle><i class="fa fa-download"></i> <span class="caret"></span></button><ul uib-dropdown-menu class="dropdown-menu" role="menu"><li><a ng-csv="doCsvExport(\'standard_csv\');" quote-strings="true" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8">Standard CSV</a></li><li><a ng-csv="doCsvExport(\'xl_csv\');" quote-strings="true" filename="{{ fileName(); }}" csv-header="doCsvHeaders(config.query.arguments.filter.type)" charset="utf-8" field-separator=";" add-bom="true">Excelvänlig CSV</a></li></ul></div><div class="btn btn-danger" ng-show="csvExportProcessing"><i class="fa fa-refresh fa-spin"></i></div>',
             link: function(scope) {
                 scope.doCsvHeaders = function (type) {
                     scope.headers = {
@@ -199,7 +199,7 @@ angular.module('RegistryClient')
                     return fn;
                 }
                 
-                scope.doCsvExport = function () {
+                scope.doCsvExport = function (outputtype) {
                     scope.csvExportProcessing = true;                    
                     return dbHandler
                         .parse(true)
@@ -232,11 +232,11 @@ angular.module('RegistryClient')
                                         value.birthMonth,
                                         value.birthYear,
                                         ((value.address) ? value.address.street : null),
-                                        ((value.address) ? value.address.postalCode : null),
+                                        ((value.address && value.address.postalCode) ? ((outputtype == 'xl_csv') ? '="' + value.address.postalCode + '"' : value.address.postalCode) : null),
                                         ((value.address) ? value.address.town : null),
                                         ((value.address) ? value.address.country : null),
                                         ((value.address) ? value.address.email : null),
-                                        ((value.address) ? value.address.mobile : null),
+                                        ((value.address && value.address.mobile) ? ((outputtype == 'xl_csv') ? '="' + value.address.mobile + '"' : value.address.mobile) : null),
                                         ((value.address) ? value.address.phone : null),
                                         ((value.gender) ? ((value.gender=='MALE') ? 'Man' : 'Kvinna') : null),
                                         $filter('date')(new Date(value.createdAt), "d.M.yyyy HH:mm")
@@ -250,11 +250,11 @@ angular.module('RegistryClient')
                                         value.account,
                                         value.vat,
                                         ((value.address) ? value.address.street : null),
-                                        ((value.address) ? value.address.postalCode : null),
+                                        ((value.address && value.address.postalCode) ? ((outputtype == 'xl_csv') ? '="' + value.address.postalCode + '"' : value.address.postalCode) : null),
                                         ((value.address) ? value.address.town : null),
                                         ((value.address) ? value.address.country : null),
                                         ((value.address) ? value.address.email : null),
-                                        ((value.address) ? value.address.mobile : null),
+                                        ((value.address && value.address.mobile) ? ((outputtype == 'xl_csv') ? '="' + value.address.mobile + '"' : value.address.mobile) : null),
                                         ((value.address) ? value.address.phone : null),
                                          $filter('date')(new Date(value.createdAt), "d.M.yyyy HH:mm")
                                     ];

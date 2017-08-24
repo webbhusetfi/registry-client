@@ -82,7 +82,7 @@ angular.module('RegistryClient')
                                 row.h = '-';
                             }
                             row.i = ((value.entry.primaryAddress) ? value.entry.primaryAddress.street : null);
-                            row.j = ((value.entry.primaryAddress) ? value.entry.primaryAddress.postalCode : null);
+                            row.j = ((value.entry.primaryAddress && value.entry.primaryAddress.postalCode) ? ((format == 'xl_csv') ? '="' + value.entry.primaryAddress.postalCode + '"' : value.entry.primaryAddress.postalCode) : null),
                             row.k = ((value.entry.primaryAddress) ? value.entry.primaryAddress.town : null);
                             row.l = ((value.entry.primaryAddress) ? value.entry.primaryAddress.country : null);                        
                             ret.push(row);
