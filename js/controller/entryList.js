@@ -151,7 +151,7 @@ angular.module('RegistryClient')
                 var typeCols = {
                     "name": {
                         "label":"Namn",
-                        "link":"/entry/edit/[id]",
+                        //"link":"/entry/edit/[id]",
                         "filter":true,
                         "sorter":true
                     }
@@ -162,13 +162,13 @@ angular.module('RegistryClient')
                 var typeCols = {
                     "firstName": {
                         "label":"Förnamn",
-                        "link":"/entry/edit/[id]",
+                        //"link":"/entry/edit/[id]",
                         "filter":true,
                         "sorter":true
                     },
                     "lastName": {
                         "label":"Efternamn",
-                        "link":"/entry/edit/[id]",
+                        //"link":"/entry/edit/[id]",
                         "filter":true,
                         "sorter":true
                     }

@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-    .directive('xgPagination', function($exceptionHandler, $window, $log, dbHandler, dialogHandler) {
+    .directive('xgPagination', function($exceptionHandler, $window, $log, dbHandler, dialogHandler, globalParams) {
         return {
             restrict: 'E',
             templateUrl: 'js/directive/template/pagination.html',
@@ -7,7 +7,9 @@ angular.module('RegistryClient')
             scope: {
                 limit: '=',
                 offset: '=',
-                count: '='
+                count: '=',
+				query: '=',
+				include: '='
             },
             controller: function($scope, $rootScope) {
                 $scope.next = 1;
@@ -44,6 +46,8 @@ angular.module('RegistryClient')
                 });
                 
                 $scope.pagination = function(id) {
+					globalParams.set('entryList.query', $scope.query);
+					globalParams.set('entryList.include', $scope.include);
                     $scope.offset = $scope.limit * id;
                     $scope.active = id;
                     $scope.next = Number(id)+1;
