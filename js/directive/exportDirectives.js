@@ -275,6 +275,7 @@ angular.module('RegistryClient')
             link: function(scope) {
                 scope.doPdfLabelExport = function () {
                     scope.pdfLabelsProcessing = true;
+					
                     dbHandler
                         .parse(true)
                         .getEntries({
@@ -287,10 +288,7 @@ angular.module('RegistryClient')
                                 "type":scope.config.query.arguments.filter.type,
                                 "parentEntry":((globalParams.get('user').role == 'USER') ? globalParams.get('user').entry : scope.config.query.arguments.filter.parentEntry),
                             }, scope.config.query.arguments.filter),
-                            "order": {
-                                "lastName":"asc",
-                                "name":"asc"
-                            }
+                            "order": scope.config.query.arguments.order
                         })
                         .runQuery()
                         .then(function(response) {
