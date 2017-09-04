@@ -208,7 +208,8 @@ angular.module('RegistryClient')
         $scope.entry.address[id].class = type;
     };
     
-    $scope.deleteEntry = function(item) {
+    $scope.deleteEntry = function(mem) {
+		/*
         dialogHandler.deleteConfirm(item, {
             "entry": {
                 "service":"entry/delete",
@@ -218,7 +219,73 @@ angular.module('RegistryClient')
                 }
             }
         });
+		*/
+		
+		del = {};
+		del.item = {'id': mem.id, 'name': mem.name, 'type': mem.type };
+		del.query = {
+            "entry": {
+                "service":"entry/delete",
+                "arguments": {
+                    "id": mem.id,
+                    "type": mem.type,
+                }
+            }
+        };
+		
+		del.completed = {'action':'back'};
+		
+		dialogHandler.deleteConfirm(del);
     };
+	
+    
+    $scope.deleteMembershipForUser = function(item) {
+		if (globalParams.get('user').role == 'USER') {
+			qry = {
+				"connection": {
+					"service":"connection/search",
+					"arguments": {
+						"filter": {
+							"registry": globalParams.get('user').registry,
+							"childEntry": item.id,	// user
+							"parentEntry": globalParams.get('user').entry	// förening
+						}
+					}
+				}
+			};
+			
+			dbHandler
+			.setQuery(qry)
+			.parse(false)
+			.runQuery()
+			.then(function(response) {
+				if (response.connection.status == 'error') {
+					$window.alert(response.connection.message);
+				} else if (response.connection.status == 'success' && response.connection.data.foundCount == 1) {
+					if (conn = response.connection.data.items[0]) {
+						conn.name = item.name;
+						del = {};
+						del.item = conn;
+						del.query = {
+							"conn":{
+								"service":"connection/delete",
+								"arguments": {
+									"id": conn.id
+								}
+							}
+						};
+						del.completed = {'action':'back'};
+						dialogHandler.deleteConfirm(del);
+					}
+				} else {
+					$window.alert("Ett fel inträffade");
+				}
+			})
+			.catch(function(response) {
+				$log.error(response);
+			});
+		}
+    }
 
     dbHandler
         .getEntries({
@@ -404,7 +471,7 @@ angular.module('RegistryClient')
                     });
                     if(_.size(connections) > 0)
                         dbHandler.setQuery(connections);
-                    
+
                     if($scope.meta.membershipDelete) {
                         var membershipDelete = {};
                         angular.forEach($scope.meta.membershipDelete, function(value, key) {

@@ -146,7 +146,7 @@
                     </div>
                 </div>
                 <hr>
-                <div ng-show="entry.type !== 'UNION'">
+                <div ng-show="entry.type !== 'UNION' && globalParams.get('user').role !== 'USER'">
                     <h2>Tillhörighet</h2>
                     <div class="membership-list" ng-show="entry.connection !== undefined">
                         <div ng-repeat="(key, connection) in entry.connection" ng-form="ngvalidation.connection[key]">
@@ -454,12 +454,17 @@
                             <a
                                 ng-show="entry.type == 'ASSOCIATION' && globalParams.get('user').role != 'USER'"
                                 class="btn btn-default"
-                                ng-click="deleteEntry({'id':entry.id,'name':entry.name, 'type':entry.type, 'post':{'action':'back'}})"
+                                ng-click="deleteEntry({'id':entry.id,'name':entry.name, 'type':entry.type})"
                             ><i class="fa fa-times"></i> Radera</a>
                             <a
                                 ng-show="entry.type == 'MEMBER_PERSON' && globalParams.get('user').role != 'USER'"
                                 class="btn btn-default"
-                                ng-click="deleteEntry({'id':entry.id,'name':entry.firstName + ' ' + entry.lastName, 'type':entry.type, 'post':{'action':'back'}})"
+                                ng-click="deleteEntry({'id':entry.id,'name':entry.firstName + ' ' + entry.lastName, 'type':entry.type})"
+                            ><i class="fa fa-times"></i> Radera</a>
+							<a
+                                ng-show="entry.type == 'MEMBER_PERSON' && globalParams.get('user').role == 'USER'"
+                                class="btn btn-default"
+                                ng-click="deleteMembershipForUser({'id':entry.id,'name':entry.firstName + ' ' + entry.lastName})"
                             ><i class="fa fa-times"></i> Radera</a>
                         </div>
                     </div>

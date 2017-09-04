@@ -70,11 +70,13 @@ angular.module('RegistryClient')
                 }
             },
             "completed": function() {
+				// reset query
+				$scope.config.list.functions.deleteDialog.query.entry.arguments = ["id", "type"];
                 $scope.config.query.force_refresh = Math.random();
             }
         }
     }
-    
+	
     // set include columns (separate from query, separate handler)
     $scope.setInclude = function(include) {
         if($scope.config.include == include) {
