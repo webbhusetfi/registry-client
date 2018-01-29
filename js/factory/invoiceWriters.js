@@ -384,11 +384,11 @@ angular.module('RegistryClient')
                                         document.fontSize(7);
                                         document.text('IBAN', 90, 529+y); 
                                         document.text('Saajan', 30, 534+y, {'width': 51, 'align': 'right'});
-                                        document.text('tiltinumero', 30, 541+y, {'width': 51, 'align': 'right'});
+                                        document.text('tilinumero', 30, 541+y, {'width': 51, 'align': 'right'});
                                         document.text('Mottagarens', 30, 548+y, {'width': 51, 'align': 'right'});
                                         document.text('kontonummer', 30, 555+y, {'width': 51, 'align': 'right'});
                                         
-                                        document.text('Saajan', 30, 572+y, {'width': 51, 'align': 'right'});
+                                        document.text('Saaja', 30, 572+y, {'width': 51, 'align': 'right'});
                                         document.text('Mottagare', 30, 579+y, {'width': 51, 'align': 'right'});
                                         
                                         document.text('Maksajan', 30, 604+y, {'width': 51, 'align': 'right'});
