@@ -323,6 +323,7 @@ angular.module('RegistryClient')
 
                                         current += row;
                                         current += row;
+                                        current += row;
                                         document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
                                         current += row;
                                         current += row;
@@ -330,11 +331,40 @@ angular.module('RegistryClient')
                                             invoicemodel.message,
                                             margin, 
                                             current, 
-                                            {'width':fullwidth, 'height': row * 18});
-                                        current += row*18;
-                                        
-                                        document.fontSize(10);
+                                            {'width':fullwidth, 'height': row * 28});
+                                        current += row*28;
+                                        //document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
+                                        current += row;
+                                        current += row;
 
+                                        //document.text("Mottagarens bank och kontonr.:", margin, current, {'width': halfpage, 'height': row});
+                                        //document.text(invoicemodel.bank + ', ' + invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                        
+                                        document.text("Mottagarens bank:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.bank, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                        current += row;
+                                        document.text("Mottagarens kontonr.:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.bankAccount, col_2_1, current, {'width': halfpage, 'height': row}); 
+                                        current += row;
+                                        document.text("Mottagare:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicer.name, col_2_1, current, {'width': halfpage, 'height': row});
+                                        current += row;
+                                        document.text("Meddelande:", margin, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.description, col_2_1, current, {'width': halfpage, 'height': row*2});
+                                        current += row;
+                                        current += row;
+                                        current += row;
+                                        document.font('Helvetica-Bold');
+                                        document.text("Referensnummer: " + referenceNumberCalculator.calculate(value.id), margin, current).stroke();
+                                        document.text("Summa:", col_2_1, current, {'width': halfpage, 'height': row});
+                                        document.text(invoicemodel.amount, col_2_2, current, {'width': halfpage, 'height': row});
+                                        document.font('Helvetica');
+                                        current += row;
+                                        document.rect(margin-10, current-row*8, fullwidth+20, row*9).stroke()
+                                        current += row;
+                                        current += row;
+                                        current += row;
+                                        document.fontSize(10);
                                         document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
                                         current += row;
                                         document.text(invoicer.name, margin, current, {'width': halfpage, 'height': row});
@@ -346,131 +376,6 @@ angular.module('RegistryClient')
                                         document.text("E-post: " + ((invoicer_adr.email) ? invoicer_adr.email : '-'), col_2_1, current, {'width': halfpage, 'height': row});
                                         current += row;
                                         document.text(((invoicer_adr.postalCode) ? invoicer_adr.postalCode : '') + ' ' + ((invoicer_adr.town) ? invoicer_adr.town : ''), margin, current, {'width': halfpage, 'height': row});
-                                        
-                                        current += row;
-                                        document.moveTo(margin, current).lineTo(fullwidth+margin, current).stroke();
-                                        
-                                        // NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-                                        // H
-                                        
-                                        y = 20;
-                                        
-                                        document.dash(2);
-                                        document.moveTo(25, 526+y).lineTo(573, 526+y).lineWidth(0.4).stroke();
-                                        
-                                        document.undash();
-                                        document.moveTo(25, 567+y).lineTo(573, 567+y).lineWidth(1.4).stroke();
-                                        
-                                        document.moveTo(25, 602+y).lineTo(310, 602+y).lineWidth(1.4).stroke();
-                                        
-                                        document.moveTo(25, 693+y).lineTo(573, 693+y).lineWidth(1.4).stroke();
-                                        
-                                        document.moveTo(96, 683+y).lineTo(310, 683+y).lineWidth(0.2).stroke();
-                                        document.moveTo(25, 716+y).lineTo(573, 716+y).lineWidth(1.4).stroke();
-                                        document.moveTo(310, 670+y).lineTo(573, 670+y).lineWidth(1.4).stroke();
-                                        
-                                        
-                                        // V
-                                        document.moveTo(84, 526+y).lineTo(84, 602+y).lineWidth(1.4).stroke();
-                                        
-                                        document.moveTo(310, 526+y).lineTo(310, 716+y).lineWidth(1.4).stroke();
-                                        
-                                        document.moveTo(359, 670+y).lineTo(359, 716+y).lineWidth(1.4).stroke();
-                                        
-                                        document.moveTo(445, 693+y).lineTo(445, 716+y).lineWidth(1.4).stroke();
-                                        document.moveTo(84, 693+y).lineTo(84, 716+y).lineWidth(0.2).stroke();
-                                        
-                                        // Labels
-                                        document.fontSize(7);
-                                        document.text('IBAN', 90, 529+y); 
-                                        document.text('Saajan', 30, 534+y, {'width': 51, 'align': 'right'});
-                                        document.text('tiltinumero', 30, 541+y, {'width': 51, 'align': 'right'});
-                                        document.text('Mottagarens', 30, 548+y, {'width': 51, 'align': 'right'});
-                                        document.text('kontonummer', 30, 555+y, {'width': 51, 'align': 'right'});
-                                        
-                                        document.text('Saajan', 30, 572+y, {'width': 51, 'align': 'right'});
-                                        document.text('Mottagare', 30, 579+y, {'width': 51, 'align': 'right'});
-                                        
-                                        document.text('Maksajan', 30, 604+y, {'width': 51, 'align': 'right'});
-                                        document.text('nimi ja', 30, 611+y, {'width': 51, 'align': 'right'});
-                                        document.text('osoite', 30, 618+y, {'width': 51, 'align': 'right'});
-                                        document.text('Betalarens', 30, 625+y, {'width': 51, 'align': 'right'});
-                                        document.text('namn och', 30, 632+y, {'width': 51, 'align': 'right'});
-                                        document.text('adress', 30, 639+y, {'width': 51, 'align': 'right'});
-                                        
-                                        document.text('Allekirjoitus', 30, 678+y, {'width': 51, 'align': 'right'});
-                                        document.text('Underskrift', 30, 685+y, {'width': 51, 'align': 'right'});
-                                        
-                                        document.save();
-                                        document.rotate(-90, {'origin': [30, 689+y]});
-                                        document.font('Helvetica-Bold');
-                                        document.text('TILISIIRTO. GIRERING', 35, 689+y, {'width': 88});
-                                        document.font('Helvetica');
-                                        document.restore();
-
-                                        document.text('Tililtä nro', 30, 698+y, {'width': 51, 'align': 'right'});
-                                        document.text('Från konto nr', 30, 705+y, {'width': 51, 'align': 'right'});
-                                        
-                                        document.text('BIC', 314, 529+y);
-                                        document.text('Viitenumero', 314, 673+y, {'width': 51});
-                                        document.text('Ref. nr', 314, 680+y, {'width': 51});
-                                        
-                                        document.text('Eräpäivä', 314, 696+y, {'width': 51});
-                                        document.text('Förfallodag', 314, 703+y, {'width': 51});
-                                        
-                                        document.text('Euro', 449, 696+y, {'width': 51});
-                                        
-                                        document.fontSize(6);
-                                        document.text('Maksu välitetään saajalle maksujenvälityksen ehtojen', 415, 724+y, {'width': 155});
-                                        document.text('mukaisesti ja vain maksajan ilmoittaman tilinumeron', 415, 731+y, {'width': 155});
-                                        document.text('perusteella.', 415, 738+y, {'width': 155});
-                                        
-                                        document.text('Betalningen förmedlas till mottagaren enligt villkoren', 415, 745+y, {'width': 155});
-                                        document.text('för betalningsförmedling och endast till det', 415, 752+y, {'width': 155});
-                                        document.text('kontonummer som betalaren angivit.', 415, 759+y, {'width': 155});
-                                        
-                                        document.fontSize(10);
-                                        
-                                        document.text(invoicemodel.bankAccount, 90, 537+y, {'width': 220, 'height': 27});
-                                        document.text(invoicemodel.bank, 314, 537+y, {'width': 258, 'height': 27});
-                                        
-                                        document.text(invoicer.name, 90, 572+y, {'width': 220, 'height': 27});
-                                        
-
-                                        if (invoicee_adr) {
-                                            if (Object.keys(invoicee_adr).length) {
-                                                if (invoicee.type == 'MEMBER_PERSON') {
-                                                    document.text(invoicee.firstName + ' ' + invoicee.lastName, 90, 607+y, {'width': 220});
-                                                } else {    
-                                                    document.text(invoicee.name, 90, 607+y, {'width': 220});
-                                                }
-                                                if (invoicee_adr.street) {
-                                                    document.text(invoicee_adr.street, 90, 619+y, {'width': 220});
-                                                }
-                                                if (invoicee_adr.postalCode && invoicee_adr.town) {
-                                                    document.text(invoicee_adr.postalCode + ' ' + invoicee_adr.town, 90, 631+y, {'width': 220});
-                                                    
-                                                }
-                                                if (invoicee_adr.country) {
-                                                    document.text(invoicee_adr.country, 90, 643+y, {'width': 220});
-                                                }
-                                            }
-                                        } else {
-                                            if (invoicee.type == 'MEMBER_PERSON') {
-                                                document.text(invoicee.firstName + ' ' + invoicee.lastName, 90, 607+y, {'width': 220});
-                                            } else {    
-                                                document.text(invoicee.name, 90, 607+y, {'width': 220});
-                                            }
-                                        }
-                                        
-                                        document.text(invoicemodel.description, 319, 572+y, {'width': 258, 'height': 95});
-                                        
-                                        document.text(referenceNumberCalculator.calculate(value.id), 363, 679+y, {'width': 258, 'height': 15});
-                                        
-                                        document.text($filter('date')(new Date(invoicemodel.dueAt), "d.M.yyyy"), 363, 703+y, {'width': 106, 'height': 15});
-                                        
-                                        document.text(invoicemodel.amount, 465, 703+y, {'width': 106, 'height': 15});
-                                        
                                     }
                                 });
                                 // page end

@@ -1,5 +1,5 @@
 angular.module('RegistryClient')
-.controller('statController', function ($scope, $http, globalParams, dbHandler) {
+.controller('statController', function ($scope, $http, globalParams, dbHandler, $filter) {
     $scope.globalParams = globalParams;
     
     $scope.doCsvMemberCount = function () {
@@ -237,14 +237,17 @@ angular.module('RegistryClient')
                 $scope.view_org_members_count = response.count.data[0].found;
 
                 var labels = [];
+                var labels2 = [];
                 var data = [];
                 angular.forEach(response.gender.data, function (value, key) {
-                    labels.push(gender_lang[value.gender]);    
+                    labels2.push(gender_lang[value.gender]);    
+                    labels.push(gender_lang[value.gender] + ': ' + $filter('number')((value.found/$scope.view_org_members_count)*100, 0) + '% (' + value.found + ' st.)');    
                     data.push(value.found);
                 });
                 $scope.view_org_gender.labels = labels;
+                $scope.view_org_gender.labels2 = labels2;
                 $scope.view_org_gender.data = data;
-
+                
                 var labels = [];
                 var data = [];
                 var d = [];

@@ -67,14 +67,16 @@
         </div>
         <div class="col-sm-12 col-lg-6">
             <strong>Könsfördelning</strong><br />
+     
             <small><em>
                 <span ng-repeat="g in view_org_gender.data track by $index">
-                    {{ view_org_gender.labels[$index] }}: {{ (view_org_gender.data[$index]/view_org_members_count)*100 |number:0 }}%
+                    {{ view_org_gender.labels2[$index] }}: {{ (view_org_gender.data[$index]/view_org_members_count)*100 |number:0 }}% ({{view_org_gender.data[$index]}} st.)
                     <span ng-show="$index+1 != view_org_gender.data.length">, </span>
                 </span>
             </em></small>
-            <canvas id="pie" class="chart chart-pie" chart-legend="true" ng-show="view_org_gender_show"
-                chart-data="view_org_gender.data" chart-labels="view_org_gender.labels">
+    
+            <canvas id="pie" class="chart chart-pie" chart-legend="true" ng-show="view_org_gender_show" chart-options="{legend:{display: false}, tooltips:{enabled:true,}}"
+                chart-data="view_org_gender.data" chart-labels="view_org_gender.labels2">
             </canvas> 
         </div>
     </div>
