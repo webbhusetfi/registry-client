@@ -98,7 +98,8 @@ angular.module('RegistryClient')
     }
     
     // main query object
-    if (globalParams.get('entryList')) {
+    //if (globalParams.get('entryList')) {
+    if ( !angular.isUndefined(globalParams.get('entryList.query')) && !angular.isUndefined(globalParams.get('entryList.include'))) {
         $scope.config.query = globalParams.get('entryList.query');
         $scope.setInclude(globalParams.get('entryList.include'));
         $scope.config.query.arguments.filter.registry = globalParams.get('user.registry');
